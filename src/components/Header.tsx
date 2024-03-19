@@ -4,23 +4,46 @@ import { ModeToggle } from "@/components/DarkModeToggle"
 import { MainNav } from "@/components/MainNav"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
+import { useToast } from "@/components/ui/use-toast"
 import detectEthereumProvider from "@metamask/detect-provider"
-import { useEffect, useState } from "react"
+import { useRouter } from 'next/navigation'
+import { createContext, useContext, useEffect, useState } from "react"
 import { Web3 } from 'web3'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@/components/ui/navigation-menu"
+import NavbarItem from "@/components/NavBarItem"
 
 export default function Header() {
-  const [hasProvider, setHasProvider] = useState<boolean | null>(null);
+    const [hasProvider, setHasProvider] = useState<boolean | null>(null);
+    const [isExitsAccount, setAccount] = useState<boolean | null>(null)
     const initialState = { accounts: [] };             
     const [wallet, setWallet] = useState(initialState);
-
+    const Router = useRouter();
+    const { toast } = useToast()
+    
     useEffect(() => {
         const getProvider = async () => {
             const provider = await detectEthereumProvider({ silent: true });
             setHasProvider(Boolean(provider));
-        };
+        };  
 
+        const getAccount = async () => {
+          setAccount(false)
+        }
+
+        getAccount()
         getProvider();
     }, []);
+
+
 
     const updateWallet = async (accounts: any) => {    
         setWallet({ accounts });                       
@@ -29,34 +52,42 @@ export default function Header() {
     const handleConnect = async () => {                
         let accounts = await window.ethereum.request({ 
             method: "eth_requestAccounts",             
-        });                                            
-        updateWallet(accounts);    
-        console.log(wallet.accounts.length == 0 );
+        });                    
+        localStorage.setItem('address-wallet', accounts[0])                        
+        updateWallet(accounts);
+        if(!isExitsAccount)     { 
+          toast({
+            title: "Account not found",
+            description: "Please register to create an account",
+            variant: "destructive",
+            duration: 2000,
+          })
+          Router.push('/register')
+        }
     };                    
   
   return (
     <header className="bg-background sticky top-0 z-40 w-full border-b">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <MainNav/>
+        <MainNav />
+        <NavbarItem  />
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
-                    {wallet.accounts.length > 0 && (            /* New */
+                    {wallet.accounts.length > 0 && (            
                 <div>
                  <Button variant={"outline"} onClick={handleConnect}> 
                     <Icons.login className="h-5 w-5 me-2"/> {wallet.accounts[0]}
                 </Button>
                 </div>
             )}
-             {wallet.accounts.length == 0 && (            /* New */
+             {wallet.accounts.length == 0 && (            
                 <div>
                  <Button variant={"outline"} onClick={handleConnect}> 
-                    <Icons.login className="h-5 w-5 me-2"/> CONNECT TO METAMASK
+                    <Icons.login className="h-5 w-5 me-2"/> <div className="font-semibold">  CONNECT TO METAMASK </div>
                 </Button>
                 </div>
             )}
                     <ModeToggle/>
-
-
           </nav>
         </div>
       </div>

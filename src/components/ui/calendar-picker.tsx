@@ -20,8 +20,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function CalendarPicker() {
-  const [date, setDate] = React.useState<Date>()
+interface DatePicker {
+  selectedDate: Date | undefined
+  onDateChange: (newDate: any) => void
+}
+
+export function CalendarPicker({ selectedDate, onDateChange }: DatePicker) {
 
   return (
     <Popover>
@@ -30,11 +34,11 @@ export function CalendarPicker() {
           variant={"outline"}
           className={cn(
             "w-[210px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !selectedDate && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -43,7 +47,7 @@ export function CalendarPicker() {
       >
         <Select
           onValueChange={(value: any) =>
-            setDate(addDays(new Date(), parseInt(value)))
+            onDateChange(addDays(new Date(), parseInt(value)))
           }
         >
           <SelectTrigger>
@@ -57,7 +61,7 @@ export function CalendarPicker() {
           </SelectContent>
         </Select>
         <div className="rounded-md border">
-          <Calendar mode="single" selected={date} onSelect={setDate} />
+          <Calendar mode="single" selected={selectedDate} onSelect={onDateChange} />
         </div>
       </PopoverContent>
     </Popover>

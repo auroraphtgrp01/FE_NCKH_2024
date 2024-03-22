@@ -2,8 +2,10 @@ import z from 'zod'
 
 export const GetSmartContract = z
     .object({
-        addressContract: z.string().min(42).max(42),
-        abi: z.string()
+        addressContract: z.string(),
+        abi: z.optional(z.string()),
+        typeContract: z.string(),
+        addressWallet: z.optional(z.string()),
     })
     .strict()
 

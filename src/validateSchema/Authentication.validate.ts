@@ -2,13 +2,13 @@ import z from 'zod'
 
 export const RegisterBody = z
     .object({
-        addressWallet: z.string().min(42).max(42),
+        addressWallet: z.optional(z.string()),
         name: z.string().trim().min(2).max(256),
         email: z.string().email(),
-        indentifyCard: z.string().min(9).max(12),
+        indentifyNumber: z.string().min(12).max(12),
         phoneNumber: z.string().min(10).max(11),
-        gender: z.boolean(),
-        dateOfBirth: z.date(),
+        gender: z.string(),
+        dateOfBirth: z.optional(z.string()),
     })
     .strict()
 
@@ -46,3 +46,10 @@ export type RefreshSessionBodyType = z.TypeOf<typeof RefreshSessionBody>
 export const RefreshSessionRes = RegisterRes
 
 export type RefreshSessionResType = z.TypeOf<typeof RefreshSessionRes>
+
+
+export const PIN = z
+    .object({
+        PIN: z.string().min(6).max(6),
+    })
+    .strict()

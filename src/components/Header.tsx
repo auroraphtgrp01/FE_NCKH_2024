@@ -20,74 +20,75 @@ import {
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu"
 import NavbarItem from "@/components/NavBarItem"
+import { useAppContext } from "@/components/ThemeProvider"
 
 export default function Header() {
-    const [hasProvider, setHasProvider] = useState<boolean | null>(null);
-    const [isExitsAccount, setAccount] = useState<boolean | null>(null)
-    const initialState = { accounts: [] };             
-    const [wallet, setWallet] = useState(initialState);
-    const Router = useRouter();
-    const { toast } = useToast()
-    
-    useEffect(() => {
-        const getProvider = async () => {
-            const provider = await detectEthereumProvider({ silent: true });
-            setHasProvider(Boolean(provider));
-        };  
+  const [hasProvider, setHasProvider] = useState<boolean | null>(null);
+  const [isExitsAccount, setAccount] = useState<boolean | null>(null)
 
-        const getAccount = async () => {
-          setAccount(false)
-        }
+  const { wallet, setWallet }: any = useAppContext()
+  const Router = useRouter();
+  const { toast } = useToast()
 
-        getAccount()
-        getProvider();
-    }, []);
+  useEffect(() => {
+    const getProvider = async () => {
+      const provider = await detectEthereumProvider({ silent: true });
+      setHasProvider(Boolean(provider));
+    };
+
+    const getAccount = async () => {
+      setAccount(true)
+    }
+
+    getAccount()
+    getProvider();
+  }, []);
 
 
 
-    const updateWallet = async (accounts: any) => {    
-        setWallet({ accounts });                       
-    };                                                 
+  const updateWallet = async (accounts: any) => {
+    setWallet({ accounts });
+  };
 
-    const handleConnect = async () => {                
-        let accounts = await window.ethereum.request({ 
-            method: "eth_requestAccounts",             
-        });                    
-        localStorage.setItem('address-wallet', accounts[0])                        
-        updateWallet(accounts);
-        if(!isExitsAccount)     { 
-          toast({
-            title: "Account not found",
-            description: "Please register to create an account",
-            variant: "destructive",
-            duration: 2000,
-          })
-          Router.push('/register')
-        }
-    };                    
-  
+  const handleConnect = async () => {
+    let accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+    localStorage.setItem('address-wallet', accounts[0])
+    updateWallet(accounts);
+    if (!isExitsAccount) {
+      toast({
+        title: "Account not found",
+        description: "Please register to create an account",
+        variant: "destructive",
+        duration: 2000,
+      })
+      Router.push('/register')
+    }
+  };
+
   return (
     <header className="bg-background sticky top-0 z-40 w-full border-b">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
         <MainNav />
-        <NavbarItem  />
+        <NavbarItem />
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-1">
-                    {wallet.accounts.length > 0 && (            
-                <div>
-                 <Button variant={"outline"} onClick={handleConnect}> 
-                    <Icons.login className="h-5 w-5 me-2"/> {wallet.accounts[0]}
+            {wallet.accounts.length > 0 && (
+              <div>
+                <Button variant={"outline"} onClick={handleConnect}>
+                  <Icons.login className="h-5 w-5 me-2" /> {wallet.accounts[0]}
                 </Button>
-                </div>
+              </div>
             )}
-             {wallet.accounts.length == 0 && (            
-                <div>
-                 <Button variant={"outline"} onClick={handleConnect}> 
-                    <Icons.login className="h-5 w-5 me-2"/> <div className="font-semibold">  CONNECT TO METAMASK </div>
+            {wallet.accounts.length == 0 && (
+              <div>
+                <Button variant={"outline"} onClick={handleConnect}>
+                  <Icons.login className="h-5 w-5 me-2" /> <div className="font-semibold">  CONNECT TO METAMASK </div>
                 </Button>
-                </div>
+              </div>
             )}
-                    <ModeToggle/>
+            <ModeToggle />
           </nav>
         </div>
       </div>

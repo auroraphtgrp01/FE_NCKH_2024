@@ -55,39 +55,80 @@ import {
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
+import { fetchAPI } from "@/utils/fetchAPI"
 
-const data: Payment[] = [
+export interface Participant {
+    userId: string
+    fullName: string
+    addressWallet: string
+    position: string
+    company: string
+    avatar?: string
+}
+
+const data: Contract[] = [
     {
         id: "m5gr84i9",
         status: "SUCCESS",
         address: "0x4f19cf235dee93c0105d40083ae214b060001a7ef22ade30e5adce0cee5b0fb6",
-        participants: ['', ''],
+        typeID: "e8d5c929-9d64-41b0-bf09-bcdf41412480",
+        typeName: "SCM Contract ",
+    },
+    {
+        id: "m5gr84i9",
+        status: "FAILED",
+        address: "0x4f19cf235dee93c0105d40083ae214b060001a7ef22ade30e5adce0cee5b0fb6",
+        typeID: "e8d5c929-9d64-41b0-bf09-bcdf41412480",
+        typeName: "Buy/Sell Contract",
     },
 ]
 
-export type Payment = {
+export type Contract = {
     id: string
     address: string
     status: "PENDING" | "SUCCESS" | "FAILED"
-    participants: string[]
+    typeID: string
+    typeName: string
 }
 
-
+const initParticipants: Participant[] = [{
+    addressWallet: '',
+    company: '',
+    fullName: '',
+    position: '',
+    userId: '',
+    avatar: ''
+}, {
+    addressWallet: '',
+    company: '',
+    fullName: '',
+    position: '',
+    userId: '',
+    avatar: ''
+}]
 
 export default function DataTableDemo() {
     const [sorting, setSorting] = React.useState<SortingState>([])
+    const [participants, setParticipants] = React.useState<Participant[]>(initParticipants)
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
     )
     const [isOpen, setIsOpen] = React.useState(false)
-    function handleOpenParticipant() {
+    async function handleOpenParticipant(addressWallet: string) {
+        await getParticipants(addressWallet)
         setIsOpen(true)
     }
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
 
-    const columns: ColumnDef<Payment>[] = [
+    const getParticipants = async (addressWallet: string) => {
+        fetchAPI(`/contract/participants/${addressWallet}`, 'GET').then((res) => {
+            setParticipants(res.data)
+        })
+    }
+
+    const columns: ColumnDef<Contract>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -122,6 +163,18 @@ export default function DataTableDemo() {
             cell: ({ row }) => <div className="lowercase text-start">{row.getValue("address")}</div>,
         },
         {
+            accessorKey: "typeID",
+            enableHiding: true,
+            header: ({ column }) => {
+                return (
+                    <div className="font-semibold ">
+                        Type Contract
+                    </div>
+                )
+            },
+            cell: ({ row }) => <div className="lowercase text-start">{row.getValue('typeID')}</div>,
+        },
+        {
             accessorKey: "status",
             header: () => {
                 return (
@@ -139,8 +192,8 @@ export default function DataTableDemo() {
             header: () => <div className="text-center font-semibold">Action</div>,
             cell: ({ row }) => {
                 return <div className="text-center">
-                    <Button onClick={handleOpenParticipant}>Participants</Button>
-                    <Link href={`/contract/detail/${row.getValue('address')}`}>
+                    <Button onClick={() => handleOpenParticipant(row.getValue('address'))} >Participants</Button>
+                    <Link href={`/contract/detail/${row.getValue('typeID')}/${row.getValue('address')}`}>
                         <Button className="ms-2" variant={"destructive"}>Detail</Button>
                     </Link>
                 </div>
@@ -299,9 +352,9 @@ export default function DataTableDemo() {
                                     <Card className="me-4 min-w-[250px]">
                                         <CardHeader className="">
                                             <CardTitle>Party A</CardTitle>
-                                            <CardDescription >Director of FPT company</CardDescription>
+                                            <CardDescription>{participants[0].company}</CardDescription>
                                             <Avatar className="min-w-[50px] min-h-[50px] !mt-5 m-auto">
-                                                <AvatarImage src="https://github.com/shadcn.png" className="" />
+                                                <AvatarImage src={participants[1].avatar} className="" />
                                                 <AvatarFallback>CN</AvatarFallback>
                                             </Avatar>
                                         </CardHeader>
@@ -310,15 +363,15 @@ export default function DataTableDemo() {
                                                 <div className="grid w-full items-center gap-4">
                                                     <div className="flex flex-col space-y-1.5">
                                                         <Label htmlFor="name">Full Name:</Label>
-                                                        <Input id="name" value={'Le Minh Tuan'} disabled readOnly />
+                                                        <Input id="name" value={participants[0].fullName} disabled readOnly />
                                                     </div>
                                                     <div className="flex flex-col space-y-1.5">
                                                         <Label htmlFor="name">Address Wallet:</Label>
-                                                        <Input id="name" value={'0x4f19cf235dee93c0105d40083ae214b060001a7ef22ade30e5adce0cee5b0fb6'} disabled readOnly />
+                                                        <Input id="name" value={participants[0].addressWallet} disabled readOnly />
                                                     </div>
                                                     <div className="flex flex-col space-y-1.5">
                                                         <Label htmlFor="name">Position: </Label>
-                                                        <Input id="name" value={'Chair Person'} disabled readOnly />
+                                                        <Input id="name" value={participants[0].position} disabled readOnly />
                                                     </div>
                                                 </div>
                                             </form>
@@ -326,10 +379,10 @@ export default function DataTableDemo() {
                                     </Card>
                                     <Card className="min-w-[250px]">
                                         <CardHeader className="">
-                                            <CardTitle>Party A</CardTitle>
-                                            <CardDescription >Director of FPT company</CardDescription>
+                                            <CardTitle>Party B</CardTitle>
+                                            <CardDescription >{participants[1].company}</CardDescription>
                                             <Avatar className="min-w-[50px] min-h-[50px] !mt-5 m-auto">
-                                                <AvatarImage src="https://github.com/shadcn.png" className="" />
+                                                <AvatarImage src={participants[1].avatar} className="" />
                                                 <AvatarFallback>CN</AvatarFallback>
                                             </Avatar>
                                         </CardHeader>
@@ -338,15 +391,15 @@ export default function DataTableDemo() {
                                                 <div className="grid w-full items-center gap-4">
                                                     <div className="flex flex-col space-y-1.5">
                                                         <Label htmlFor="name">Full Name:</Label>
-                                                        <Input id="name" value={'Le Minh Tuan'} disabled readOnly />
+                                                        <Input id="name" value={participants[1].fullName} disabled readOnly />
                                                     </div>
                                                     <div className="flex flex-col space-y-1.5">
                                                         <Label htmlFor="name">Address Wallet:</Label>
-                                                        <Input id="name" value={'0x4f19cf235dee93c0105d40083ae214b060001a7ef22ade30e5adce0cee5b0fb6'} disabled readOnly />
+                                                        <Input id="name" value={participants[1].addressWallet} disabled readOnly />
                                                     </div>
                                                     <div className="flex flex-col space-y-1.5">
                                                         <Label htmlFor="name">Position: </Label>
-                                                        <Input id="name" value={'Chair Person'} disabled readOnly />
+                                                        <Input id="name" value={participants[1].position} disabled readOnly />
                                                     </div>
                                                 </div>
                                             </form>

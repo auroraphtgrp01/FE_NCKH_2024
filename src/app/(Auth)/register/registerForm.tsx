@@ -47,8 +47,9 @@ import { toast, useToast } from "@/components/ui/use-toast"
 import { fetchAPI } from "@/utils/fetchAPI"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { set } from "date-fns"
-
+import usePreventLeave from 'react-hook-use-prevent-leave';
 export default function RegisterForm() {
+  const [blockPage, setBlockPage] = React.useState<boolean>(true)
   const { wallet, setWallet }: any = useAppContext()
   const [isOpen, setIsOpen] = React.useState(false)
   const [registerId, setRegisterId] = React.useState<string>("")
@@ -58,9 +59,12 @@ export default function RegisterForm() {
   const formPIN = useForm<PINType>({
     resolver: zodResolver(PIN),
   })
+  function togglePageBlock(): void {
+    setBlockPage((prev) => !prev);
+  }
+  usePreventLeave(blockPage);
   const [date, setDate] = React.useState<Date>()
   const { toast } = useToast()
-  console.log(isOpen);
   function isBlockClose() {
     setIsOpen(true)
     toast({
@@ -125,7 +129,6 @@ export default function RegisterForm() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, (error) => {
-              console.log(error)
             })} className="space-y-2 max-w-[400px] flex-shrink-0 w-full">
               <FormField
                 control={form.control}

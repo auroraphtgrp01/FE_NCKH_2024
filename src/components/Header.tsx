@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/navigation-menu"
 import NavbarItem from "@/components/NavBarItem"
 import { useAppContext } from "@/components/ThemeProvider"
+import Link from "next/link"
 
 export default function Header() {
   const [hasProvider, setHasProvider] = useState<boolean | null>(null);
@@ -86,6 +87,11 @@ export default function Header() {
                 <Button variant={"outline"} onClick={handleConnect}>
                   <Icons.login className="h-5 w-5 me-2" /> <div className="font-semibold">  CONNECT TO METAMASK </div>
                 </Button>
+                <Link href="/register">
+                  <Button variant={"outline"} className="ms-2">
+                    <Icons.key className="h-5 w-5 me-2" /> <div className="font-semibold"> REGISTER </div>
+                  </Button>
+                </Link>
               </div>
             )}
             <ModeToggle />

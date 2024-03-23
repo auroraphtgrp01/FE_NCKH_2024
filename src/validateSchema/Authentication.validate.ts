@@ -53,3 +53,5 @@ export const PIN = z
         PIN: z.string().min(6).max(6),
     })
     .strict()
+
+export type PINType = z.TypeOf<typeof PIN>

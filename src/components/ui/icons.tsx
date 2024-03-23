@@ -5,6 +5,7 @@ import {
   LucideIcon,
   ScanFace,
   KeyRound,
+  Key
 } from "lucide-react"
 import Image from "next/image"
 
@@ -15,8 +16,9 @@ export const Icons = {
   moon: Moon,
   login: ScanFace,
   register: KeyRound,
+  key: Key,
   logo: (props: LucideProps) => (
-      <Image src={'/metamask.png'} alt="" height={48} width={48} /> 
+    <Image src={'/metamask.png'} alt="" height={48} width={48} />
   ),
   gitHub: (props: LucideProps) => (
     <svg viewBox="0 0 438.549 438.549" {...props}>

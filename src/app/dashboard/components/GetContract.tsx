@@ -51,7 +51,6 @@ export default function GetContract() {
   })
   async function fetchABI() {
     const nameContract = selectedValue
-    console.log(selectedValue);
     if (nameContract === '') {
       toast({
         title: "Error get ABI",

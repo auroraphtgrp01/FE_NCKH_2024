@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppProvider, ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/toaster";
+import { Footer } from "@/components/Footer"
 
 const inter = Inter({ subsets: ["vietnamese"] });
 
@@ -32,9 +33,12 @@ export default function RootLayout({
               {children}
             </div>
             <Toaster />
+            <div className="mt-48">
+              <Footer />
+            </div>
           </AppProvider>
         </ThemeProvider>
       </body>
-    </html>
+    </html >
   );
 }

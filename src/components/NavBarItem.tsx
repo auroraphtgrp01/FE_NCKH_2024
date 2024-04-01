@@ -64,7 +64,7 @@ export default function NavbarItem() {
                 Dashboard
               </NavigationMenuLink>
             </Link>
-            <NavigationMenuTrigger>Smart Contract</NavigationMenuTrigger>
+            <NavigationMenuTrigger className="ms-4">Smart Contract</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3">

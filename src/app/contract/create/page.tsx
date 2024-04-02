@@ -13,14 +13,52 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import Image from 'next/image'
 import { Textarea } from '@/components/ui/textarea'
+import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
+import { Switch } from '@/components/ui/switch'
 
-
+export interface GrantPermission {
+    readContract: boolean,
+    editPartyInfo: boolean,
+    chatWithParty: boolean,
+    editTheTerm: boolean
+}
 
 export default function page() {
     const [date, setDate] = React.useState<Date>()
     const [valueCombobox, setValueCombobox] = React.useState<Date>()
+    const [isOpen, setIsOpen] = React.useState(false)
+    const [per, setPer] = React.useState<GrantPermission>({
+        readContract: true,
+        chatWithParty: false,
+        editPartyInfo: false,
+        editTheTerm: false
+    })
+    function onChangePer(key: keyof GrantPermission): void {
+        let pers = { ...per }
+        pers[key] = !pers[key]
+        setPer(pers)
+        return undefined
+    }
+    function openGrantPermission() {
+        setIsOpen(true)
+    }
     return (
         <div className='w-full flex'>
             <div className='flex  py-4'>
@@ -81,6 +119,7 @@ export default function page() {
                             <div className='flex'>
                                 <Combobox setValue={setValueCombobox} value={valueCombobox}></Combobox>
                                 <Button className='ms-2'>Invite</Button>
+                                <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
                             </div>
                         </div>
                         <div className="flex flex-col space-y-2 mt-2">
@@ -88,6 +127,7 @@ export default function page() {
                             <div className='flex'>
                                 <Combobox setValue={setValueCombobox} value={valueCombobox}></Combobox>
                                 <Button className='ms-2'>Invite</Button>
+                                <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
                             </div>
                         </div>
                         <div className="flex flex-col space-y-2 mt-2">
@@ -125,6 +165,59 @@ export default function page() {
                     </CardContent>
                 </Card>
             </div>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogPortal >
+                    <DialogOverlay>
+                        <DialogContent className="sm:max-w-[450px]" >
+                            <DialogHeader >
+                                <DialogTitle>Grant Permisison  </DialogTitle>
+                                <DialogDescription>
+                                    Grant Permisison of the contract to Party
+                                </DialogDescription>
+                            </DialogHeader>
+                            <Accordion type="single" defaultValue="item-1" >
+                                <AccordionItem value="item-1">
+                                    <AccordionTrigger >
+                                        <div className='flex items-center space-x-2 me-2'>
+                                            <Switch id="" />
+                                            <Label htmlFor="">Full Access to Contract</Label>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div>
+                                            <div className="grid gap-4 py-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className='flex items-center space-x-2 me-2'>
+                                                        <Switch id="" />
+                                                        <Label htmlFor="">Read the Contract</Label>
+                                                    </div>
+                                                    <div className='flex items-center space-x-2'>
+                                                        <Switch id="" />
+                                                        <Label htmlFor="">Edit the Party Info</Label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="grid gap-4 py-4 ">
+                                                <div className="flex items-center space-x-2">
+                                                    <div className='flex items-center space-x-2 me-6'>
+                                                        <Switch id="" />
+                                                        <Label htmlFor="">Chat with Party</Label>
+                                                    </div>
+                                                    <div className='flex items-center space-x-2'>
+                                                        <Switch id="" />
+                                                        <Label htmlFor="">Edit terms in the contract </Label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+
+                        </DialogContent>
+                    </DialogOverlay>
+                </DialogPortal>
+            </Dialog>
         </div >
     )
 }

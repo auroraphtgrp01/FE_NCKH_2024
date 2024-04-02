@@ -33,7 +33,7 @@ export function CalendarPicker({ selectedDate, onDateChange }: DatePicker) {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[210px] justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal",
             !selectedDate && "text-muted-foreground"
           )}
         >
@@ -43,7 +43,7 @@ export function CalendarPicker({ selectedDate, onDateChange }: DatePicker) {
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="flex w-auto flex-col space-y-2 p-2"
+        className="flex w-full flex-col space-y-2 p-2"
       >
         <Select
           onValueChange={(value: any) =>

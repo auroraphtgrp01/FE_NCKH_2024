@@ -20,6 +20,7 @@ import {
 
 import Web3 from 'web3'
 import GetContract from '@/app/dashboard/components/GetContract'
+import { log } from 'console'
 export default function Dashboard() {
   const [data, setData] = useState({})
   const getData = (dataFromChild: any) => {
@@ -27,10 +28,11 @@ export default function Dashboard() {
   };
   const [balance, setBalance] = React.useState('')
   useEffect(() => {
-    const web3 = new Web3(window.ethereum);
-    (web3.eth.getBalance(localStorage.getItem('address-wallet') as string)).then((bal) => {
-      setBalance(web3.utils.fromWei(bal, "ether"))
-    });
+  
+
+    // (web3.eth.getBalance(localStorage.getItem('address-wallet') as string)).then((bal) => {
+    //   setBalance(web3.utils.fromWei(bal, "ether"))
+    // });
   }, [])
   return (
     <div className="flex mt-6">

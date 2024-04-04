@@ -8,29 +8,25 @@ import { useToast } from "@/components/ui/use-toast"
 import detectEthereumProvider from "@metamask/detect-provider"
 import { useRouter } from 'next/navigation'
 import { createContext, useContext, useEffect, useState } from "react"
-import { Web3 } from 'web3'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-} from "@/components/ui/navigation-menu"
 import NavbarItem from "@/components/NavBarItem"
 import { useAppContext } from "@/components/ThemeProvider"
 import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function Header() {
   const [hasProvider, setHasProvider] = useState<boolean | null>(null);
   const [isExitsAccount, setAccount] = useState<boolean | null>(null)
-
   const { wallet, setWallet }: any = useAppContext()
   const Router = useRouter();
   const { toast } = useToast()
-
   useEffect(() => {
     const getProvider = async () => {
       const provider = await detectEthereumProvider({ silent: true });
@@ -39,7 +35,11 @@ export default function Header() {
 
     const getAccount = async () => {
       //goi api check account
-      setAccount(false)
+      if (true) {
+        setAccount(true)
+      } else {
+        setAccount(false)
+      }
     }
 
     getAccount()
@@ -56,7 +56,9 @@ export default function Header() {
     let accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
-    localStorage.setItem('address-wallet', accounts[0])
+    console.log(window.ethereum);
+
+    // localStorage.setItem('address-wallet', accounts[0])
     updateWallet(accounts);
     if (!isExitsAccount) {
       toast({
@@ -99,6 +101,7 @@ export default function Header() {
           </nav>
         </div>
       </div>
+
     </header>
   )
 }

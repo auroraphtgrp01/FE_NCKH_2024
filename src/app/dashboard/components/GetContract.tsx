@@ -21,16 +21,25 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import { useAppContext } from "@/components/ThemeProvider"
+import Web3 from "web3"
 
 export default function GetContract() {
   const { toast } = useToast()
   const [contract, setContract] = useState({})
   const [abi, setABI] = useState([])
   const [selectedValue, setSelectedValue] = useState('')
+  const [addressContract, setAddressContract] = useState('')
   const [error, setError] = useState('')
+
   const handleChange = (event: any) => {
     setSelectedValue(event.target.value);
   }
+  const [payload, setPayload] = useState({
+    abi: [],
+    addressContract: '',
+    addressWallet: '',
+    methodCall: ''
+  })
   const { wallet, setWallet }: any = useAppContext()
   function onSubmit(values: z.infer<typeof GetSmartContract>) {
     if (abi.length == 0) {
@@ -40,25 +49,38 @@ export default function GetContract() {
         variant: "destructive"
       })
     } else {
-      const contractPayload = {
+      const contractPayload: any = {
         ...values, abi
       }
+      setPayload(contractPayload)
+      getContract().then((res) => {
+        console.log('Contract:', res);
+      })
       // goi api o day
     }
   }
-  const form = useForm<GetContractBodyType>({
-    resolver: zodResolver(GetSmartContract),
-  })
+  async function getContract(): Promise<any> {
+    const web3 = new Web3(window.ethereum);
+    const contract = new web3.eth.Contract(payload.abi, payload.addressContract)
+    try {
+      const methodCall = payload.methodCall
+      const result: string[][] = await contract.methods.getContractInformationArray().call();
+      return arrayToObject(result as any);
+    } catch (error) {
+      console.error("Error:", error);
+      return [];
+    }
+  }
   async function fetchABI() {
     const nameContract = selectedValue
-    if (nameContract === '') {
+    if (false) {
       toast({
         title: "Error get ABI",
         description: "Please select type of contract to get ABI",
         variant: "destructive"
       })
     } else {
-      axios.get(`http://localhost:3000/smart-contracts/abi?contractName=${nameContract}`).then((res) => {
+      axios.get(`http://localhost:3000/smart-contracts/abi`).then((res) => {
         setABI(res.data.abi)
       })
         .catch((error) => {
@@ -76,15 +98,22 @@ export default function GetContract() {
       return JSON.stringify(item)
     })
   }
-  useEffect(() => {
-  }, [])
-  useEffect(() => {
+  function arrayToObject(arr: string[]): { [key: string]: string } {
+    const obj: { [key: string]: string } = {};
+    for (let i = 0; i < arr.length; i += 2) {
+      if (i + 1 < arr.length) {
+        obj[arr[i]] = arr[i + 1];
+      }
+    }
+    return obj;
+  }
+  const form = useForm<GetContractBodyType>({
+    resolver: zodResolver(GetSmartContract),
+  })
 
-  }, [abi]);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, (error) => {
-
       })} className="space-y-2 max-w-[400px] flex-shrink-0 w-full">
         <FormField
           control={form.control}
@@ -105,6 +134,19 @@ export default function GetContract() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Address Contract: </FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} className="w-96" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="methodCall"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Method call: </FormLabel>
               <FormControl>
                 <Input placeholder="" {...field} className="w-96" />
               </FormControl>

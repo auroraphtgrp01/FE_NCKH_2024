@@ -18,12 +18,17 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import { useAppContext } from "@/components/ThemeProvider"
 import Web3 from "web3"
 
-export default function GetContract() {
+export interface ContractData {
+  dataContract: any | undefined
+  setDataContract: (data: any) => void
+}
+
+
+export default function GetContract({ dataContract, setDataContract }: ContractData) {
   const { toast } = useToast()
   const [contract, setContract] = useState({})
   const [abi, setABI] = useState([])
@@ -54,7 +59,7 @@ export default function GetContract() {
       }
       setPayload(contractPayload)
       getContract().then((res) => {
-        console.log('Contract:', res);
+        setDataContract(res)
       })
       // goi api o day
     }

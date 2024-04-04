@@ -26,7 +26,6 @@ interface DatePicker {
 }
 
 export function CalendarPicker({ selectedDate, onDateChange }: DatePicker) {
-
   return (
     <Popover>
       <PopoverTrigger asChild>

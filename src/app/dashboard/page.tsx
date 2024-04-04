@@ -19,21 +19,34 @@ import {
 } from "@/components/ui/table"
 
 import Web3 from 'web3'
-import GetContract from '@/app/dashboard/components/GetContract'
+import GetContract, { ContractData } from '@/app/dashboard/components/GetContract'
 import { log } from 'console'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 export default function Dashboard() {
-  const [data, setData] = useState({})
-  const getData = (dataFromChild: any) => {
-    setData(dataFromChild);
-  };
+  // const [dataContract, setDataContract] = useState(null)
+  const [dataContract, setDataContract] = useState([])
   const [balance, setBalance] = React.useState('')
   useEffect(() => {
-  
-
-    // (web3.eth.getBalance(localStorage.getItem('address-wallet') as string)).then((bal) => {
-    //   setBalance(web3.utils.fromWei(bal, "ether"))
-    // });
   }, [])
+
+
+  function handleDataChange(data: any) {
+    setDataContract(objectToKeyValueArray(data))
+    console.log(dataContract);
+  };
+
+  function objectToKeyValueArray(data: any): any {
+    if (!data || typeof data !== 'object' || data === null) {
+      return [];
+    }
+    const modifiedKeys = Object.keys(data).map((key) => {
+      return key;
+    });
+    return modifiedKeys.map((key) => ({ [key]: data[key] }));
+  }
+
+
   return (
     <div className="flex mt-6">
       <div className="me-3">
@@ -42,7 +55,7 @@ export default function Dashboard() {
             <CardTitle className='text-2xl'>Smart Contract</CardTitle>
           </CardHeader>
           <CardContent>
-            <GetContract />
+            <GetContract dataContract={dataContract} setDataContract={handleDataChange} />
           </CardContent>
         </Card>
       </div>
@@ -61,6 +74,9 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className='text-2xl'> Table of Contract Data </CardTitle>
+            <Textarea value={JSON.stringify(dataContract)}>
+
+            </Textarea>
           </CardHeader>
           <CardContent>
             <Table>
@@ -73,16 +89,18 @@ export default function Dashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">001</TableCell>
-                  <TableCell>nameA</TableCell>
-                  <TableCell>Le Minh Tuan</TableCell>
-                </TableRow>
+                {dataContract.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{Object.keys(item)[0]}</TableCell>
+                    <TableCell>{item[Object.keys(item)[0]]}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
       </div>
-    </div>
+    </div >
   )
 }

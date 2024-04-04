@@ -48,6 +48,7 @@ import { fetchAPI } from "@/utils/fetchAPI"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { set } from "date-fns"
 import usePreventLeave from 'react-hook-use-prevent-leave';
+
 export default function RegisterForm() {
   const [blockPage, setBlockPage] = React.useState<boolean>(true)
   const { wallet, setWallet }: any = useAppContext()

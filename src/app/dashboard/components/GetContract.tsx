@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useToast } from "@/components/ui/use-toast"
 import { useAppContext } from "@/components/ThemeProvider"
 import Web3 from "web3"
+import { Icons } from "@/components/ui/icons"
 
 export interface ContractData {
   dataContract: any | undefined

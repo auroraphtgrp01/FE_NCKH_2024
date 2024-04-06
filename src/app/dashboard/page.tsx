@@ -74,9 +74,6 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className='text-2xl'> Table of Contract Data </CardTitle>
-            <Textarea value={JSON.stringify(dataContract)}>
-
-            </Textarea>
           </CardHeader>
           <CardContent>
             <Table>

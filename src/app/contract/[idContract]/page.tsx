@@ -33,10 +33,6 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-//  import file css
-// import '../../assest/css/base.css'
-// import '../../assest/css/style.css'
-// 
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -47,35 +43,15 @@ import {
     CommandGroup,
     CommandInput,
     CommandItem,
+    CommandList,
 } from "@/components/ui/command"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-
-const frameworks = [
-    {
-        value: "next.js",
-        label: "Next.js",
-    },
-    {
-        value: "sveltekit",
-        label: "SvelteKit",
-    },
-    {
-        value: "nuxt.js",
-        label: "Nuxt.js",
-    },
-    {
-        value: "remix",
-        label: "Remix",
-    },
-    {
-        value: "astro",
-        label: "Astro",
-    },
-]
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 
 export default function Page() {
     // useState
@@ -109,6 +85,8 @@ export default function Page() {
     const [customerAccountNumber, setCustomerAccountNumber] = useState('');
     const [customerSignature, setCustomerSignature] = useState('ExampleA');
     // Sử dụng mảng để lưu trữ các giá trị của ô input
+    const [open, setOpen] = React.useState(false)
+    const [value, setValue] = React.useState("")
     const [inputs, setInputs] = useState([{ value: '' }]);
 
     const addInput = () => {
@@ -208,350 +186,359 @@ export default function Page() {
     const handleChangeCustomerSignature = (event: any) => {
         setCustomerSignature(event.target.value);
     };
-
-
+    const tags = Array.from({ length: 50 }).map(
+        (_, i, a) => `v1.2.0-beta.${a.length - i}`
+    )
     return (
         <div className='mt-4'>
             <div className='flex justify-between'>
                 {/* form data */}
-                <form className='mr-4 max-w-[50%]  border shadow-2xl p-5 w-[50%]'>
-                    <div id="main">
-                        <div id="application">
-                            <div className="">
-                                <h5 className="text-center">
-                                    <b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b>
-                                    <div>
-                                        <b>Độc lập - Tự do - Hạnh phúc</b>
-                                    </div>
-                                    <div>
-                                        -------------------------------
-                                    </div>
-                                    <div className="flex justify-center items-center">
-                                        <Input type="text" name="" className="ml-2 mt-2 border-b w-24" onChange={handleChangeCity}></Input>
-                                        <div className='pt-2'>, Ngày</div>
-                                        <Input type="text" name="" className="ml-2 mt-2 border-b w-10" onChange={handleChangeDay}></Input>
-                                        <div className='pt-2'>Tháng</div>
-                                        <Input type="text" name="" className="ml-2 mt-2 border-b w-10" onChange={handleChangeMonth}></Input>
-                                        <div className='pt-2'>Năm</div>
-                                        <Input type="text" name="" className="ml-2 mt-2 border-b w-16" onChange={handleChangeYear}></Input>
-                                    </div>
-                                </h5>
-                                <h5 className="font-bold my-3 flex items-center justify-center ">
-                                    <Textarea name="" id="" placeholder='Nhập tiêu đề' className='border-b w-[70%] h-5' onChange={handleChangeTitleContract} ></Textarea>
-                                </h5>
+                <div className="p-4">
+                    <ScrollArea className="h-[600px] rounded-md border">
+                        <form className='max-w-[100%]  border shadow-2xl p-5 w-[100%]'>
+                            <div id="main">
+                                <div id="application">
+                                    <div className="">
+                                        <h5 className="text-center">
+                                            <b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b>
+                                            <div>
+                                                <b>Độc lập - Tự do - Hạnh phúc</b>
+                                            </div>
+                                            <div>
+                                                -------------------------------
+                                            </div>
+                                            <div className="flex justify-center items-center">
+                                                <Input type="text" name="" className="ml-2 mt-2  w-10" onChange={handleChangeCity}></Input>
+                                                <div className='pt-2'>, Ngày</div>
+                                                <Input type="text" name="" className="ml-2 mt-2  w-10" onChange={handleChangeDay}></Input>
+                                                <div className='pt-2'>Tháng</div>
+                                                <Input type="text" name="" className="ml-2 mt-2  w-10" onChange={handleChangeMonth}></Input>
+                                                <div className='pt-2'>Năm</div>
+                                                <Input type="text" name="" className="ml-2 mt-2  w-16" onChange={handleChangeYear}></Input>
+                                            </div>
+                                        </h5>
+                                        <h5 className="font-bold my-3 flex items-center justify-center ">
+                                            <Textarea name="" id="" placeholder='Nhập tiêu đề' className=' w-[70%] h-5' onChange={handleChangeTitleContract} ></Textarea>
+                                        </h5>
 
-                                {/* <div className="flex items-center justify-center font-bold flex-wrap">
+                                        {/* <div className="flex items-center justify-center font-bold flex-wrap">
                                     <div className='pt-2'>Số:</div>
-                                    <Input type="text" placeholder='Nhập số hợp đồng' name="" id="contractNumber" className="w-50 ml-3 mr-3 font-bold border border-b" onChange={handleChangeNumberContract}></Input>
+                                    <Input type="text" placeholder='Nhập số hợp đồng' name="" id="contractNumber" className="w-50 ml-3 mr-3 font-bold border " onChange={handleChangeNumberContract}></Input>
                                     <div className='pt-2'>/HD</div>
                                 </div> */}
 
-                                {/* <div className="law-title">
+                                        {/* <div className="law-title">
                                     <textarea name="" id="" placeholder='Nhập luật ......' className=' 'onChange={handleChangeLaw}></textarea>
                                 </div> */}
-                                <div className="">
-                                    <div className="my-3">
-                                        <div className="font-bold">BÊN NHÀ CUNG CẤP ( sau đây gọi tắt là Nhà cung cấp ):</div>
                                         <div className="">
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
-                                                <Input placeholder='Nhập số hợp đồng' id="supplierName" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierName} ></Input>
+                                            <div className="my-3">
+                                                <div className="font-bold">BÊN NHÀ CUNG CẤP ( sau đây gọi tắt là Nhà cung cấp ):</div>
+                                                <div className="">
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
+                                                        <Input placeholder='Nhập số hợp đồng' id="supplierName" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierName} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2">- Số CCCD: </span>
+                                                        <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierCitizenID} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Người đại diện:</span>
+                                                        <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierSurrogate} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
+                                                        <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierAddress} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Điện thoại:</span>
+                                                        <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onChange={handleChangeSupplierPhoneNumber} ></Input>
+                                                        <span className="text-nowrap pt-2"> Fax:</span>
+                                                        <Input placeholder='Nhập số Fax' id="supplierFax" type="number" className="mt-2 ml-2 " onChange={handleChangeSupplierFax} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Số tài khoản:</span>
+                                                        <Input placeholder='Nhập số tài khoản' id="supplierAccountNumber" type="number" className="mr-2 mt-2 ml-2 " onChange={handleChangeSupplierAccountNumber} ></Input>
+                                                        <span className="text-nowrap pt-2"> tại Kho bạc:</span>
+                                                        <Input placeholder='Nhập địa chỉ Kho Bạc' id="treasurySupplier" type="text" className="mt-2 mr-2 ml-2 " onChange={handleChangeSupplierTreasury} ></Input>
+                                                    </div>
+                                                </div>
+
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2">- Số CCCD: </span>
-                                                <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeCustomerCitizenID} ></Input>
+                                            <div className="my-3">
+                                                <div className="font-bold">BÊN THUÊ DỊCH VỤ ( sau đây gọi tắt khách hàng ):</div>
+                                                <div className="">
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
+                                                        <Input placeholder='Nhập số hợp đồng' id="supplierName" type="text" className="mt-2 ml-2 border-2" onChange={handleChangeCustomerName} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2">- Số CCCD: </span>
+                                                        <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onChange={handleChangeCustomerCitizenID} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Người đại diện:</span>
+                                                        <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onChange={handleChangeCustomerSurrogate} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
+                                                        <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onChange={handleChangeCustomerAddress} ></Input>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-nowrap pt-2"> - Điện thoại:</span>
+                                                        <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onChange={handleChangeCustomerPhoneNumber} ></Input>
+                                                        <span className="text-nowrap pt-2"> Số tài khoản</span>
+                                                        <Input placeholder='Nhập số tài khoản' id="supplierFax" type="number" className="mt-2 ml-2 " onChange={handleChangeCustomerAccountNumber} ></Input>
+                                                    </div>
+
+                                                </div>
+
+
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Người đại diện:</span>
-                                                <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierSurrogate} ></Input>
+                                            <div className="flex items-center my-2">
+                                                <span className="text-nowrap pt-2">Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
+                                                    ngày</span>
+                                                <Input id="startedAt" type="date" name="" className="mt-2 ml-2 " onChange={handleChangSigningDate} ></Input>
+
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
-                                                <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierAddress} ></Input>
+                                            <div className="flex items-center my-2">
+                                                <span className="text-nowrap pt-2"> Ngày có hiệu lực, Và được kết thúc
+                                                    vào ngày
+                                                </span>
+                                                <Input id="endedAt" type="date" name="" className="mt-2 ml-2 " onChange={handleChangeEndDate} ></Input>
+
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Điện thoại:</span>
-                                                <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 border-b" onChange={handleChangeSupplierPhoneNumber} ></Input>
-                                                <span className="text-nowrap pt-2"> Fax:</span>
-                                                <Input placeholder='Nhập số Fax' id="supplierFax" type="number" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierFax} ></Input>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Số tài khoản:</span>
-                                                <Input placeholder='Nhập số tài khoản' id="supplierAccountNumber" type="number" className="mr-2 mt-2 ml-2 border-b" onChange={handleChangeSupplierAccountNumber} ></Input>
-                                                <span className="text-nowrap pt-2"> tại Kho bạc:</span>
-                                                <Input placeholder='Nhập địa chỉ Kho Bạc' id="treasurySupplier" type="text" className="mt-2 mr-2 ml-2 border-b" onChange={handleChangeSupplierTreasury} ></Input>
+
+                                            <div className="flex items-center my-2">
+                                                <div className="text-nowrap"> Hai bên thống nhất ký kết hợp đồng
+                                                    với các nội dung sau đây:
+                                                </div>
                                             </div>
                                         </div>
-
-                                    </div>
-                                    <div className="my-3">
-                                        <div className="font-bold">BÊN THUÊ DỊCH VỤ ( sau đây gọi tắt khách hàng ):</div>
                                         <div className="">
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
-                                                <Input placeholder='Nhập số hợp đồng' id="supplierName" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierName} ></Input>
+                                            <div className="my-2">
+                                                <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2">- Số CCCD: </span>
-                                                <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeCustomerCitizenID} ></Input>
+                                            <div className="">
+                                                {inputs.map((input, index) => (
+                                                    <div key={index} className='mt-2'>
+                                                        {/* CBB */}
+                                                        <ComboboxDemo />
+                                                        {index === inputs.length - 1 && (
+                                                            <Button type="button" className='ml-2 ' onClick={addInput}>
+                                                                Thêm mới
+                                                            </Button>
+                                                        )}
+                                                        {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
+                                                        <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-2' value={input.value}
+                                                            onChange={(e) => handleInputChange(index, e.target.value)} ></Textarea>
+
+                                                    </div>
+                                                ))}
+
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Người đại diện:</span>
-                                                <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierSurrogate} ></Input>
+                                            <div className="grid grid-cols-2 text-center">
+                                                <div className="mr-10">
+                                                    <b className="">BÊN MUA</b>
+                                                    <div><i>(Chữ ký, họ tên)</i></div>
+                                                    <Textarea name="" id="" className=' h-[130px]' onChange={handleChangeSupplierSignature} ></Textarea>
+                                                </div>
+                                                <div className="">
+                                                    <b className="">BÊN BÁN</b>
+                                                    <div><i>(Chữ ký, họ tên)</i></div>
+                                                    <Textarea name="" id="" className=' h-[130px]' onChange={handleChangeCustomerSignature} ></Textarea>
+
+                                                </div>
                                             </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
-                                                <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierAddress} ></Input>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <span className="text-nowrap pt-2"> - Điện thoại:</span>
-                                                <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 border-b" onChange={handleChangeSupplierPhoneNumber} ></Input>
-                                                <span className="text-nowrap pt-2"> Số tài khoản</span>
-                                                <Input placeholder='Nhập số tài khoản' id="supplierFax" type="number" className="mt-2 ml-2 border-b" onChange={handleChangeSupplierFax} ></Input>
-                                            </div>
+
 
                                         </div>
 
-
-                                    </div>
-                                    <div className="flex items-center my-2">
-                                        <span className="text-nowrap pt-2">Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
-                                            ngày</span>
-                                        <Input id="startedAt" type="date" name="" className="mt-2 ml-2 border-b" onChange={handleChangSigningDate} ></Input>
-
-                                    </div>
-                                    <div className="flex items-center my-2">
-                                        <span className="text-nowrap pt-2"> Ngày có hiệu lực, Và được kết thúc
-                                            vào ngày
-                                        </span>
-                                        <Input id="endedAt" type="date" name="" className="mt-2 ml-2 border-b" onChange={handleChangeEndDate} ></Input>
-
-                                    </div>
-
-                                    <div className="flex items-center my-2">
-                                        <div className="text-nowrap"> Hai bên thống nhất ký kết hợp đồng
-                                            với các nội dung sau đây:
-                                        </div>
                                     </div>
                                 </div>
-                                <div className="">
-                                    <div className="my-2">
-                                        <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
-                                    </div>
-                                    <div className="my-4">
-
-                                        {inputs.map((input, index) => (
-                                            <div key={index}>
-                                                <ComboboxDemo />
-                                                {index === inputs.length - 1 && (
-                                                    <Button type="button" className='ml-2' onClick={addInput}>
-                                                        Thêm mới
-                                                    </Button>
-                                                )}
-                                                {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
-                                                <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className='border-b mt-2' value={input.value}
-                                                    onChange={(e) => handleInputChange(index, e.target.value)} ></Textarea>
-
-                                            </div>
-                                        ))}
-
-                                    </div>
-                                    <div className="grid grid-cols-2 text-center">
-                                        <div className="mr-10">
-                                            <b className="">BÊN MUA</b>
-                                            <div><i>(Chữ ký, họ tên)</i></div>
-                                            <Textarea name="" id="" className='border-b h-[130px]' onChange={handleChangeSupplierSignature} ></Textarea>
-                                        </div>
-                                        <div className="">
-                                            <b className="">BÊN BÁN</b>
-                                            <div><i>(Chữ ký, họ tên)</i></div>
-                                            <Textarea name="" id="" className='border-b h-[130px]' onChange={handleChangeCustomerSignature} ></Textarea>
-
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
                             </div>
-                        </div>
-                    </div>
-                </form>
+                        </form >
+                    </ScrollArea>
+                </div>
+
 
 
                 {/* Preview form */}
-                <form className='mr-4 max-w-[50%]  h-[80%] w-[50%] border shadow-2xl p-5'>
-                    <div id="main">
-                        <div id="application">
-                            <div className="introduce">
-                                <h5 className="title text-center">
-                                    <b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b>
-                                    <div>
-                                        <b>Độc lập - Tự do - Hạnh phúc</b>
-                                    </div>
-                                    <div>
-                                        -------------------------------
-                                    </div>
-                                    <div className="flex justify-center items-center">
-                                        {city}
-                                        &nbsp;, ngày&nbsp;
-                                        {day}
-                                        &nbsp;tháng&nbsp;
-                                        {month}
-                                        &nbsp;năm&nbsp;
-                                        {year}
-                                    </div>
-                                </h5>
-                                <h5 className="font-bold my-3 text-center uppercase">
-                                    {titleContract}
-                                </h5>
+                <div className="p-4">
+                    <ScrollArea className="h-[600px]  rounded-md border">
+                        <form className='max-w-[100%]  border shadow-2xl p-5 w-[100%]' >
+                            <div id="main">
+                                <div id="application">
+                                    <div className="introduce">
+                                        <h5 className="title text-center">
+                                            <b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b>
+                                            <div>
+                                                <b>Độc lập - Tự do - Hạnh phúc</b>
+                                            </div>
+                                            <div>
+                                                -------------------------------
+                                            </div>
+                                            <div className="flex justify-center items-center">
+                                                {city}
+                                                &nbsp;, ngày&nbsp;
+                                                {day}
+                                                &nbsp;tháng&nbsp;
+                                                {month}
+                                                &nbsp;năm&nbsp;
+                                                {year}
+                                            </div>
+                                        </h5>
+                                        <h5 className="font-bold my-3 text-center uppercase">
+                                            {titleContract}
+                                        </h5>
 
-                                {/* <div className="items-center justify-center text-center font-bold">
+                                        {/* <div className="items-center justify-center text-center font-bold">
                                     Số:&nbsp;
                                     {numberContract}
                                     /HĐ
                                 </div> */}
 
-                                {/* <div className="law-title">
+                                        {/* <div className="law-title">
                                    
                                 </div> */}
-                                <div className="wrapper-content">
-                                    <div className="contentA  my-3">
-                                        <div className="font-bold">BÊN NHÀ CUNG CẤP ( sau đây gọi tắt là Nhà cung cấp ):</div>
-                                        <div className="information-A">
-                                            <div className="flex items-cente mt-2 text-nowrap">
-                                                <span className=" name">- Tên doanh nghiệp:&nbsp;</span>
-                                                {supplierName ? supplierName : <Input className='border-1'></Input>}                                               
-                                            </div>
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name">- Số CCCD:&nbsp;</span>
-                                                {supplierCitizenID ? supplierCitizenID : <Input className='border-1'></Input>} 
-                                            </div>
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name"> - Người đại diện:&nbsp;</span>
-                                                {supplierSurrogate ? supplierSurrogate : <Input className='border-1'></Input>} 
-                                            </div>
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name"> - Địa chỉ cơ quan:&nbsp;</span>
-                                                {supplierAddress ? supplierAddress : <Input className='border-1'></Input>} 
-                                            </div>
-                                            <div className="flex justify-between items-center mt-2 text-nowrap">
-                                                <span className=" name"> - Điện thoại:&nbsp;
-                                                </span>
-                                                {supplierPhoneNumber ? supplierPhoneNumber : <Input className='border-1'></Input>} 
+                                        <div className="wrapper-content">
+                                            <div className="contentA  my-3">
+                                                <div className="font-bold">BÊN NHÀ CUNG CẤP ( sau đây gọi tắt là Nhà cung cấp ):</div>
+                                                <div className="information-A">
+                                                    <div className="flex items-cente mt-2 text-nowrap">
+                                                        <span className=" name">- Tên doanh nghiệp:&nbsp;</span>
+                                                        {supplierName ? supplierName : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name">- Số CCCD:&nbsp;</span>
+                                                        {supplierCitizenID ? supplierCitizenID : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name"> - Người đại diện:&nbsp;</span>
+                                                        {supplierSurrogate ? supplierSurrogate : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name"> - Địa chỉ cơ quan:&nbsp;</span>
+                                                        {supplierAddress ? supplierAddress : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex justify-between items-center mt-2 text-nowrap">
+                                                        <span className=" name"> - Điện thoại:&nbsp;
+                                                        </span>
+                                                        {supplierPhoneNumber ? supplierPhoneNumber : <Input className='border-1 pb-0' disabled></Input>}
 
-                                                <span className=" name"> Fax:&nbsp;          
-                                                </span>
-                                                {supplierFax ? supplierFax : <Input className='border-1'></Input>} 
+                                                        <span className=" name"> Fax:&nbsp;
+                                                        </span>
+                                                        {supplierFax ? supplierFax : <Input className='border-1 pb-0' disabled></Input>}
+
+                                                    </div>
+                                                    <div className="flex justify-between items-center mt-2 text-nowrap">
+                                                        <span className=" name"> - Số tài khoản:&nbsp;
+                                                        </span>
+                                                        {supplierAccountNumber ? supplierAccountNumber : <Input className='border-1 pb-0' disabled></Input>}
+
+                                                        <span className=" name"> tại Kho bạc:&nbsp;
+                                                        </span>
+                                                        {supplierTreasury ? supplierTreasury : <Input className='border-1 pb-0' disabled></Input>}
+
+                                                    </div>
+                                                </div>
+
 
                                             </div>
-                                            <div className="flex justify-between items-center mt-2 text-nowrap">
-                                                <span className=" name"> - Số tài khoản:&nbsp;            
-                                                </span>
-                                                {supplierAccountNumber ? supplierAccountNumber : <Input className='border-1'></Input>} 
+                                            <div className="contentB  my-3">
+                                                <div className="font-bold">BÊN THUÊ DỊCH VỤ ( sau đây gọi tắt khách hàng ):</div>
+                                                <div className="information-A">
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name">- Tên doanh nghiệp:&nbsp; </span>
+                                                        {customerName ? customerName : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name">- Số CCCD:&nbsp; </span>
+                                                        {customerCitizenID ? customerCitizenID : <Input className='border-1 pb-0' disabled></Input>}
 
-                                                <span className=" name"> tại Kho bạc:&nbsp;    
-                                                </span>
-                                                {supplierTreasury ? supplierTreasury : <Input className='border-1'></Input>} 
+                                                    </div>
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name"> - Người đại diện:&nbsp;</span>
+                                                        {customerSurrogate ? customerSurrogate : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex items-center mt-2 text-nowrap">
+                                                        <span className=" name"> - Địa chỉ cơ quan:&nbsp;</span>
+                                                        {customerAddress ? customerAddress : <Input className='border-1 pb-0' disabled></Input>}
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-nowrap mt-2">
+                                                        <span className=" name"> - Điện thoại:&nbsp;
+                                                        </span>
+                                                        {customerPhoneNumber ? customerPhoneNumber : <Input className='border-1 pb-0' disabled></Input>}
 
+                                                        <span className=" name"> Số tài khoản:&nbsp;
+                                                        </span>
+                                                        {customerAccountNumber ? customerAccountNumber : <Input className='border-1 pb-0' disabled></Input>}
+
+                                                    </div>
+
+                                                </div>
+
+
+                                            </div>
+                                            <div className="flex items-center my-2">
+                                                Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
+                                                ngày&nbsp;
+                                                {formatDate(signingDate)}
+
+                                            </div>
+                                            <div className="flex items-center my-2">
+                                                <span> Ngày có hiệu lực, Và được kết thúc
+                                                    vào ngày&nbsp;
+                                                </span>
+                                                {formatDate(endDate)}
+
+                                            </div>
+
+                                            <div className="flex items-center my-2">
+                                                <div> Hai bên thống nhất ký kết hợp đồng
+
+                                                    với các nội dung sau đây:
+                                                </div>
                                             </div>
                                         </div>
-
-
-                                    </div>
-                                    <div className="contentB  my-3">
-                                        <div className="font-bold">BÊN THUÊ DỊCH VỤ ( sau đây gọi tắt khách hàng ):</div>
-                                        <div className="information-A">
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name">- Tên doanh nghiệp:&nbsp; </span>
-                                                {supplierTreasury ? supplierTreasury : <Input className='border-1'></Input>} 
-                                            </div>
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name">- Số CCCD:&nbsp; </span>
-                                                {customerName ? customerName : <Input className='border-1'></Input>} 
-
-                                            </div>
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name"> - Người đại diện:&nbsp;</span>
-                                                {customerSurrogate ? customerSurrogate : <Input className='border-1'></Input>} 
-                                            </div>
-                                            <div className="flex items-center mt-2 text-nowrap">
-                                                <span className=" name"> - Địa chỉ cơ quan:&nbsp;</span>
-                                                {customerAddress ? customerAddress : <Input className='border-1'></Input>} 
-                                            </div>
-                                            <div className="flex items-center justify-between text-nowrap mt-2">
-                                                <span className=" name"> - Điện thoại:&nbsp;
-                                                </span>
-                                                {customerPhoneNumber ? customerPhoneNumber : <Input className='border-1'></Input>} 
-
-                                                <span className=" name"> Số tài khoản:&nbsp;
-                                                </span>
-                                                {customerAccountNumber ? customerAccountNumber : <Input className='border-1'></Input>} 
-
-                                            </div>
-
-                                        </div>
-
-
-                                    </div>
-                                    <div className="flex items-center my-2">
-                                        Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
-                                        ngày&nbsp;
-                                        {formatDate(signingDate)}
-
-                                    </div>
-                                    <div className="flex items-center my-2">
-                                        <span> Ngày có hiệu lực, Và được kết thúc
-                                            vào ngày&nbsp;
-                                        </span>
-                                        {formatDate(endDate)}
-
-                                    </div>
-
-                                    <div className="flex items-center my-2">
-                                        <div> Hai bên thống nhất ký kết hợp đồng
-
-                                            với các nội dung sau đây:
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="my-2">
-                                        <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
-                                    </div>
-                                    <div className="my-2">
-
                                         <div>
-                                            {inputs.map((input, index) => (
-                                                <><b>Điều 1. Đối tượng Hợp đồng</b>
-                                                    <div key={index}>{input.value}</div></>
-                                            ))}
+                                            <div className="my-2">
+                                                <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
+                                            </div>
+                                            <div className="my-2">
+
+                                                <div>
+                                                    {inputs.map((input, index) => (
+                                                        <><b>Điều 1. Đối tượng Hợp đồng</b>
+                                                            <div key={index}>{input.value}</div></>
+                                                    ))}
+
+                                                </div>
+                                            </div>
+
+
+                                            <div>
+                                                <div className='grid grid-cols-2 text-center'>
+                                                    <div>
+                                                        <b>BÊN MUA</b>
+                                                        <div><i>(Chữ ký, họ tên)</i></div>
+                                                        <div className='text-center'>{supplierSignature}</div>
+                                                    </div>
+                                                    <div>
+                                                        <b>BÊN BÁN</b>
+                                                        <div><i>(Chữ ký, họ tên)</i></div>
+                                                        {customerSignature}
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                         </div>
                                     </div>
-
-
-                                    <div>
-                                        <div className='grid grid-cols-2 text-center'>
-                                            <div>
-                                                <b>BÊN MUA</b>
-                                                <div><i>(Chữ ký, họ tên)</i></div>
-                                                <div className='text-center'>{supplierSignature}</div>
-                                            </div>
-                                            <div>
-                                                <b>BÊN BÁN</b>
-                                                <div><i>(Chữ ký, họ tên)</i></div>
-                                                {customerSignature}
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </form >
-
+                        </form >
+                    </ScrollArea>
+                </div>
             </div >
         </div >
     )
@@ -600,26 +587,28 @@ export function ComboboxDemo() {
                 <Command>
                     <CommandInput placeholder="Search framework..." />
                     <CommandEmpty>No framework found.</CommandEmpty>
-                    <CommandGroup>
-                        {frameworks.map((framework) => (
-                            <CommandItem
-                                key={framework.value}
-                                value={framework.value}
-                                onSelect={(currentValue) => {
-                                    setValue(currentValue === value ? "" : currentValue)
-                                    setOpen(false)
-                                }}
-                            >
-                                <Check
-                                    className={cn(
-                                        "mr-2 h-4 w-4",
-                                        value === framework.value ? "opacity-100" : "opacity-0"
-                                    )}
-                                />
-                                {framework.label}
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
+                    <CommandList>
+                        <CommandGroup>
+                            {frameworks.map((framework) => (
+                                <CommandItem
+                                    key={framework.value}
+                                    value={framework.value}
+                                    onSelect={(currentValue) => {
+                                        setValue(currentValue === value ? "" : currentValue)
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            value === framework.value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {framework.label}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
                 </Command>
             </PopoverContent>
         </Popover>
@@ -634,3 +623,4 @@ function formatDate(inputDate: any) {
     const day = parts[2];
     return `${day}/${month}/${year}`;
 }
+

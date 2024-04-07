@@ -52,13 +52,12 @@ import {
 } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { CalendarPicker } from "@/components/ui/calendar-picker"
 
 export default function Page() {
     // useState
     const [city, setCity] = useState('__');
-    const [day, setDay] = useState('__');
-    const [month, setMonth] = useState('__');
-    const [year, setYear] = useState('2024');
+    const [date, setDate] = React.useState<Date>()
     const [titleContract, settitleContract] = useState('Tiêu đề hợp đồng');
     const [numberContract, setNumberContract] = useState('__');
     const [law, setLaw] = useState('Lorem ipsum, dolor sit amet consectetur adipisicing elit.Fuga quam nobis perspiciatis ratione similique in quis rem fugiat doloremque.Magnam tempore quo doloremque hic a unde consequatur reiciendis nulla recusandae!');
@@ -101,20 +100,14 @@ export default function Page() {
         console.log(inputs);
     };
 
+    const handleDates = () => {
+        console.log(date);
+        
+    }
 
     // function handleState
     const handleChangeCity = (event: any) => {
         setCity(event.target.value);
-    };
-
-    const handleChangeDay = (event: any) => {
-        setDay(event.target.value);
-    };
-    const handleChangeMonth = (event: any) => {
-        setMonth(event.target.value);
-    };
-    const handleChangeYear = (event: any) => {
-        setYear(event.target.value);
     };
 
     const handleChangeTitleContract = (event: any) => {
@@ -189,13 +182,14 @@ export default function Page() {
     const tags = Array.from({ length: 50 }).map(
         (_, i, a) => `v1.2.0-beta.${a.length - i}`
     )
+    
     return (
         <div className='mt-4'>
             <div className='flex justify-between'>
                 {/* form data */}
                 <div className="p-4">
                     <ScrollArea className="h-[600px] rounded-md border">
-                        <form className='max-w-[100%]  border shadow-2xl p-5 w-[100%]'>
+                        <div className='max-w-[100%]  border shadow-2xl p-16 text-sm w-[100%]'>
                             <div id="main">
                                 <div id="application">
                                     <div className="">
@@ -208,27 +202,29 @@ export default function Page() {
                                                 -------------------------------
                                             </div>
                                             <div className="flex justify-center items-center">
-                                                <Input type="text" name="" className="ml-2 mt-2  w-10" onChange={handleChangeCity}></Input>
-                                                <div className='pt-2'>, Ngày</div>
-                                                <Input type="text" name="" className="ml-2 mt-2  w-10" onChange={handleChangeDay}></Input>
-                                                <div className='pt-2'>Tháng</div>
-                                                <Input type="text" name="" className="ml-2 mt-2  w-10" onChange={handleChangeMonth}></Input>
+                                                <Input type="text" name="" className="ml-2 mt-2 border-b w-24" onBlur={handleChangeCity}></Input>
+                                                <div className='pt-2'>, Ngày hợp đồng</div>
+                                                <CalendarPicker  onDateChange={setDate} selectedDate={date} />
+                                                {/* <Input type="date" name="" className="ml-2 mt-2 border-b w-40" onBlur={handleDates}></Input> */}
+                                                {/* <div className='pt-2'>Tháng</div>
+                                                <Input type="text" name="" className="ml-2 mt-2 border-b w-10" onBlur={handleChangeMonth}></Input>
                                                 <div className='pt-2'>Năm</div>
-                                                <Input type="text" name="" className="ml-2 mt-2  w-16" onChange={handleChangeYear}></Input>
+                                                <Input type="text" name="" className="ml-2 mt-2 border-b w-16" onBlur={handleChangeYear}></Input> */}
                                             </div>
+
                                         </h5>
-                                        <h5 className="font-bold my-3 flex items-center justify-center ">
-                                            <Textarea name="" id="" placeholder='Nhập tiêu đề' className=' w-[70%] h-5' onChange={handleChangeTitleContract} ></Textarea>
+                                        <h5 className="my-3 flex items-center justify-center ">
+                                            <Textarea name="" id="" placeholder='Nhập tiêu đề' className=' w-[70%] h-5' onBlur={handleChangeTitleContract} ></Textarea>
                                         </h5>
 
                                         {/* <div className="flex items-center justify-center font-bold flex-wrap">
                                     <div className='pt-2'>Số:</div>
-                                    <Input type="text" placeholder='Nhập số hợp đồng' name="" id="contractNumber" className="w-50 ml-3 mr-3 font-bold border " onChange={handleChangeNumberContract}></Input>
+                                    <Input type="text" placeholder='Nhập số hợp đồng' name="" id="contractNumber" className="w-50 ml-3 mr-3 font-bold border " onBlur={handleChangeNumberContract}></Input>
                                     <div className='pt-2'>/HD</div>
                                 </div> */}
 
                                         {/* <div className="law-title">
-                                    <textarea name="" id="" placeholder='Nhập luật ......' className=' 'onChange={handleChangeLaw}></textarea>
+                                    <textarea name="" id="" placeholder='Nhập luật ......' className=' 'onBlur={handleChangeLaw}></textarea>
                                 </div> */}
                                         <div className="">
                                             <div className="my-3">
@@ -236,31 +232,31 @@ export default function Page() {
                                                 <div className="">
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
-                                                        <Input placeholder='Nhập số hợp đồng' id="supplierName" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierName} ></Input>
+                                                        <Input placeholder='Nhập tên doanh nghiệp' id="supplierName" type="text" className="mt-2 ml-2 " onBlur={handleChangeSupplierName} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2">- Số CCCD: </span>
-                                                        <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierCitizenID} ></Input>
+                                                        <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onBlur={handleChangeSupplierCitizenID} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Người đại diện:</span>
-                                                        <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierSurrogate} ></Input>
+                                                        <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onBlur={handleChangeSupplierSurrogate} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
-                                                        <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onChange={handleChangeSupplierAddress} ></Input>
+                                                        <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onBlur={handleChangeSupplierAddress} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Điện thoại:</span>
-                                                        <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onChange={handleChangeSupplierPhoneNumber} ></Input>
+                                                        <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onBlur={handleChangeSupplierPhoneNumber} ></Input>
                                                         <span className="text-nowrap pt-2"> Fax:</span>
-                                                        <Input placeholder='Nhập số Fax' id="supplierFax" type="number" className="mt-2 ml-2 " onChange={handleChangeSupplierFax} ></Input>
+                                                        <Input placeholder='Nhập số Fax' id="supplierFax" type="number" className="mt-2 ml-2 " onBlur={handleChangeSupplierFax} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Số tài khoản:</span>
-                                                        <Input placeholder='Nhập số tài khoản' id="supplierAccountNumber" type="number" className="mr-2 mt-2 ml-2 " onChange={handleChangeSupplierAccountNumber} ></Input>
+                                                        <Input placeholder='Nhập số tài khoản' id="supplierAccountNumber" type="number" className="mr-2 mt-2 ml-2 " onBlur={handleChangeSupplierAccountNumber} ></Input>
                                                         <span className="text-nowrap pt-2"> tại Kho bạc:</span>
-                                                        <Input placeholder='Nhập địa chỉ Kho Bạc' id="treasurySupplier" type="text" className="mt-2 mr-2 ml-2 " onChange={handleChangeSupplierTreasury} ></Input>
+                                                        <Input placeholder='Nhập địa chỉ Kho Bạc' id="treasurySupplier" type="text" className="mt-2 mr-2 ml-2 " onBlur={handleChangeSupplierTreasury} ></Input>
                                                     </div>
                                                 </div>
 
@@ -270,25 +266,25 @@ export default function Page() {
                                                 <div className="">
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
-                                                        <Input placeholder='Nhập số hợp đồng' id="supplierName" type="text" className="mt-2 ml-2 border-2" onChange={handleChangeCustomerName} ></Input>
+                                                        <Input placeholder='Nhập tên doanh nghiệp' id="supplierName" type="text" className="mt-2 ml-2 border-2" onBlur={handleChangeCustomerName} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2">- Số CCCD: </span>
-                                                        <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onChange={handleChangeCustomerCitizenID} ></Input>
+                                                        <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onBlur={handleChangeCustomerCitizenID} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Người đại diện:</span>
-                                                        <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onChange={handleChangeCustomerSurrogate} ></Input>
+                                                        <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onBlur={handleChangeCustomerSurrogate} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
-                                                        <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onChange={handleChangeCustomerAddress} ></Input>
+                                                        <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onBlur={handleChangeCustomerAddress} ></Input>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <span className="text-nowrap pt-2"> - Điện thoại:</span>
-                                                        <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onChange={handleChangeCustomerPhoneNumber} ></Input>
+                                                        <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onBlur={handleChangeCustomerPhoneNumber} ></Input>
                                                         <span className="text-nowrap pt-2"> Số tài khoản</span>
-                                                        <Input placeholder='Nhập số tài khoản' id="supplierFax" type="number" className="mt-2 ml-2 " onChange={handleChangeCustomerAccountNumber} ></Input>
+                                                        <Input placeholder='Nhập số tài khoản' id="supplierFax" type="number" className="mt-2 ml-2 " onBlur={handleChangeCustomerAccountNumber} ></Input>
                                                     </div>
 
                                                 </div>
@@ -298,14 +294,14 @@ export default function Page() {
                                             <div className="flex items-center my-2">
                                                 <span className="text-nowrap pt-2">Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
                                                     ngày</span>
-                                                <Input id="startedAt" type="date" name="" className="mt-2 ml-2 " onChange={handleChangSigningDate} ></Input>
+                                                <Input id="startedAt" type="date" className="mt-2 ml-2 " onBlur={handleChangSigningDate} ></Input>
 
                                             </div>
                                             <div className="flex items-center my-2">
                                                 <span className="text-nowrap pt-2"> Ngày có hiệu lực, Và được kết thúc
                                                     vào ngày
                                                 </span>
-                                                <Input id="endedAt" type="date" name="" className="mt-2 ml-2 " onChange={handleChangeEndDate} ></Input>
+                                                <Input id="endedAt" type="date" className="mt-2 ml-2 " onBlur={handleChangeEndDate} ></Input>
 
                                             </div>
 
@@ -330,8 +326,8 @@ export default function Page() {
                                                             </Button>
                                                         )}
                                                         {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
-                                                        <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-2' value={input.value}
-                                                            onChange={(e) => handleInputChange(index, e.target.value)} ></Textarea>
+                                                        <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-2' defaultValue={input.value}
+                                                            onBlur={(e) => handleInputChange(index, e.target.value)} ></Textarea>
 
                                                     </div>
                                                 ))}
@@ -341,12 +337,12 @@ export default function Page() {
                                                 <div className="mr-10">
                                                     <b className="">BÊN MUA</b>
                                                     <div><i>(Chữ ký, họ tên)</i></div>
-                                                    <Textarea name="" id="" className=' h-[130px]' onChange={handleChangeSupplierSignature} ></Textarea>
+                                                    <Textarea name="" id="" className=' h-[130px]' onBlur={handleChangeSupplierSignature} ></Textarea>
                                                 </div>
                                                 <div className="">
                                                     <b className="">BÊN BÁN</b>
                                                     <div><i>(Chữ ký, họ tên)</i></div>
-                                                    <Textarea name="" id="" className=' h-[130px]' onChange={handleChangeCustomerSignature} ></Textarea>
+                                                    <Textarea name="" id="" className=' h-[130px]' onBlur={handleChangeCustomerSignature} ></Textarea>
 
                                                 </div>
                                             </div>
@@ -357,7 +353,7 @@ export default function Page() {
                                     </div>
                                 </div>
                             </div>
-                        </form >
+                        </div>
                     </ScrollArea>
                 </div>
 
@@ -365,8 +361,8 @@ export default function Page() {
 
                 {/* Preview form */}
                 <div className="p-4">
-                    <ScrollArea className="h-[600px]  rounded-md border">
-                        <form className='max-w-[100%]  border shadow-2xl p-5 w-[100%]' >
+                    <ScrollArea className="h-[600px] rounded-md border">
+                        <form className='max-w-[100%] p-16 text-sm border shadow-2xl w-[100%]' >
                             <div id="main">
                                 <div id="application">
                                     <div className="introduce">
@@ -380,12 +376,12 @@ export default function Page() {
                                             </div>
                                             <div className="flex justify-center items-center">
                                                 {city}
-                                                &nbsp;, ngày&nbsp;
+                                                {/* &nbsp;, ngày&nbsp;
                                                 {day}
                                                 &nbsp;tháng&nbsp;
                                                 {month}
                                                 &nbsp;năm&nbsp;
-                                                {year}
+                                                {year} */}
                                             </div>
                                         </h5>
                                         <h5 className="font-bold my-3 text-center uppercase">
@@ -407,38 +403,38 @@ export default function Page() {
                                                 <div className="information-A">
                                                     <div className="flex items-cente mt-2 text-nowrap">
                                                         <span className=" name">- Tên doanh nghiệp:&nbsp;</span>
-                                                        {supplierName ? supplierName : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierName }
                                                     </div>
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name">- Số CCCD:&nbsp;</span>
-                                                        {supplierCitizenID ? supplierCitizenID : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierCitizenID }
                                                     </div>
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name"> - Người đại diện:&nbsp;</span>
-                                                        {supplierSurrogate ? supplierSurrogate : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierSurrogate}
                                                     </div>
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name"> - Địa chỉ cơ quan:&nbsp;</span>
-                                                        {supplierAddress ? supplierAddress : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierAddress}
                                                     </div>
                                                     <div className="flex justify-between items-center mt-2 text-nowrap">
                                                         <span className=" name"> - Điện thoại:&nbsp;
                                                         </span>
-                                                        {supplierPhoneNumber ? supplierPhoneNumber : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierPhoneNumber}
 
                                                         <span className=" name"> Fax:&nbsp;
                                                         </span>
-                                                        {supplierFax ? supplierFax : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierFax}
 
                                                     </div>
                                                     <div className="flex justify-between items-center mt-2 text-nowrap">
                                                         <span className=" name"> - Số tài khoản:&nbsp;
                                                         </span>
-                                                        {supplierAccountNumber ? supplierAccountNumber : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierAccountNumber}
 
                                                         <span className=" name"> tại Kho bạc:&nbsp;
                                                         </span>
-                                                        {supplierTreasury ? supplierTreasury : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {supplierTreasury}
 
                                                     </div>
                                                 </div>
@@ -450,29 +446,29 @@ export default function Page() {
                                                 <div className="information-A">
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name">- Tên doanh nghiệp:&nbsp; </span>
-                                                        {customerName ? customerName : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {customerName}
                                                     </div>
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name">- Số CCCD:&nbsp; </span>
-                                                        {customerCitizenID ? customerCitizenID : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {customerCitizenID}
 
                                                     </div>
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name"> - Người đại diện:&nbsp;</span>
-                                                        {customerSurrogate ? customerSurrogate : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {customerSurrogate}
                                                     </div>
                                                     <div className="flex items-center mt-2 text-nowrap">
                                                         <span className=" name"> - Địa chỉ cơ quan:&nbsp;</span>
-                                                        {customerAddress ? customerAddress : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {customerAddress}
                                                     </div>
                                                     <div className="flex items-center justify-between text-nowrap mt-2">
                                                         <span className=" name"> - Điện thoại:&nbsp;
                                                         </span>
-                                                        {customerPhoneNumber ? customerPhoneNumber : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {customerPhoneNumber}
 
                                                         <span className=" name"> Số tài khoản:&nbsp;
                                                         </span>
-                                                        {customerAccountNumber ? customerAccountNumber : <Input className='border-1 pb-0' disabled></Input>}
+                                                        {customerAccountNumber}
 
                                                     </div>
 
@@ -508,10 +504,10 @@ export default function Page() {
                                             <div className="my-2">
 
                                                 <div>
-                                                    {inputs.map((input, index) => (
+                                                    {/* {inputs.map((input, index) => (
                                                         <><b>Điều 1. Đối tượng Hợp đồng</b>
                                                             <div key={index}>{input.value}</div></>
-                                                    ))}
+                                                    ))} */} 
 
                                                 </div>
                                             </div>

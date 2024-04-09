@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Icons } from "@/components/ui/icons"
 
 interface DatePicker {
   selectedDate: Date | undefined

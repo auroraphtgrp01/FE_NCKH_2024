@@ -24,11 +24,13 @@ export function State() {
     const [customerAddress, setCustomerAddress] = useState('');
     const [customerPhoneNumber, setCustomerPhoneNumber] = useState('');
     const [customerAccountNumber, setCustomerAccountNumber] = useState('');
-    const [customerSignature, setCustomerSignature] = useState('ExampleA');
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('');
+    const [customerSignature, setCustomerSignature] = useState('ExampleB');
     const [inputs, setInputs] = useState<{ value: string }[]>([{ value: '' }]);
-
+    const [open, setOpen] = useState(false);
+    const [values, setValues] = useState<{ value: string }[]>([{ value: '' }])
+    const [disabledInputs, setDisabledInputs] = useState<boolean[]>([]);
+    const [disabledValues, setDisabledValues] = useState<boolean[]>([]);
+    const [defaultLabel, setDefaultLabel] = useState<string>("Select framework");
     return {
         city, setCity,
         date, setDate,
@@ -54,8 +56,11 @@ export function State() {
         customerPhoneNumber, setCustomerPhoneNumber,
         customerAccountNumber, setCustomerAccountNumber,
         customerSignature, setCustomerSignature,
-        open, setOpen,
-        value, setValue,
         inputs, setInputs,
+        open, setOpen,
+        values, setValues,
+        disabledInputs, setDisabledInputs,
+        disabledValues, setDisabledValues,
+        defaultLabel, setDefaultLabel
     };
 }

@@ -107,27 +107,19 @@ export default function Page() {
         customerSignature, setCustomerSignature,
         inputs, setInputs,
         open, setOpen,
-        values, setValues,
-        disabledInputs, setDisabledInputs,
-        disabledValues, setDisabledValues,
+        values, setValues
     } = State();
-    const handleComboboxChange = async (index: number, e: any) => {
+    const handleComboboxChange = (index: number, e: any) => {
         const newCombobox = [...values];
-        newCombobox[index].value = e;
+        newCombobox[index].value = value;
         setValues(newCombobox);
         console.log(values);
-
+        // console.log("event : ", e);
     };
 
     const addInput = () => {
         const newInputs = [...inputs, { value: '' }];
-        const newCBB = [...values, { value: 'Select framework...' }];
         setInputs(newInputs);
-        setValues(newCBB);
-        setDisabledInputs([...disabledInputs, true]); // set input trước cái input tạo ra
-        setDisabledValues([...disabledValues, true]); // set input trước cái input tạo ra
-
-
     };
 
     const handleInputChange = (index: number, value: string) => {
@@ -411,19 +403,16 @@ export default function Page() {
                                                 {inputs.map((input, index) => (
                                                     <div key={index} className='mt-3' >
                                                         {/* CBB */}
-                                                        {/* open={open} onOpenChange={setOpen} */}
-                                                        <span className='font-bold'> {index + 1} . </span>
-                                                        <Popover >
+                                                        <Popover open={open} onOpenChange={setOpen}>
                                                             <PopoverTrigger asChild>
                                                                 <Button
                                                                     variant="outline"
                                                                     role="combobox"
                                                                     aria-expanded={open}
                                                                     className="w-[200px] justify-between"
-                                                                    disabled={disabledValues[index] ? true : false}
                                                                 >
-                                                                    {values.length > 0 ?
-                                                                        frameworks.find(framework => framework.value === values[0].value)?.label || "Select framework..."
+                                                                    {values
+                                                                        ? frameworks.find((framework) => framework.value === values)?.label
                                                                         : "Select framework..."}
                                                                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                                 </Button>
@@ -440,7 +429,7 @@ export default function Page() {
                                                                                     value={framework.value}
                                                                                     onSelect={(currentValue) => {
                                                                                         // setValue(currentValue === value ? "" : currentValue)
-                                                                                        setOpen(false)
+                                                                                        // setOpen(false)
                                                                                         handleComboboxChange(index, currentValue)
                                                                                     }}
                                                                                 >
@@ -448,7 +437,7 @@ export default function Page() {
                                                                                     <CheckIcon
                                                                                         className={cn(
                                                                                             "ml-auto h-4 w-4",
-                                                                                            values.toString() === framework.value ? "opacity-100" : "opacity-0"
+                                                                                            values === framework.value ? "opacity-100" : "opacity-0"
                                                                                         )}
                                                                                     />
                                                                                 </CommandItem>
@@ -460,16 +449,15 @@ export default function Page() {
                                                         </Popover>
                                                         {/* ttx */}
                                                         {index === inputs.length - 1 && (
-                                                            <span ref={inputRefs.add}>
+                                                            <> <span ref={inputRefs.add}>
                                                                 <Button type="button" className='ml-2 ' onClick={(e) => { addInput() }} >
                                                                     Thêm mới
                                                                 </Button>
-                                                            </span>
+                                                            </span></>
                                                         )}
                                                         {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
                                                         <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-3' defaultValue={input.value}
-                                                            onBlur={(e) => { handleInputChange(index, e.target.value); handleInputChangePosition("add", e, 'PreviewAddRef') }}
-                                                            disabled={disabledInputs[index] ? true : false}></Textarea>
+                                                            onBlur={(e) => { handleInputChange(index, e.target.value); handleInputChangePosition("add", e, 'PreviewAddRef') }}></Textarea>
 
                                                     </div>
                                                 ))}
@@ -592,20 +580,28 @@ export default function Page() {
                                                     <div className="flex justify-between mt-2">
                                                         <span ref={previewRefs.PreviewCustomerPhoneNumberRef}> - Điện thoại:&nbsp;      {customerPhoneNumber}
                                                         </span>
+
                                                         <span ref={previewRefs.PreviewCustomerAccountNumberRef}> Số tài khoản:&nbsp;       {customerAccountNumber}
                                                         </span>
+
                                                     </div>
+
                                                 </div>
+
+
                                             </div>
                                             <div className="my-2">
                                                 <span ref={previewRefs.PreviewSigningDateRef}>Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
                                                     ngày&nbsp;
                                                     {formatDate(signingDate)}</span>
+
                                             </div>
                                             <div className="my-2">
                                                 <span ref={previewRefs.PreviewEndDateRef}> Ngày có hiệu lực, Và được kết thúc
                                                     vào ngày&nbsp;    {formatDate(endDate)}
                                                 </span>
+
+
                                             </div>
 
                                             <div className="my-2">
@@ -621,11 +617,11 @@ export default function Page() {
                                             <div className="my-2">
 
                                                 <div>
-                                                    {values.map((cbb, index) => (
+                                                    {/* {values.map((cbb, index) => (
                                                         <div key={index} ref={previewRefs.PreviewAddRef}>
-                                                            <div className='font-bold'>{index + 1} . {cbb.value}</div>
+                                                            <div>{cbb.value}</div>
                                                         </div>
-                                                    ))}
+                                                    ))} */}
                                                     {inputs.map((input, index) => (
                                                         <div key={index} ref={previewRefs.PreviewAddRef}>
                                                             <div>{input.value}</div>
@@ -634,6 +630,7 @@ export default function Page() {
 
                                                 </div>
                                             </div>
+
 
                                             <div>
                                                 <div className='grid grid-cols-2 text-center mt-3'>
@@ -663,6 +660,10 @@ export default function Page() {
     )
 }
 
+
+
+
+
 function formatDate(inputDate: any) {
     const parts = inputDate.split('-'); // Tách chuỗi thành các phần riêng biệt
     const year = parts[0];
@@ -681,10 +682,15 @@ function getDate(inputDate: any) {
 
 
 function convertToDateVN(dateString: string): string {
+    // Tạo đối tượng Date từ chuỗi
     const date = new Date(dateString);
+
+    // Kiểm tra nếu date là NaN hoặc không hợp lệ
     if (isNaN(date.getTime())) {
         return 'Ngày không hợp lệ';
     }
+
+    // Chuyển đổi ngày thành định dạng "ngày - tháng - năm" của Việt Nam
     const formattedDate = format(date, 'dd-MM-yyyy');
 
     return formattedDate;
@@ -696,7 +702,7 @@ function extractDatePart(dateString: string, part: 'day' | 'month' | 'year'): nu
         case 'day':
             return parsedDate.getDate();
         case 'month':
-            return parsedDate.getMonth() + 1;
+            return parsedDate.getMonth() + 1; // Tháng bắt đầu từ 0
         case 'year':
             return parsedDate.getFullYear();
         default:

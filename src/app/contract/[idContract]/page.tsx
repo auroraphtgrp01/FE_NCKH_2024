@@ -108,8 +108,8 @@ export default function Page() {
         inputs, setInputs,
         open, setOpen,
         values, setValues,
-        disabledInputs, setDisabledInputs,
-        disabledValues, setDisabledValues,
+        // disabledInputs, setDisabledInputs,
+        // disabledValues, setDisabledValues,
     } = State();
     const handleComboboxChange = async (index: number, e: any) => {
         const newCombobox = [...values];
@@ -124,8 +124,8 @@ export default function Page() {
         const newCBB = [...values, { value: 'Select framework...' }];
         setInputs(newInputs);
         setValues(newCBB);
-        setDisabledInputs([...disabledInputs, true]); // set input trước cái input tạo ra
-        setDisabledValues([...disabledValues, true]); // set input trước cái input tạo ra
+        // setDisabledInputs([...disabledInputs, true]); // set input trước cái input tạo ra
+        // setDisabledValues([...disabledValues, true]); // set input trước cái input tạo ra
 
 
     };
@@ -134,6 +134,8 @@ export default function Page() {
         const newInputs = [...inputs];
         newInputs[index].value = value;
         setInputs(newInputs);
+        console.log(inputs);
+
     };
 
     const handleDates = (newDate: Date) => {
@@ -420,10 +422,10 @@ export default function Page() {
                                                                     role="combobox"
                                                                     aria-expanded={open}
                                                                     className="w-[200px] justify-between"
-                                                                    disabled={disabledValues[index] ? true : false}
+                                                                // disabled={disabledValues[index] ? true : false}
                                                                 >
                                                                     {values.length > 0 ?
-                                                                        frameworks.find(framework => framework.value === values[0].value)?.label || "Select framework..."
+                                                                        frameworks.find(framework => framework.value === values[index].value)?.label || "Select framework..."
                                                                         : "Select framework..."}
                                                                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                                 </Button>
@@ -440,7 +442,7 @@ export default function Page() {
                                                                                     value={framework.value}
                                                                                     onSelect={(currentValue) => {
                                                                                         // setValue(currentValue === value ? "" : currentValue)
-                                                                                        setOpen(false)
+                                                                                        // setOpen(false)
                                                                                         handleComboboxChange(index, currentValue)
                                                                                     }}
                                                                                 >
@@ -469,7 +471,7 @@ export default function Page() {
                                                         {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
                                                         <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-3' defaultValue={input.value}
                                                             onBlur={(e) => { handleInputChange(index, e.target.value); handleInputChangePosition("add", e, 'PreviewAddRef') }}
-                                                            disabled={disabledInputs[index] ? true : false}></Textarea>
+                                                        ></Textarea>
 
                                                     </div>
                                                 ))}
@@ -621,17 +623,7 @@ export default function Page() {
                                             <div className="my-2">
 
                                                 <div>
-                                                    {values.map((cbb, index) => (
-                                                        <div key={index} ref={previewRefs.PreviewAddRef}>
-                                                            <div className='font-bold'>{index + 1} . {cbb.value}</div>
-                                                        </div>
-                                                    ))}
-                                                    {inputs.map((input, index) => (
-                                                        <div key={index} ref={previewRefs.PreviewAddRef}>
-                                                            <div>{input.value}</div>
-                                                        </div>
-                                                    ))}
-
+                                                    {renderContent(values, inputs, previewRefs)}
                                                 </div>
                                             </div>
 
@@ -645,7 +637,6 @@ export default function Page() {
                                                     <div>
                                                         <b>BÊN BÁN</b>
                                                         <div><i>(Chữ ký, họ tên)</i></div>
-
                                                         <div className='text-center' ref={previewRefs.PreviewCustomerSignatureRef}>{customerSignature}</div>
                                                     </div>
                                                 </div>
@@ -663,14 +654,14 @@ export default function Page() {
     )
 }
 
-function formatDate(inputDate: any) {
+const formatDate = (inputDate: any) => {
     const parts = inputDate.split('-'); // Tách chuỗi thành các phần riêng biệt
     const year = parts[0];
     const month = parts[1];
     const day = parts[2];
     return `${day}/${month}/${year}`;
 }
-function getDate(inputDate: any) {
+const getDate = (inputDate: any) => {
     const parts = inputDate.split('-'); // Tách chuỗi thành các phần riêng biệt
     const year = parts[0];
     const month = parts[1];
@@ -680,7 +671,7 @@ function getDate(inputDate: any) {
 
 
 
-function convertToDateVN(dateString: string): string {
+const convertToDateVN = (dateString: string): string => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
         return 'Ngày không hợp lệ';
@@ -690,7 +681,7 @@ function convertToDateVN(dateString: string): string {
     return formattedDate;
 }
 
-function extractDatePart(dateString: string, part: 'day' | 'month' | 'year'): number {
+const extractDatePart = (dateString: string, part: 'day' | 'month' | 'year'): number => {
     const parsedDate = parse(dateString, 'dd-MM-yyyy', new Date());
     switch (part) {
         case 'day':
@@ -702,4 +693,26 @@ function extractDatePart(dateString: string, part: 'day' | 'month' | 'year'): nu
         default:
             throw new Error('Tham số không hợp lệ');
     }
+}
+
+const renderContent = (values: any, inputs: any, previewRefs: any) => {
+    const renderArray = [];
+    for (let i = 0; i < Math.max(values.length, inputs.length); i++) {
+        if (i < values.length) {
+            renderArray.push(
+                <div key={`value-${i}`} ref={previewRefs.PreviewAddRef}>
+                    <div className='font-bold'>{i + 1}. {values[i].value}</div>
+                </div>
+            );
+        }
+
+        if (i < inputs.length) {
+            renderArray.push(
+                <div key={`input-${i}`} ref={previewRefs.PreviewAddRef}>
+                    <div>{inputs[i].value}</div>
+                </div>
+            );
+        }
+    }
+    return renderArray;
 }

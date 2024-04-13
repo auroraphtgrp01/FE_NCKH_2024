@@ -58,6 +58,7 @@ import { CalendarPicker } from "@/components/ui/calendar-picker"
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 
 export default function Page() {
+    const [inputValue, setInputvalue] = useState('')
     const frameworks = [
         {
             value: "next.js",
@@ -116,7 +117,6 @@ export default function Page() {
         newCombobox[index].value = e;
         setValues(newCombobox);
         console.log(values);
-
     };
 
     const addInput = () => {
@@ -278,15 +278,21 @@ export default function Page() {
     function handleInputChangePosition(inputId: keyof typeof inputRefs, e: any, previewRefName: keyof typeof previewRefs) {
         const inputElement = inputRefs[inputId].current;
         const previewContainerRef = previewRefs[previewRefName].current;
+
         if (previewContainerRef && inputElement) {
             previewContainerRef.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Ngăn chặn sự kiện cuộn được lan truyền lên phần tử cha
+            // e.preventDefault();
         }
     }
 
+
+
     return (
-        <div className='mt-2 '>
+        <div className='mt-2 overflow-hidden'>
             <div className='flex justify-between'>
-                {/* form data */}
+                {/* edit form */}
                 <div className="p-4 w-[50%] h-[772px]">
                     <ScrollArea className="h-[772px] rounded-md border w-[100%]">
                         <form className='max-w-[100%] border shadow-2xl p-16 text-sm w-[100%]'>
@@ -425,15 +431,20 @@ export default function Page() {
                                                                 // disabled={disabledValues[index] ? true : false}
                                                                 >
                                                                     {values.length > 0 ?
-                                                                        frameworks.find(framework => framework.value === values[index].value)?.label || "Select framework..."
+                                                                        frameworks.find(framework => framework.value === values[index].value)?.label || inputValue || "Select framework..."
                                                                         : "Select framework..."}
                                                                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                                 </Button>
                                                             </PopoverTrigger>
                                                             <PopoverContent className="w-[200px] p-0">
                                                                 <Command>
-                                                                    <CommandInput placeholder="Search framework..." className="h-9" />
-                                                                    <CommandEmpty>No framework found.</CommandEmpty>
+                                                                    <CommandInput placeholder="Search framework..." className="h-9" onBlur={(e) => setInputvalue(e.target.value)} />
+                                                                    <CommandEmpty>
+                                                                        {/*  */}
+                                                                        <Button type="button" className='w-[80%]' onClick={(e) => { handleComboboxChange(index, inputValue) }}>
+                                                                            Thêm mới
+                                                                        </Button>
+                                                                    </CommandEmpty>
                                                                     <CommandList>
                                                                         <CommandGroup>
                                                                             {frameworks.map((framework) => (
@@ -464,7 +475,7 @@ export default function Page() {
                                                         {index === inputs.length - 1 && (
                                                             <span ref={inputRefs.add}>
                                                                 <Button type="button" className='ml-2 ' onClick={(e) => { addInput() }} >
-                                                                    Thêm mới
+                                                                    Add
                                                                 </Button>
                                                             </span>
                                                         )}
@@ -486,7 +497,7 @@ export default function Page() {
                                                 <div className="">
                                                     <b className="">BÊN BÁN</b>
                                                     <div className='mb-2'><i>(Chữ ký, họ tên)</i></div>
-                                                    <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { await handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
+                                                    <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
                                                 </div>
                                             </div>
 

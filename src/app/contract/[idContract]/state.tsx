@@ -27,7 +27,7 @@ export function State() {
     const [customerSignature, setCustomerSignature] = useState('ExampleB');
     const [inputs, setInputs] = useState<{ value: string }[]>([{ value: '' }]);
     const [open, setOpen] = useState(false);
-    const [values, setValues] = useState<{ value: string }[]>([{ value: '' }])
+    const [values, setValues] = useState<{ value: string }[]>([{ value: 'Select framework...' }])
     const [disabledInputs, setDisabledInputs] = useState<boolean[]>([]);
     const [disabledValues, setDisabledValues] = useState<boolean[]>([]);
     const [defaultLabel, setDefaultLabel] = useState<string>("Select framework");

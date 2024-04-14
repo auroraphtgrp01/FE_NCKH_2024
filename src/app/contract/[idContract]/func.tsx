@@ -27,14 +27,14 @@ export function FunctionHandle() {
         customerPhoneNumber, setCustomerPhoneNumber,
         customerAccountNumber, setCustomerAccountNumber,
         customerSignature, setCustomerSignature,
-        open, setOpen,
-        value, setValue,
         inputs, setInputs,
     } = State();
 
     const addInput = () => {
         const newInputs = [...inputs, { value: '' }];
         setInputs(newInputs);
+
+
     };
 
     const handleInputChange = (index: number, value: string) => {

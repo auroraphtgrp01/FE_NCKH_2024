@@ -55,7 +55,32 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { CalendarPicker } from "@/components/ui/calendar-picker"
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
+
 export default function Page() {
+    const [inputValue, setInputvalue] = useState('')
+    const frameworks = [
+        {
+            value: "next.js",
+            label: "Next.js",
+        },
+        {
+            value: "sveltekit",
+            label: "SvelteKit",
+        },
+        {
+            value: "nuxt.js",
+            label: "Nuxt.js",
+        },
+        {
+            value: "remix",
+            label: "Remix",
+        },
+        {
+            value: "astro",
+            label: "Astro",
+        },
+    ]
     const {
         city, setCity,
         date, setDate,
@@ -81,27 +106,41 @@ export default function Page() {
         customerPhoneNumber, setCustomerPhoneNumber,
         customerAccountNumber, setCustomerAccountNumber,
         customerSignature, setCustomerSignature,
-        open, setOpen,
-        value, setValue,
         inputs, setInputs,
+        open, setOpen,
+        values, setValues,
+        // disabledInputs, setDisabledInputs,
+        // disabledValues, setDisabledValues,
     } = State();
+    const handleComboboxChange = async (index: number, e: any) => {
+        const newCombobox = [...values];
+        newCombobox[index].value = e;
+        setValues(newCombobox);
+        console.log(values);
+    };
 
     const addInput = () => {
         const newInputs = [...inputs, { value: '' }];
+        const newCBB = [...values, { value: 'Select framework...' }];
         setInputs(newInputs);
+        setValues(newCBB);
+        // setDisabledInputs([...disabledInputs, true]); // set input trước cái input tạo ra
+        // setDisabledValues([...disabledValues, true]); // set input trước cái input tạo ra
+
+
     };
 
     const handleInputChange = (index: number, value: string) => {
         const newInputs = [...inputs];
         newInputs[index].value = value;
         setInputs(newInputs);
-        // console.log(inputs);
+        console.log(inputs);
+
     };
 
     const handleDates = (newDate: Date) => {
         console.log(newDate);
         setDate(newDate)
-
     }
 
     // function handleState
@@ -178,6 +217,7 @@ export default function Page() {
     const handleChangeCustomerSignature = (event: any) => {
         setCustomerSignature(event.target.value);
     };
+
     // Position
     const inputRefs = {
         city: useRef<HTMLInputElement>(null),
@@ -205,7 +245,6 @@ export default function Page() {
         customerPhoneNumber: useRef<HTMLInputElement>(null),
         customerAccountNumber: useRef<HTMLInputElement>(null),
         customerSignature: useRef<HTMLInputElement>(null),
-
     };
 
     // Tạo Ref
@@ -239,15 +278,21 @@ export default function Page() {
     function handleInputChangePosition(inputId: keyof typeof inputRefs, e: any, previewRefName: keyof typeof previewRefs) {
         const inputElement = inputRefs[inputId].current;
         const previewContainerRef = previewRefs[previewRefName].current;
+
         if (previewContainerRef && inputElement) {
             previewContainerRef.scrollIntoView({ behavior: "smooth", block: "center" });
+
+            // Ngăn chặn sự kiện cuộn được lan truyền lên phần tử cha
+            // e.preventDefault();
         }
     }
 
+
+
     return (
-        <div className='mt-2 overflow-y-hidden'>
+        <div className='mt-2 overflow-hidden'>
             <div className='flex justify-between'>
-                {/* form data */}
+                {/* edit form */}
                 <div className="p-4 w-[50%] h-[772px]">
                     <ScrollArea className="h-[772px] rounded-md border w-[100%]">
                         <form className='max-w-[100%] border shadow-2xl p-16 text-sm w-[100%]'>
@@ -370,21 +415,74 @@ export default function Page() {
                                             <div className="my-2">
                                                 <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
                                             </div>
-                                            <div className="">
+                                            <div>
                                                 {inputs.map((input, index) => (
                                                     <div key={index} className='mt-3' >
                                                         {/* CBB */}
-                                                        <ComboboxDemo />
-                                                        {index === inputs.length - 1 && (
-                                                            <> <span ref={inputRefs.add}>
-                                                                <Button type="button" className='ml-2 ' onClick={(e) => { addInput() }} >
-                                                                    Thêm mới
+                                                        {/* open={open} onOpenChange={setOpen} */}
+                                                        <span className='font-bold'> {index + 1} . </span>
+                                                        <Popover >
+                                                            <PopoverTrigger asChild>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    role="combobox"
+                                                                    aria-expanded={open}
+                                                                    className="w-[200px] justify-between"
+                                                                // disabled={disabledValues[index] ? true : false}
+                                                                >
+                                                                    {values.length > 0 ?
+                                                                        frameworks.find(framework => framework.value === values[index].value)?.label || inputValue || "Select framework..."
+                                                                        : "Select framework..."}
+                                                                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                                 </Button>
-                                                            </span></>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-[200px] p-0">
+                                                                <Command>
+                                                                    <CommandInput placeholder="Search framework..." className="h-9" onBlur={(e) => setInputvalue(e.target.value)} />
+                                                                    <CommandEmpty>
+                                                                        {/*  */}
+                                                                        <Button type="button" className='w-[80%]' onClick={(e) => { handleComboboxChange(index, inputValue) }}>
+                                                                            Thêm mới
+                                                                        </Button>
+                                                                    </CommandEmpty>
+                                                                    <CommandList>
+                                                                        <CommandGroup>
+                                                                            {frameworks.map((framework) => (
+                                                                                <CommandItem className='cursor-pointer' style={{ pointerEvents: 'auto' }}
+                                                                                    key={framework.value}
+                                                                                    value={framework.value}
+                                                                                    onSelect={(currentValue) => {
+                                                                                        // setValue(currentValue === value ? "" : currentValue)
+                                                                                        // setOpen(false)
+                                                                                        handleComboboxChange(index, currentValue)
+                                                                                    }}
+                                                                                >
+                                                                                    {framework.label}
+                                                                                    <CheckIcon
+                                                                                        className={cn(
+                                                                                            "ml-auto h-4 w-4",
+                                                                                            values.toString() === framework.value ? "opacity-100" : "opacity-0"
+                                                                                        )}
+                                                                                    />
+                                                                                </CommandItem>
+                                                                            ))}
+                                                                        </CommandGroup>
+                                                                    </CommandList>
+                                                                </Command>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        {/* ttx */}
+                                                        {index === inputs.length - 1 && (
+                                                            <span ref={inputRefs.add}>
+                                                                <Button type="button" className='ml-2 ' onClick={(e) => { addInput() }} >
+                                                                    Add
+                                                                </Button>
+                                                            </span>
                                                         )}
                                                         {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
                                                         <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-3' defaultValue={input.value}
-                                                            onBlur={(e) => { handleInputChange(index, e.target.value); handleInputChangePosition("add", e, 'PreviewAddRef') }}></Textarea>
+                                                            onBlur={(e) => { handleInputChange(index, e.target.value); handleInputChangePosition("add", e, 'PreviewAddRef') }}
+                                                        ></Textarea>
 
                                                     </div>
                                                 ))}
@@ -399,8 +497,7 @@ export default function Page() {
                                                 <div className="">
                                                     <b className="">BÊN BÁN</b>
                                                     <div className='mb-2'><i>(Chữ ký, họ tên)</i></div>
-                                                    <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { await handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
-
+                                                    <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
                                                 </div>
                                             </div>
 
@@ -508,28 +605,20 @@ export default function Page() {
                                                     <div className="flex justify-between mt-2">
                                                         <span ref={previewRefs.PreviewCustomerPhoneNumberRef}> - Điện thoại:&nbsp;      {customerPhoneNumber}
                                                         </span>
-
                                                         <span ref={previewRefs.PreviewCustomerAccountNumberRef}> Số tài khoản:&nbsp;       {customerAccountNumber}
                                                         </span>
-
                                                     </div>
-
                                                 </div>
-
-
                                             </div>
                                             <div className="my-2">
                                                 <span ref={previewRefs.PreviewSigningDateRef}>Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
                                                     ngày&nbsp;
                                                     {formatDate(signingDate)}</span>
-
                                             </div>
                                             <div className="my-2">
                                                 <span ref={previewRefs.PreviewEndDateRef}> Ngày có hiệu lực, Và được kết thúc
                                                     vào ngày&nbsp;    {formatDate(endDate)}
                                                 </span>
-
-
                                             </div>
 
                                             <div className="my-2">
@@ -545,16 +634,9 @@ export default function Page() {
                                             <div className="my-2">
 
                                                 <div>
-                                                    {inputs.map((input, index) => (
-                                                        <div key={index} ref={previewRefs.PreviewAddRef}>
-                                                            <b>Điều 1. Đối tượng Hợp đồng</b>
-                                                            <div>{input.value}</div>
-                                                        </div>
-                                                    ))}
-
+                                                    {renderContent(values, inputs, previewRefs)}
                                                 </div>
                                             </div>
-
 
                                             <div>
                                                 <div className='grid grid-cols-2 text-center mt-3'>
@@ -566,7 +648,6 @@ export default function Page() {
                                                     <div>
                                                         <b>BÊN BÁN</b>
                                                         <div><i>(Chữ ký, họ tên)</i></div>
-
                                                         <div className='text-center' ref={previewRefs.PreviewCustomerSignatureRef}>{customerSignature}</div>
                                                     </div>
                                                 </div>
@@ -583,87 +664,15 @@ export default function Page() {
         </div >
     )
 }
-export function ComboboxDemo() {
-    const [open, setOpen] = React.useState(false)
-    const [value, setValue] = React.useState("")
-    const frameworks = [
-        {
-            value: "next.js",
-            label: "Next.js",
-        },
-        {
-            value: "sveltekit",
-            label: "SvelteKit",
-        },
-        {
-            value: "nuxt.js",
-            label: "Nuxt.js",
-        },
-        {
-            value: "remix",
-            label: "Remix",
-        },
-        {
-            value: "astro",
-            label: "Astro",
-        },
-    ]
-    return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
-                >
-                    {value
-                        ? frameworks.find((framework) => framework.value === value)?.label
-                        : "Select framework..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-                <Command>
-                    <CommandInput placeholder="Search framework..." />
-                    <CommandEmpty>No framework found.</CommandEmpty>
-                    <CommandList>
-                        <CommandGroup>
-                            {frameworks.map((framework) => (
-                                <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
-                                    onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
-                                    }}
-                                >
-                                    <Check
-                                        className={cn(
-                                            "mr-2 h-4 w-4",
-                                            value === framework.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                    {framework.label}
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
-    )
-}
 
-
-function formatDate(inputDate: any) {
+const formatDate = (inputDate: any) => {
     const parts = inputDate.split('-'); // Tách chuỗi thành các phần riêng biệt
     const year = parts[0];
     const month = parts[1];
     const day = parts[2];
     return `${day}/${month}/${year}`;
 }
-function getDate(inputDate: any) {
+const getDate = (inputDate: any) => {
     const parts = inputDate.split('-'); // Tách chuỗi thành các phần riêng biệt
     const year = parts[0];
     const month = parts[1];
@@ -673,31 +682,48 @@ function getDate(inputDate: any) {
 
 
 
-function convertToDateVN(dateString: string): string {
-    // Tạo đối tượng Date từ chuỗi
+const convertToDateVN = (dateString: string): string => {
     const date = new Date(dateString);
-
-    // Kiểm tra nếu date là NaN hoặc không hợp lệ
     if (isNaN(date.getTime())) {
         return 'Ngày không hợp lệ';
     }
-
-    // Chuyển đổi ngày thành định dạng "ngày - tháng - năm" của Việt Nam
     const formattedDate = format(date, 'dd-MM-yyyy');
 
     return formattedDate;
 }
 
-function extractDatePart(dateString: string, part: 'day' | 'month' | 'year'): number {
+const extractDatePart = (dateString: string, part: 'day' | 'month' | 'year'): number => {
     const parsedDate = parse(dateString, 'dd-MM-yyyy', new Date());
     switch (part) {
         case 'day':
             return parsedDate.getDate();
         case 'month':
-            return parsedDate.getMonth() + 1; // Tháng bắt đầu từ 0
+            return parsedDate.getMonth() + 1;
         case 'year':
             return parsedDate.getFullYear();
         default:
             throw new Error('Tham số không hợp lệ');
     }
+}
+
+const renderContent = (values: any, inputs: any, previewRefs: any) => {
+    const renderArray = [];
+    for (let i = 0; i < Math.max(values.length, inputs.length); i++) {
+        if (i < values.length) {
+            renderArray.push(
+                <div key={`value-${i}`} ref={previewRefs.PreviewAddRef}>
+                    <div className='font-bold'>{i + 1}. {values[i].value}</div>
+                </div>
+            );
+        }
+
+        if (i < inputs.length) {
+            renderArray.push(
+                <div key={`input-${i}`} ref={previewRefs.PreviewAddRef}>
+                    <div>{inputs[i].value}</div>
+                </div>
+            );
+        }
+    }
+    return renderArray;
 }

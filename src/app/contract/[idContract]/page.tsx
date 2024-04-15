@@ -2,8 +2,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { format, parse } from "date-fns";
 import { State } from "./state";
-import { ToastAction } from "@/components/ui/toast";
-import { toast, useToast } from "@/components/ui/use-toast";
 
 import Link from "next/link";
 import {
@@ -345,7 +343,7 @@ export default function Page() {
               <div className="grid gap-2">
                 <Label htmlFor="name">AddressWallet</Label>
                 <Input
-                  className="flex h-10 w-full border border-input rounded-3xl "
+                  className="flex h-10 w-full border border-input rounded-xl "
                   id="name"
                   placeholder="m@example.com"
                   disabled
@@ -354,7 +352,7 @@ export default function Page() {
               <div className="grid gap-2">
                 <Label htmlFor="name">Your Party</Label>
                 <Input
-                  className="flex h-10 w-full border border-input rounded-3xl "
+                  className="flex h-10 w-full border border-input rounded-xl "
                   id="name"
                   placeholder="Your Party"
                   disabled
@@ -363,7 +361,7 @@ export default function Page() {
               <div className="grid gap-2">
                 <Label htmlFor="name">Contract Status</Label>
                 <Input
-                  className="flex h-10 w-full border border-input rounded-3xl "
+                  className="flex h-10 w-full border border-input rounded-xl "
                   id="name"
                   placeholder="Contract Status"
                   disabled
@@ -372,48 +370,46 @@ export default function Page() {
             </div>
 
             <div className="flex items-center p-6 pt-0 justify-between space-x-2">
-              <Button className="text-[white] dark:text-black bg-primary hover:bg-primary/90 outline-none border-none py-2 px-4 border rounded-md shadow flex">
+              <Button className="text-[white] dark:text-black bg-primary hover:bg-primary/90 outline-none border-none py-2 px-4 border rounded-full shadow flex">
                 Accept
               </Button>
-              <Button className="text-[white] bg-destructive hover:bg-destructive/90 outline-none border-none py-2 px-4 border rounded-md shadow flex">
+              <Button className="text-[white] bg-destructive hover:bg-destructive/90 outline-none border-none py-2 px-4 border rounded-full shadow flex">
                 Refuse the invition
               </Button>
-              <Button className="text-[white] bg-blue-600 hover:bg-blue-600/90 outline-none border-none py-2 px-4 border rounded-md shadow flex">
+              <Button className="text-[white] bg-blue-600 hover:bg-blue-600/90 outline-none border-none py-2 px-4 border rounded-full shadow flex">
                 Chat with parties
               </Button>
             </div>
-            {/* <div className="flex items-center p-6 pt-0"> */}
-            {/* </div> */}
             <div className="flex items-center p-6 pt-0 mx-8 space-x-2">
               <div>
-                <Dialog>
-                  <DialogTrigger>
-                    <Button className="text-[white] dark:text-black bg-orange-500 hover:bg-orange-500/90 outline-none border-none py-2 px-4 border rounded-md shadow">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="text-[white] dark:text-black bg-orange-500 hover:bg-orange-500/90 outline-none border-none py-2 px-4 border rounded-full shadow">
                       Request edit permission
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Bạn có muốn tiếp tục ?</DialogTitle>
-                      <DialogDescription>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Bạn có muốn tiếp tục ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
                         This action cannot be undone. This will permanently
                         delete your account and remove your data from our
                         servers.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                      <Button type="submit">Continue</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction className=" bg-orange-500 hover:bg-orange-500/90">
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
               <div>
-                <Button className="text-[white] dark:text-black bg-orange-400 hover:bg-orange-400/90 outline-none border-none py-2 px-4 border rounded-md shadow">
+                <Button className="text-[white] dark:text-black bg-orange-400 hover:bg-orange-400/90 outline-none border-none py-2 px-4 border rounded-full shadow">
                   Sign a contract
                 </Button>
               </div>
@@ -677,9 +673,9 @@ export default function Page() {
             </div>
           </div>
           <Button className="inline-flex items-center justify-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 ml-auto rounded-full">
-            <p className="text-xl text-gray-500">
+            <p className="text-gray-500">
               <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
+                className="w-[20px] h-[20px] text-gray-800 dark:text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -689,9 +685,9 @@ export default function Page() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
                   d="M5 12h14m-7 7V5"
                 />
               </svg>
@@ -720,9 +716,9 @@ export default function Page() {
             placeholder="Type your message..."
           ></Input>
           <Button className="bg-orange-500 outline-gray-600 inline-flex items-center justify-center text-sm font-medium border border-input hover:bg-orange-500/90 h-10 w-10 ml-auto rounded-xl">
-            <p className="text-xl text-gray-500">
+            <p className="text-xl">
               <svg
-                className="w-6 h-6 text-white"
+                className="w-[20px] h-[20px] text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -732,10 +728,10 @@ export default function Page() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 11c.889-.086 1.416-.543 2.156-1.057a22.323 22.323 0 0 0 3.958-5.084 1.6 1.6 0 0 1 .582-.628 1.549 1.549 0 0 1 1.466-.087c.205.095.388.233.537.406a1.64 1.64 0 0 1 .384 1.279l-1.388 4.114M7 11H4v6.5A1.5 1.5 0 0 0 5.5 19v0A1.5 1.5 0 0 0 7 17.5V11Zm6.5-1h4.915c.286 0 .372.014.626.15.254.135.472.332.637.572a1.874 1.874 0 0 1 .215 1.673l-2.098 6.4C17.538 19.52 17.368 20 16.12 20c-2.303 0-4.79-.943-6.67-1.475"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12.01 6.001C6.5 1 1 8 5.782 13.001L12.011 20l6.23-7C23 8 17.5 1 12.01 6.002Z"
                 />
               </svg>
             </p>

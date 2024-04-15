@@ -44,7 +44,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { Check, ChevronsUpDown, Key } from "lucide-react";
+import {
+  Check,
+  FilePen,
+  FileSliders,
+  MessagesSquare,
+  SendHorizontal,
+  X,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -333,7 +340,7 @@ export default function Page() {
         {/* edit form */}
         <div className="p-4 h-[772px] md:min-w-[250px]">
           {/* <div className="mt-4 w-[30%] max-w-[50%]"> */}
-          <Card className="rounded-2xl border bg-card text-card-foreground">
+          <Card className="rounded-2xl border bg-grey-50 text-card-foreground">
             <div className="flex flex-col p-6 space-y-1">
               <h3 className="font-semibold tracking-tight text-2xl">
                 Information
@@ -370,64 +377,16 @@ export default function Page() {
             </div>
 
             <div className="flex items-center p-6 pt-0 justify-between space-x-2">
-              <Button className="text-black text-sm dark:text-black bg-gray-100 hover:bg-gray-200/90 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white  dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white outline-none border-none py-2 px-4 border rounded-full shadow flex">
-                <svg
-                  className="w-6 h-6 text-green-500 dark:text-green-500"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="3 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 11.917 9.724 16.5 19 7.5"
-                  />
-                </svg>
+              <Button className="text-sm bg-green-500 hover:bg-green-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow flex">
+                <Check size={17} strokeWidth={2.5} className="mr-1" />
                 Accept
               </Button>
-              <Button className="text-black text-sm bg-gradient-to-r  bg-gray-100 hover:bg-gray-200/90  dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white outline-none border-none py-2 px-4 border rounded-full shadow flex">
-                <svg
-                  className="w-6 h-6 text-red-500"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="3 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18 17.94 6M18 18 6.06 6"
-                  />
-                </svg>
+              <Button className=" text-sm bg-gradient-to-r  bg-red-500 hover:bg-red-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow flex">
+                <X size={17} strokeWidth={2.5} className="mr-1" />
                 Refuse the invition
               </Button>
-              <Button className="text-black text-sm  bg-gray-100 hover:bg-gray-200/90  dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white outline-none border-none py-2 px-4 border rounded-full shadow flex">
-                <svg
-                  className="w-6 h-6 text-orange-500"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="3 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 17h6l3 3v-3h2V9h-2M4 4h11v8H9l-3 3v-3H4V4Z"
-                  />
-                </svg>
+              <Button className="text-sm  bg-orange-500 hover:bg-orange-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow flex">
+                <MessagesSquare size={17} strokeWidth={2.5} className="mr-1" />
                 Chat with parties
               </Button>
             </div>
@@ -435,24 +394,12 @@ export default function Page() {
               <div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button className="text-black text-sm dark:text-black bg-gray-100 hover:bg-gray-200/90  dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white outline-none border-none py-2 px-4 border rounded-full shadow">
-                      <svg
-                        className="w-6 h-6 text-green-800"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        viewBox="2 0 24 24"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                        />
-                      </svg>
+                    <Button className="text-white text-sm bg-gray-500 hover:bg-gray-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow">
+                      <FileSliders
+                        size={17}
+                        strokeWidth={2.5}
+                        className="mr-1"
+                      />
                       Request edit permission
                     </Button>
                   </AlertDialogTrigger>
@@ -469,7 +416,7 @@ export default function Page() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction className=" bg-orange-500 hover:bg-orange-500/90 dark:text-white">
+                      <AlertDialogAction className=" dark:text-white">
                         Continue
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -477,24 +424,8 @@ export default function Page() {
                 </AlertDialog>
               </div>
               <div>
-                <Button className="text-black text-sm dark:text-black  bg-gray-100 hover:bg-gray-200/90  dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white outline-none border-none py-2 px-4 border rounded-full shadow">
-                  <svg
-                    className="w-6 h-6 text-blue-800"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 11c.889-.086 1.416-.543 2.156-1.057a22.323 22.323 0 0 0 3.958-5.084 1.6 1.6 0 0 1 .582-.628 1.549 1.549 0 0 1 1.466-.087c.205.095.388.233.537.406a1.64 1.64 0 0 1 .384 1.279l-1.388 4.114M7 11H4v6.5A1.5 1.5 0 0 0 5.5 19v0A1.5 1.5 0 0 0 7 17.5V11Zm6.5-1h4.915c.286 0 .372.014.626.15.254.135.472.332.637.572a1.874 1.874 0 0 1 .215 1.673l-2.098 6.4C17.538 19.52 17.368 20 16.12 20c-2.303 0-4.79-.943-6.67-1.475"
-                    />
-                  </svg>
+                <Button className="text-white text-sm bg-blue-500 hover:bg-blue-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow">
+                  <FilePen size={17} strokeWidth={2.5} className="mr-1" />
                   Sign a contract
                 </Button>
               </div>
@@ -802,20 +733,7 @@ export default function Page() {
           ></Input>
           <Button className="bg-orange-500 outline-gray-600 inline-flex items-center justify-center text-sm font-medium border border-input hover:bg-orange-500/90 h-10 w-10 ml-auto rounded-xl">
             <p className="text-xl">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                />
-              </svg>
+              <SendHorizontal size={15} strokeWidth={2} />
             </p>
           </Button>
         </div>

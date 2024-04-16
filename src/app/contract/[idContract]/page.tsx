@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { format, parse } from "date-fns";
 import { State } from "./state";
+import { FunctionHandle } from "./func";
 
 import Link from "next/link";
 import {
@@ -75,11 +76,10 @@ import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function Page() {
-  const [inputValue, setInputvalue] = useState("");
-  const frameworks = [
+  const [frameworks, setFrameworks] = useState([
     {
-      value: "next.js",
-      label: "Next.js",
+      value: "next111 .js",
+      label: "Next11.js",
     },
     {
       value: "sveltekit",
@@ -97,90 +97,88 @@ export default function Page() {
       value: "astro",
       label: "Astro",
     },
-  ];
+  ]);
+
+
   const {
-    city,
-    setCity,
-    date,
-    setDate,
-    titleContract,
-    setTitleContract,
-    numberContract,
-    setNumberContract,
-    law,
-    setLaw,
-    signingDate,
-    setSigningDate,
-    endDate,
-    setEndDate,
-    content,
-    setContent,
-    supplierName,
-    setSupplierName,
-    supplierCitizenID,
-    setSupplierCitizenID,
-    supplierSurrogate,
-    setSupplierSurrogate,
-    supplierAddress,
-    setSupplierAddress,
-    supplierPhoneNumber,
-    setSupplierPhoneNumber,
-    supplierFax,
-    setSupplierFax,
-    supplierAccountNumber,
-    setSupplierAccountNumber,
-    supplierTreasury,
-    setSupplierTreasury,
-    supplierSignature,
-    setSupplierSignature,
-    customerName,
-    setCustomerName,
-    customerCitizenID,
-    setCustomerCitizenID,
-    customerSurrogate,
-    setCustomerSurrogate,
-    customerAddress,
-    setCustomerAddress,
-    customerPhoneNumber,
-    setCustomerPhoneNumber,
-    customerAccountNumber,
-    setCustomerAccountNumber,
-    customerSignature,
-    setCustomerSignature,
-    inputs,
-    setInputs,
-    open,
-    setOpen,
-    values,
-    setValues,
-    // disabledInputs, setDisabledInputs,
-    // disabledValues, setDisabledValues,
+    city, setCity,
+    date, setDate,
+    titleContract, setTitleContract,
+    numberContract, setNumberContract,
+    law, setLaw,
+    signingDate, setSigningDate,
+    endDate, setEndDate,
+    content, setContent,
+    supplierName, setSupplierName,
+    supplierCitizenID, setSupplierCitizenID,
+    supplierSurrogate, setSupplierSurrogate,
+    supplierAddress, setSupplierAddress,
+    supplierPhoneNumber, setSupplierPhoneNumber,
+    supplierFax, setSupplierFax,
+    supplierAccountNumber, setSupplierAccountNumber,
+    supplierTreasury, setSupplierTreasury,
+    supplierSignature, setSupplierSignature,
+    customerName, setCustomerName,
+    customerCitizenID, setCustomerCitizenID,
+    customerSurrogate, setCustomerSurrogate,
+    customerAddress, setCustomerAddress,
+    customerPhoneNumber, setCustomerPhoneNumber,
+    customerAccountNumber, setCustomerAccountNumber,
+    customerSignature, setCustomerSignature,
+    inputs, setInputs,
+    open, setOpen,
+    values, setValues,
+    showChat, setShowChat,
+    inputValue, setInputvalue,
+    inputRefs, previewRefs
   } = State();
-  const handleComboboxChange = async (index: number, e: any) => {
-    const newCombobox = [...values];
-    newCombobox[index].value = e;
-    setValues(newCombobox);
+
+  const {
+    formatDate,
+    getDate,
+    convertToDateVN,
+    extractDatePart,
+    renderContent,
+    handleInputChangePosition
+  } = FunctionHandle();
+  // useEffect(() => {
+  //   console.log('framework');
+  //   console.log(frameworks);
+  // }, [frameworks]);
+
+  const handleSelectComboboxChange = (index: number, e: any) => {
+    const clone = [...values];
+    clone[index].value = e;
+    clone[index].label = e;
+    setValues(clone);
+    console.log('Values');
     console.log(values);
+
+
+  };
+  const handleAddComboboxChange = (index: number, e: any) => {
+    const clone = [...frameworks]
+    clone.push({
+      value: e,
+      label: e,
+    })
+    setFrameworks(clone)
   };
 
   const addInput = () => {
     const newInputs = [...inputs, { value: "" }];
-    const newCBB = [...values, { value: "Select framework..." }];
+    const clone = [...values, { value: "Select framework...", label: 'Select framework...' }];
     setInputs(newInputs);
-    setValues(newCBB);
-    // setDisabledInputs([...disabledInputs, true]); // set input trước cái input tạo ra
-    // setDisabledValues([...disabledValues, true]); // set input trước cái input tạo ra
+    setValues(clone);
   };
 
   const handleInputChange = (index: number, value: string) => {
     const newInputs = [...inputs];
     newInputs[index].value = value;
     setInputs(newInputs);
-    console.log(inputs);
   };
 
   const handleDates = (newDate: Date) => {
-    console.log(newDate);
     setDate(newDate);
   };
 
@@ -260,79 +258,8 @@ export default function Page() {
   };
 
   // Position
-  const inputRefs = {
-    city: useRef<HTMLInputElement>(null),
-    date: useRef<HTMLInputElement>(null),
-    titleContract: useRef<HTMLInputElement>(null),
-    numberContract: useRef<HTMLInputElement>(null),
-    law: useRef<HTMLInputElement>(null),
-    signingDate: useRef<HTMLInputElement>(null),
-    endDate: useRef<HTMLInputElement>(null),
-    content: useRef<HTMLInputElement>(null),
-    add: useRef<HTMLInputElement>(null),
-    supplierName: useRef<HTMLInputElement>(null),
-    supplierCitizenID: useRef<HTMLInputElement>(null),
-    supplierSurrogate: useRef<HTMLInputElement>(null),
-    supplierAddress: useRef<HTMLInputElement>(null),
-    supplierPhoneNumber: useRef<HTMLInputElement>(null),
-    supplierFax: useRef<HTMLInputElement>(null),
-    supplierAccountNumber: useRef<HTMLInputElement>(null),
-    supplierTreasury: useRef<HTMLInputElement>(null),
-    supplierSignature: useRef<HTMLInputElement>(null),
-    customerName: useRef<HTMLInputElement>(null),
-    customerCitizenID: useRef<HTMLInputElement>(null),
-    customerSurrogate: useRef<HTMLInputElement>(null),
-    customerAddress: useRef<HTMLInputElement>(null),
-    customerPhoneNumber: useRef<HTMLInputElement>(null),
-    customerAccountNumber: useRef<HTMLInputElement>(null),
-    customerSignature: useRef<HTMLInputElement>(null),
-  };
 
-  // Tạo Ref
-  const previewRefs = {
-    PreviewSupplierNameRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierCitizenIDRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierSurrogateRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierAddressRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierPhoneNumberRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierFaxRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierAccountNumberRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierTreasuryRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerNameRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerCitizenIDRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerSurrogateRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerAddressRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerPhoneNumberRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerAccountNumberRef: useRef<HTMLDivElement>(null),
-    PreviewSigningDateRef: useRef<HTMLDivElement>(null),
-    PreviewEndDateRef: useRef<HTMLDivElement>(null),
-    PreviewSupplierSignatureRef: useRef<HTMLDivElement>(null),
-    PreviewCustomerSignatureRef: useRef<HTMLDivElement>(null),
-    PreviewTitleContractRef: useRef<HTMLDivElement>(null),
-    PreviewDateRef: useRef<HTMLDivElement>(null),
-    PreviewNumberContractRef: useRef<HTMLDivElement>(null),
-    PreviewLawRef: useRef<HTMLDivElement>(null),
-    PreviewAddRef: useRef<HTMLDivElement>(null),
-  };
 
-  function handleInputChangePosition(
-    inputId: keyof typeof inputRefs,
-    e: any,
-    previewRefName: keyof typeof previewRefs
-  ) {
-    const inputElement = inputRefs[inputId].current;
-    const previewContainerRef = previewRefs[previewRefName].current;
-
-    if (previewContainerRef && inputElement) {
-      previewContainerRef.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-
-      // Ngăn chặn sự kiện cuộn được lan truyền lên phần tử cha
-      // e.preventDefault();
-    }
-  }
 
   return (
     <div className="mt-2 overflow-hidden">
@@ -385,7 +312,7 @@ export default function Page() {
                 <X size={17} strokeWidth={2.5} className="mr-1" />
                 Refuse the invition
               </Button>
-              <Button className="text-sm  bg-orange-500 hover:bg-orange-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow flex">
+              <Button className="text-sm  bg-orange-500 hover:bg-orange-500/90 dark:text-white outline-none border-none py-2 px-4 border rounded-md shadow flex" onClick={() => setShowChat(!showChat)}>
                 <MessagesSquare size={17} strokeWidth={2.5} className="mr-1" />
                 Chat with parties
               </Button>
@@ -403,23 +330,380 @@ export default function Page() {
                       Request edit permission
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Bạn có muốn tiếp tục ?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your account and remove your data from our
-                        servers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction className=" dark:text-white">
-                        Continue
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
+                  <AlertDialogContent className="w-full h-[100%] max-w-[95%]">
+                    <div className='overflow-hidden'>
+                      <div className='flex justify-between'>
+                        {/* edit form */}
+                        <div className="px-4 w-[50%] h-[772px]">
+                          <ScrollArea className="h-[772px] rounded-md border w-[100%]">
+                            <form className='max-w-[100%] border shadow-2xl p-16 text-sm w-[100%]'>
+                              <div id="main">
+                                <div id="application">
+                                  <div className="">
+                                    <h5 className="text-center">
+                                      <b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b>
+                                      <div>
+                                        <b>Độc lập - Tự do - Hạnh phúc</b>
+                                      </div>
+                                      <div>
+                                        -------------------------------
+                                      </div>
+                                      <div className="flex justify-center items-center" ref={inputRefs.date} >
+                                        <Input type="text" name="" className="ml-2 mt-2 border-b w-24" onBlur={(e) => { handleChangeCity(e), handleInputChangePosition("date", e, 'PreviewDateRef') }}></Input>
+                                        &nbsp; <span className='text-nowrap'>Ngày hợp đồng</span>&nbsp;
+                                        <CalendarPicker onDateChange={(e) => { handleDates(e); handleInputChangePosition("date", e, 'PreviewDateRef') }} selectedDate={date} />
+                                      </div>
+
+                                    </h5>
+                                    <h5 className="my-3 flex items-center justify-center " ref={inputRefs.titleContract}>
+                                      <Textarea name="" id="" placeholder='Nhập tiêu đề' className=' w-[70%] h-5' onBlur={(e) => { handleChangeTitleContract(e); handleInputChangePosition("titleContract", e, 'PreviewTitleContractRef') }} ></Textarea>
+                                    </h5>
+
+                                    <div className="flex items-center justify-center font-bold flex-wrap" ref={inputRefs.numberContract}>
+                                      <div className='pt-2'>Số:</div>
+                                      <Input type="text" placeholder='Nhập số hợp đồng' name="" id="contractNumber" className="w-50 ml-3 mr-3 font-bold border " onBlur={(e) => { handleChangeNumberContract(e), handleInputChangePosition("numberContract", e, 'PreviewNumberContractRef') }}></Input>
+                                      <div className='pt-2'>/HD</div>
+                                    </div>
+
+                                    <div className="law-title" ref={inputRefs.law}>
+                                      <Textarea name="" id="" placeholder='Nhập luật' className=' w-[100%] h-5 mt-2' onBlur={(e) => { handleChangeLaw(e); handleInputChangePosition("law", e, 'PreviewLawRef') }} ></Textarea>
+                                    </div>
+                                    <div className="">
+                                      <div className="my-3">
+                                        <div className="font-bold">BÊN NHÀ CUNG CẤP ( sau đây gọi tắt là Nhà cung cấp ):</div>
+                                        <div className="">
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
+                                            <Input placeholder='Nhập tên doanh nghiệp' id="supplierName" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierName(e); handleInputChangePosition("supplierName", e, 'PreviewSupplierNameRef') }} ref={inputRefs.supplierName} ></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2">- Số CCCD: </span>
+                                            <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierCitizenID(e); handleInputChangePosition("supplierCitizenID", e, 'PreviewSupplierCitizenIDRef') }} ref={inputRefs.supplierCitizenID}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Người đại diện:</span>
+                                            <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierSurrogate(e); handleInputChangePosition("supplierSurrogate", e, 'PreviewSupplierSurrogateRef') }} ref={inputRefs.supplierSurrogate}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
+                                            <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierAddress(e); handleInputChangePosition("supplierAddress", e, 'PreviewSupplierAddressRef') }} ref={inputRefs.supplierAddress}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Điện thoại:</span>
+                                            <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierPhoneNumber(e); handleInputChangePosition("supplierPhoneNumber", e, 'PreviewSupplierPhoneNumberRef') }} ref={inputRefs.supplierPhoneNumber}></Input>
+                                            <span className="text-nowrap pt-2"> Fax:</span>
+                                            <Input placeholder='Nhập số Fax' id="supplierFax" type="number" className="mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierFax(e); handleInputChangePosition("supplierFax", e, 'PreviewSupplierFaxRef') }} ref={inputRefs.supplierFax}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Số tài khoản:</span>
+                                            <Input placeholder='Nhập số tài khoản' id="supplierAccountNumber" type="number" className="mr-2 mt-2 ml-2 " onBlur={(e) => { handleChangeSupplierAccountNumber(e); handleInputChangePosition("supplierAccountNumber", e, 'PreviewSupplierAccountNumberRef') }} ref={inputRefs.supplierAccountNumber}></Input>
+                                            <span className="text-nowrap pt-2"> tại Kho bạc:</span>
+                                            <Input placeholder='Nhập địa chỉ Kho Bạc' id="treasurySupplier" type="text" className="mt-2 mr-2 ml-2 " onBlur={(e) => { handleChangeSupplierTreasury(e); handleInputChangePosition("supplierTreasury", e, 'PreviewSupplierTreasuryRef') }} ref={inputRefs.supplierTreasury}></Input>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="my-3">
+                                        <div className="font-bold">BÊN THUÊ DỊCH VỤ ( sau đây gọi tắt khách hàng ):</div>
+                                        <div className="">
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2">- Tên doanh nghiệp: </span>
+                                            <Input placeholder='Nhập tên doanh nghiệp' id="supplierName" type="text" className="mt-2 ml-2 border-2" onBlur={(e) => { handleChangeCustomerName(e); handleInputChangePosition("customerName", e, 'PreviewCustomerNameRef') }} ref={inputRefs.customerName}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2">- Số CCCD: </span>
+                                            <Input placeholder='Nhập CCCD' id="citizenIdentificationSupplier" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeCustomerCitizenID(e); handleInputChangePosition("customerCitizenID", e, 'PreviewCustomerCitizenIDRef') }} ref={inputRefs.customerCitizenID}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Người đại diện:</span>
+                                            <Input placeholder='Nhập tên người đại diện' id="supplierRepresentative" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeCustomerSurrogate(e); handleInputChangePosition("customerSurrogate", e, 'PreviewCustomerSurrogateRef') }} ref={inputRefs.customerSurrogate}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Địa chỉ cơ quan:</span>
+                                            <Input placeholder='Nhập địa chỉ cơ quan' id="supplierAddress" type="text" className="mt-2 ml-2 " onBlur={(e) => { handleChangeCustomerAddress(e); handleInputChangePosition("customerAddress", e, 'PreviewCustomerAddressRef') }} ref={inputRefs.customerAddress}></Input>
+                                          </div>
+                                          <div className="flex items-center">
+                                            <span className="text-nowrap pt-2"> - Điện thoại:</span>
+                                            <Input placeholder='Nhập số điện thoại' id="supplierPhone" type="number" className="mr-2 mt-2 ml-2 " onBlur={(e) => { handleChangeCustomerPhoneNumber(e); handleInputChangePosition("customerPhoneNumber", e, 'PreviewCustomerPhoneNumberRef') }} ref={inputRefs.customerPhoneNumber}></Input>
+                                            <span className="text-nowrap pt-2"> Số tài khoản</span>
+                                            <Input placeholder='Nhập số tài khoản' id="supplierFax" type="number" className="mt-2 ml-2 " onBlur={(e) => { handleChangeCustomerAccountNumber(e); handleInputChangePosition("customerAccountNumber", e, 'PreviewCustomerAccountNumberRef') }} ref={inputRefs.customerAccountNumber}></Input>
+                                          </div>
+
+                                        </div>
+
+
+                                      </div>
+                                      <div className="flex items-center my-2">
+                                        <span className="text-nowrap pt-2">Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
+                                          ngày</span>
+                                        <Input id="startedAt" type="date" className="mt-2 ml-2 " onBlur={(e) => { handleChangSigningDate(e), handleInputChangePosition("signingDate", e, 'PreviewSigningDateRef') }} ref={inputRefs.signingDate}></Input>
+
+                                      </div>
+                                      <div className="flex items-center my-2">
+                                        <span className="text-nowrap pt-2"> Ngày có hiệu lực, Và được kết thúc
+                                          vào ngày
+                                        </span>
+                                        <Input id="endedAt" type="date" className="mt-2 ml-2 " onBlur={(e) => { handleChangeEndDate(e), handleInputChangePosition("endDate", e, 'PreviewEndDateRef') }} ref={inputRefs.endDate}></Input>
+
+                                      </div>
+
+                                      <div className="flex items-center my-2">
+                                        <div className="text-nowrap"> Hai bên thống nhất ký kết hợp đồng
+                                          với các nội dung sau đây:
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="">
+                                      <div className="my-2">
+                                        <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
+                                      </div>
+                                      <div>
+                                        {inputs.map((input, index) => (
+                                          <div key={index} className='mt-3' >
+                                            {/* CBB */}
+                                            {/* open={open} onOpenChange={setOpen} */}
+                                            <span className='font-bold'> {index + 1} . </span>
+                                            <Popover >
+                                              <PopoverTrigger asChild>
+                                                <Button
+                                                  variant="outline"
+                                                  role="combobox"
+                                                  aria-expanded={open}
+                                                  className="w-[200px] justify-between"
+                                                // disabled={disabledValues[index] ? true : false}
+                                                >
+                                                  {values.length > 0 ?
+                                                    frameworks.find(framework => framework.value === values[index].value)?.label || inputValue || "Select framework..."
+                                                    : "Select framework..."
+                                                  }
+                                                  <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                              </PopoverTrigger>
+                                              {/* new edit */}
+                                              <PopoverContent className="w-[200px] p-0">
+                                                <Command>
+                                                  <CommandInput placeholder="Search framework..." className="h-9 text-ellipsis " onBlur={(e) => setInputvalue(e.target.value)} />
+                                                  <CommandEmpty>
+                                                    {/*  */}
+                                                    <Button type="button" className='w-[80%]' onClick={(e) => { handleAddComboboxChange(index, inputValue) }}>
+                                                      Thêm mới
+                                                    </Button>
+                                                  </CommandEmpty>
+                                                  <CommandList>
+                                                    <CommandGroup>
+                                                      {frameworks.map((framework) => (
+                                                        <CommandItem className='cursor-pointer' style={{ pointerEvents: 'auto' }}
+                                                          key={framework.value}
+                                                          value={framework.value}
+                                                          onSelect={(currentValue) => {
+                                                            // setValue(currentValue === value ? "" : currentValue)
+                                                            // setOpen(false)
+                                                            handleSelectComboboxChange(index, currentValue)
+                                                          }}
+                                                        >
+                                                          {framework.label}
+                                                          <CheckIcon
+                                                            className={cn(
+                                                              "ml-auto h-4 w-4",
+                                                              values.toString() === framework.value ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                          />
+                                                        </CommandItem>
+                                                      ))}
+                                                    </CommandGroup>
+                                                  </CommandList>
+                                                </Command>
+                                              </PopoverContent>
+                                            </Popover>
+                                            {/* ttx */}
+                                            {index === inputs.length - 1 && (
+                                              <span ref={inputRefs.add}>
+                                                <Button type="button" className='ml-2 ' onClick={(e) => { addInput() }} >
+                                                  Add
+                                                </Button>
+                                              </span>
+                                            )}
+                                            {/* Nếu là input cuối cùng thì hiển thị nút thêm mới */}
+                                            <Textarea name="" id="" placeholder='Nhập nội dung điều khoản' className=' mt-3' defaultValue={input.value}
+                                              onBlur={(e) => { handleInputChange(index, e.target.value); handleInputChangePosition("add", e, 'PreviewAddRef') }}
+                                            ></Textarea>
+
+                                          </div>
+                                        ))}
+
+                                      </div>
+                                      <div className="grid grid-cols-2 text-center mt-3">
+                                        <div className="mr-10">
+                                          <b className="">BÊN MUA</b>
+                                          <div className='mb-2'><i>(Chữ ký, họ tên)</i></div>
+                                          <span ref={inputRefs.supplierSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={(e) => { handleChangeSupplierSignature(e), handleInputChangePosition("supplierSignature", e, 'PreviewSupplierSignatureRef') }} ></Textarea></span>
+                                        </div>
+                                        <div className="">
+                                          <b className="">BÊN BÁN</b>
+                                          <div className='mb-2'><i>(Chữ ký, họ tên)</i></div>
+                                          <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
+                                        </div>
+                                      </div>
+                                      <div className="w-full h-[100px]"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </ScrollArea>
+                        </div>
+
+                        {/* Preview form  */}
+                        <div className="px-4 w-[50%]">
+                          <ScrollArea className="h-[772px] rounded-md border w-[100%]">
+                            <form className='max-w-[100%] border shadow-2xl p-16 text-sm w-[100%]'>
+                              <div id="main">
+                                <div id="application">
+                                  <div className="introduce">
+                                    <h5 className="title text-center">
+                                      <b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b>
+                                      <div>
+                                        <b>Độc lập - Tự do - Hạnh phúc</b>
+                                      </div>
+                                      <div>
+                                        -------------------------------
+                                      </div>
+                                      <div className="flex justify-center items-center" ref={previewRefs.PreviewDateRef}>
+                                        {city}
+                                        &nbsp;, ngày&nbsp;
+                                        {date && <span>{extractDatePart(convertToDateVN(date.toString()), 'day')}</span>}
+                                        &nbsp;tháng&nbsp;
+                                        {date && <span>{extractDatePart(convertToDateVN(date.toString()), 'month')}</span>}
+                                        &nbsp;năm&nbsp;
+                                        {date && <span>{extractDatePart(convertToDateVN(date.toString()), 'year')}</span>}
+                                      </div>
+                                    </h5>
+                                    <h5 className="font-bold my-3 text-center uppercase text-lg" ref={previewRefs.PreviewTitleContractRef}>
+                                      {titleContract}
+                                    </h5>
+
+                                    <div className="items-center justify-center text-center font-bold" ref={previewRefs.PreviewNumberContractRef}>
+                                      Số:&nbsp;
+                                      {numberContract}
+                                      /HĐ
+                                    </div>
+
+                                    <div className="law-title" ref={previewRefs.PreviewLawRef}>
+                                      {law}
+                                    </div>
+                                    <div className="wrapper-content">
+                                      <div className="contentA  my-3">
+                                        <div className="font-bold">BÊN NHÀ CUNG CẤP ( sau đây gọi tắt là Nhà cung cấp ):</div>
+                                        <div className="information-A">
+                                          <div className="flex items-cente mt-2">
+                                            <span ref={previewRefs.PreviewSupplierNameRef}>- Tên doanh nghiệp:&nbsp;</span>
+                                            {supplierName}
+                                          </div>
+                                          <div className="flex items-center mt-2">
+                                            <span ref={previewRefs.PreviewSupplierCitizenIDRef}>- Số CCCD:&nbsp;</span>
+                                            {supplierCitizenID}
+                                          </div>
+                                          <div className="flex items-center mt-2">
+                                            <span ref={previewRefs.PreviewSupplierSurrogateRef}> - Người đại diện:&nbsp;</span>
+                                            {supplierSurrogate}
+                                          </div>
+                                          <div className="flex items-center mt-2">
+                                            <span ref={previewRefs.PreviewSupplierAddressRef}> - Địa chỉ cơ quan:&nbsp;</span>
+                                            {supplierAddress}
+                                          </div>
+                                          <div className="flex justify-between items-center mt-2" >
+                                            <span ref={previewRefs.PreviewSupplierPhoneNumberRef}> - Điện thoại:&nbsp;      {supplierPhoneNumber}
+                                            </span>
+                                            <span ref={previewRefs.PreviewSupplierFaxRef}> Fax:&nbsp;          {supplierFax}
+                                            </span>
+                                          </div>
+                                          <div className="flex justify-between items-center mt-2">
+                                            <span ref={previewRefs.PreviewSupplierAccountNumberRef}> - Số tài khoản:&nbsp;  {supplierAccountNumber}
+                                            </span>
+                                            <span ref={previewRefs.PreviewSupplierTreasuryRef}> tại Kho bạc:&nbsp;     {supplierTreasury}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="contentB  my-3">
+                                        <div className="font-bold">BÊN THUÊ DỊCH VỤ ( sau đây gọi tắt khách hàng ):</div>
+                                        <div className="information-A">
+                                          <div className="mt-2 text-wrap" >
+                                            <span ref={previewRefs.PreviewCustomerNameRef}>- Tên doanh nghiệp:&nbsp;{customerName}</span>
+
+                                          </div>
+                                          <div className="mt-2 text-wrap">
+                                            <span ref={previewRefs.PreviewCustomerCitizenIDRef}>- Số CCCD:&nbsp; </span>                           {customerCitizenID}
+
+
+                                          </div>
+                                          <div className="mt-2 text-wrap">
+                                            <span ref={previewRefs.PreviewCustomerSurrogateRef}> - Người đại diện:&nbsp;</span>            {customerSurrogate}
+                                          </div>
+                                          <div className="mt-2 text-wrap">
+                                            <span ref={previewRefs.PreviewCustomerAddressRef}> - Địa chỉ cơ quan:&nbsp;</span>                  {customerAddress}
+
+                                          </div>
+                                          <div className="flex justify-between mt-2">
+                                            <span ref={previewRefs.PreviewCustomerPhoneNumberRef}> - Điện thoại:&nbsp;      {customerPhoneNumber}
+                                            </span>
+                                            <span ref={previewRefs.PreviewCustomerAccountNumberRef}> Số tài khoản:&nbsp;       {customerAccountNumber}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="my-2">
+                                        <span ref={previewRefs.PreviewSigningDateRef}>Thỏa thuận cung cấp này Thỏa thuận được ký kết vào
+                                          ngày&nbsp;
+                                          {formatDate(signingDate)}</span>
+                                      </div>
+                                      <div className="my-2">
+                                        <span ref={previewRefs.PreviewEndDateRef}> Ngày có hiệu lực, Và được kết thúc
+                                          vào ngày&nbsp;    {formatDate(endDate)}
+                                        </span>
+                                      </div>
+
+                                      <div className="my-2">
+                                        <div> Hai bên thống nhất ký kết hợp đồng
+                                          với các nội dung sau đây:
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div className="my-2">
+                                        <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
+                                      </div>
+                                      <div className="my-2">
+
+                                        <div>
+                                          {renderContent(values, inputs, previewRefs)}
+                                        </div>
+                                      </div>
+
+                                      <div>
+                                        <div className='grid grid-cols-2 text-center mt-3'>
+                                          <div>
+                                            <b>BÊN MUA</b>
+                                            <div><i>(Chữ ký, họ tên)</i></div>
+                                            <div className='text-center' ref={previewRefs.PreviewSupplierSignatureRef}>{supplierSignature}</div>
+                                          </div>
+                                          <div>
+                                            <b>BÊN BÁN</b>
+                                            <div><i>(Chữ ký, họ tên)</i></div>
+                                            <div className='text-center' ref={previewRefs.PreviewCustomerSignatureRef}>{customerSignature}</div>
+                                          </div>
+                                        </div>
+                                        <div className="w-full h-[100px]"></div>
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form >
+                          </ScrollArea>
+                        </div>
+                      </div >
+                    </div >
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
@@ -674,12 +958,11 @@ export default function Page() {
 
       {/* Message */}
 
-      <div className="mt-5 w-[25%] justify-between rounded-2xl border bg-card text-card-foreground shadow-sm">
+      {showChat && <div className="w-[25%] justify-between rounded-2xl border bg-card text-card-foreground shadow-sm fixed bottom-2 right-2">
         <div className="space-y-1.5 p-6 flex flex-row items-center">
           <div className="flex items-center space-x-4">
             <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/800px-MetaMask_Fox.svg.png"
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/800px-MetaMask_Fox.svg.png"
                 alt=""
               />
             </span>
@@ -688,10 +971,10 @@ export default function Page() {
               <p className="text-sm text-muted-foreground">m@example.com</p>
             </div>
           </div>
-          {/* <Button className="inline-flex items-center justify-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 ml-auto rounded-full">
-            <p className="text-gray-500">
+          <Button className="inline-flex items-center justify-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 ml-auto rounded-full">
+            <p className="text-xl text-gray-500">
               <svg
-                className="w-[20px] h-[20px] text-gray-800 dark:text-white"
+                className="w-6 h-6 text-gray-800 dark:text-white"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -701,14 +984,14 @@ export default function Page() {
               >
                 <path
                   stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M5 12h14m-7 7V5"
                 />
               </svg>
             </p>
-          </Button> */}
+          </Button>
         </div>
         <div className="p-6 pt-0">
           <div className="space-y-4">
@@ -716,13 +999,13 @@ export default function Page() {
               Hi, how can I help you today?
             </div>
             <div className="flex w-max max-w-[75%] flex-col gap-2 rounded-3xl px-3 py-2 text-sm ml-auto bg-orange-400 text-white">
-              Hey, I'm having trouble with my account.
+              Hey, Im having trouble with my account.
             </div>
             <div className="flex w-max max-w-[75%] flex-col gap-2 rounded-3xl px-3 py-2 text-sm bg-muted dark:#303030">
               What seems to be the problem?
             </div>
             <div className="flex w-max max-w-[75%] flex-col gap-2 rounded-3xl px-3 py-2 text-sm ml-auto bg-orange-400 text-white">
-              I can't log in.
+              I cant log in.
             </div>
           </div>
         </div>
@@ -732,78 +1015,30 @@ export default function Page() {
             placeholder="Type your message..."
           ></Input>
           <Button className="bg-orange-500 outline-gray-600 inline-flex items-center justify-center text-sm font-medium border border-input hover:bg-orange-500/90 h-10 w-10 ml-auto rounded-xl">
-            <p className="text-xl">
-              <SendHorizontal size={15} strokeWidth={2} />
+            <p className="text-xl text-gray-500">
+              <svg
+                className="w-6 h-6 text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 11c.889-.086 1.416-.543 2.156-1.057a22.323 22.323 0 0 0 3.958-5.084 1.6 1.6 0 0 1 .582-.628 1.549 1.549 0 0 1 1.466-.087c.205.095.388.233.537.406a1.64 1.64 0 0 1 .384 1.279l-1.388 4.114M7 11H4v6.5A1.5 1.5 0 0 0 5.5 19v0A1.5 1.5 0 0 0 7 17.5V11Zm6.5-1h4.915c.286 0 .372.014.626.15.254.135.472.332.637.572a1.874 1.874 0 0 1 .215 1.673l-2.098 6.4C17.538 19.52 17.368 20 16.12 20c-2.303 0-4.79-.943-6.67-1.475"
+                />
+              </svg>
             </p>
           </Button>
         </div>
-      </div>
+      </div>}
+
     </div>
   );
 }
 
-const formatDate = (inputDate: any) => {
-  const parts = inputDate.split("-"); // Tách chuỗi thành các phần riêng biệt
-  const year = parts[0];
-  const month = parts[1];
-  const day = parts[2];
-  return `${day}/${month}/${year}`;
-};
-const getDate = (inputDate: any) => {
-  const parts = inputDate.split("-"); // Tách chuỗi thành các phần riêng biệt
-  const year = parts[0];
-  const month = parts[1];
-  const day = parts[2];
-  return `${day}/${month}/${year}`;
-};
-
-const convertToDateVN = (dateString: string): string => {
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    return "Ngày không hợp lệ";
-  }
-  const formattedDate = format(date, "dd-MM-yyyy");
-
-  return formattedDate;
-};
-
-const extractDatePart = (
-  dateString: string,
-  part: "day" | "month" | "year"
-): number => {
-  const parsedDate = parse(dateString, "dd-MM-yyyy", new Date());
-  switch (part) {
-    case "day":
-      return parsedDate.getDate();
-    case "month":
-      return parsedDate.getMonth() + 1;
-    case "year":
-      return parsedDate.getFullYear();
-    default:
-      throw new Error("Tham số không hợp lệ");
-  }
-};
-
-const renderContent = (values: any, inputs: any, previewRefs: any) => {
-  const renderArray = [];
-  for (let i = 0; i < Math.max(values.length, inputs.length); i++) {
-    if (i < values.length) {
-      renderArray.push(
-        <div key={`value-${i}`} ref={previewRefs.PreviewAddRef}>
-          <div className="font-bold">
-            {i + 1}. {values[i].value}
-          </div>
-        </div>
-      );
-    }
-
-    if (i < inputs.length) {
-      renderArray.push(
-        <div key={`input-${i}`} ref={previewRefs.PreviewAddRef}>
-          <div>{inputs[i].value}</div>
-        </div>
-      );
-    }
-  }
-  return renderArray;
-};

@@ -33,6 +33,8 @@ export function State() {
     const [defaultLabel, setDefaultLabel] = useState<string>("Select framework");
     const [showChat, setShowChat] = useState(false)
     const [inputValue, setInputvalue] = useState("");
+
+
     const inputRefs = {
         city: useRef<HTMLInputElement>(null),
         date: useRef<HTMLInputElement>(null),

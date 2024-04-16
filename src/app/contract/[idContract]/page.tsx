@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { format, parse } from "date-fns";
@@ -141,10 +142,6 @@ export default function Page() {
     renderContent,
     handleInputChangePosition
   } = FunctionHandle();
-  // useEffect(() => {
-  //   console.log('framework');
-  //   console.log(frameworks);
-  // }, [frameworks]);
 
   const handleSelectComboboxChange = (index: number, e: any) => {
     const clone = [...values];
@@ -153,8 +150,6 @@ export default function Page() {
     setValues(clone);
     console.log('Values');
     console.log(values);
-
-
   };
   const handleAddComboboxChange = (index: number, e: any) => {
     const clone = [...frameworks]
@@ -427,7 +422,6 @@ export default function Page() {
                                             <span className="text-nowrap pt-2"> Số tài khoản</span>
                                             <Input placeholder='Nhập số tài khoản' id="supplierFax" type="number" className="mt-2 ml-2 " onBlur={(e) => { handleChangeCustomerAccountNumber(e); handleInputChangePosition("customerAccountNumber", e, 'PreviewCustomerAccountNumberRef') }} ref={inputRefs.customerAccountNumber}></Input>
                                           </div>
-
                                         </div>
 
 
@@ -462,7 +456,7 @@ export default function Page() {
                                             {/* CBB */}
                                             {/* open={open} onOpenChange={setOpen} */}
                                             <span className='font-bold'> {index + 1} . </span>
-                                            <Popover >
+                                            <Popover>
                                               <PopoverTrigger asChild>
                                                 <Button
                                                   variant="outline"
@@ -472,7 +466,7 @@ export default function Page() {
                                                 // disabled={disabledValues[index] ? true : false}
                                                 >
                                                   {values.length > 0 ?
-                                                    frameworks.find(framework => framework.value === values[index].value)?.label || inputValue || "Select framework..."
+                                                    frameworks.find(framework => framework.value === values[index].value)?.label || "Select framework..."
                                                     : "Select framework..."
                                                   }
                                                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -495,8 +489,6 @@ export default function Page() {
                                                           key={framework.value}
                                                           value={framework.value}
                                                           onSelect={(currentValue) => {
-                                                            // setValue(currentValue === value ? "" : currentValue)
-                                                            // setOpen(false)
                                                             handleSelectComboboxChange(index, currentValue)
                                                           }}
                                                         >
@@ -958,11 +950,12 @@ export default function Page() {
 
       {/* Message */}
 
-      {showChat && <div className="w-[25%] justify-between rounded-2xl border bg-card text-card-foreground shadow-sm fixed bottom-2 right-2">
+      {showChat && <div className="mt-5 w-[25%] justify-between rounded-2xl border bg-card text-card-foreground shadow-sm fixed right-2 bottom-2">
         <div className="space-y-1.5 p-6 flex flex-row items-center">
           <div className="flex items-center space-x-4">
             <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/800px-MetaMask_Fox.svg.png"
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/800px-MetaMask_Fox.svg.png"
                 alt=""
               />
             </span>
@@ -971,27 +964,6 @@ export default function Page() {
               <p className="text-sm text-muted-foreground">m@example.com</p>
             </div>
           </div>
-          <Button className="inline-flex items-center justify-center text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10 ml-auto rounded-full">
-            <p className="text-xl text-gray-500">
-              <svg
-                className="w-6 h-6 text-gray-800 dark:text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 12h14m-7 7V5"
-                />
-              </svg>
-            </p>
-          </Button>
         </div>
         <div className="p-6 pt-0">
           <div className="space-y-4">
@@ -999,7 +971,7 @@ export default function Page() {
               Hi, how can I help you today?
             </div>
             <div className="flex w-max max-w-[75%] flex-col gap-2 rounded-3xl px-3 py-2 text-sm ml-auto bg-orange-400 text-white">
-              Hey, Im having trouble with my account.
+              Hey,Im having trouble with my account.
             </div>
             <div className="flex w-max max-w-[75%] flex-col gap-2 rounded-3xl px-3 py-2 text-sm bg-muted dark:#303030">
               What seems to be the problem?
@@ -1015,24 +987,8 @@ export default function Page() {
             placeholder="Type your message..."
           ></Input>
           <Button className="bg-orange-500 outline-gray-600 inline-flex items-center justify-center text-sm font-medium border border-input hover:bg-orange-500/90 h-10 w-10 ml-auto rounded-xl">
-            <p className="text-xl text-gray-500">
-              <svg
-                className="w-6 h-6 text-white"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 11c.889-.086 1.416-.543 2.156-1.057a22.323 22.323 0 0 0 3.958-5.084 1.6 1.6 0 0 1 .582-.628 1.549 1.549 0 0 1 1.466-.087c.205.095.388.233.537.406a1.64 1.64 0 0 1 .384 1.279l-1.388 4.114M7 11H4v6.5A1.5 1.5 0 0 0 5.5 19v0A1.5 1.5 0 0 0 7 17.5V11Zm6.5-1h4.915c.286 0 .372.014.626.15.254.135.472.332.637.572a1.874 1.874 0 0 1 .215 1.673l-2.098 6.4C17.538 19.52 17.368 20 16.12 20c-2.303 0-4.79-.943-6.67-1.475"
-                />
-              </svg>
+            <p className="text-xl">
+              <SendHorizontal size={15} strokeWidth={2} />
             </p>
           </Button>
         </div>

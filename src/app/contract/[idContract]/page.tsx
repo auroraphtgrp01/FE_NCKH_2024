@@ -325,7 +325,7 @@ export default function Page() {
                       Request edit permission
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="w-full h-[100%] max-w-[95%]">
+                  <AlertDialogContent className="w-full h-[95%] max-w-[95%]">
                     <div className='overflow-hidden'>
                       <div className='flex justify-between'>
                         {/* edit form */}
@@ -535,7 +535,7 @@ export default function Page() {
                                           <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
                                         </div>
                                       </div>
-                                      <div className="w-full h-[100px]"></div>
+                                      {/* <div className="w-full h-[100px]"></div> */}
                                     </div>
                                   </div>
                                 </div>
@@ -684,7 +684,7 @@ export default function Page() {
                                             <div className='text-center' ref={previewRefs.PreviewCustomerSignatureRef}>{customerSignature}</div>
                                           </div>
                                         </div>
-                                        <div className="w-full h-[100px]"></div>
+                                        {/* <div className="w-full h-[100px]"></div> */}
                                       </div>
 
                                     </div>

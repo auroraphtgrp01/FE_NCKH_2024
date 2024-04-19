@@ -100,6 +100,10 @@ export default function page() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isOpen, setIsOpen] = React.useState(false)
     // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isOpenA, setIsOpenA] = React.useState(false)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isOpenB, setIsOpenB] = React.useState(false)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [openA, setOpenA] = React.useState(false)
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [openB, setOpenB] = React.useState(false)
@@ -270,11 +274,6 @@ export default function page() {
                     <CardContent>
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Party A:</Label>
-                            {/* <div className='flex'>
-                                <Combobox setValue={setValueCombobox} value={valueCombobox}></Combobox>
-                                <Button className='ms-2'>Invite</Button>
-                                <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
-                            </div> */}
 
                             {/* CBB A*/}
                             <div>
@@ -287,7 +286,7 @@ export default function page() {
                                                 <Button
                                                     variant="outline"
                                                     role="combobox"
-                                                    aria-expanded={open}
+                                                    aria-expanded={isOpenA}
                                                     className=" justify-between truncate w-[160px]">
                                                     {valuesA.length > 0 ?
                                                         frameworksA.find(framework => framework.value === valuesA[index].value)?.label || "Select framework..."
@@ -349,10 +348,10 @@ export default function page() {
                                                 <Button
                                                     variant="outline"
                                                     role="combobox"
-                                                    aria-expanded={open}
+                                                    aria-expanded={isOpenB}
                                                     className=" justify-between truncate w-[160px]">
                                                     {valuesB.length > 0 ?
-                                                        frameworksA.find(framework => framework.value === valuesB[index].value)?.label || "Select framework..."
+                                                        frameworksB.find(framework => framework.value === valuesB[index].value)?.label || "Select framework..."
                                                         : "Select framework..."
                                                     }
                                                     <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />

@@ -75,7 +75,6 @@ import { Separator } from "@/components/ui/separator";
 import { CalendarPicker } from "@/components/ui/calendar-picker";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { DialogClose } from "@radix-ui/react-dialog";
-
 export default function Page() {
   const [frameworks, setFrameworks] = useState([
     {
@@ -140,7 +139,6 @@ export default function Page() {
     convertToDateVN,
     extractDatePart,
     renderContent,
-    handleInputChangePosition
   } = FunctionHandle();
 
   const handleSelectComboboxChange = (index: number, e: any) => {
@@ -172,6 +170,20 @@ export default function Page() {
     newInputs[index].value = value;
     setInputs(newInputs);
   };
+
+  // Position
+  const handleInputChangePosition = (inputId: keyof typeof inputRefs, e: any, previewRefName: keyof typeof previewRefs) => {
+    const inputElement = inputRefs[inputId].current;
+    const previewContainerRef = previewRefs[previewRefName].current;
+
+    if (previewContainerRef && inputElement) {
+      previewContainerRef.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+    }
+  }
 
   const handleDates = (newDate: Date) => {
     setDate(newDate);
@@ -325,11 +337,17 @@ export default function Page() {
                       Request edit permission
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="w-full h-[95%] max-w-[95%]">
+                  <AlertDialogContent className="w-full h-[95%] max-w-[98%]">
+                    {/* dau x  */}
+                    <div className="">
+                      <AlertDialogCancel className="border-none w-[40px] p-0 hover:bg-white hover:text-gray-400 absolute right-2 top-0">
+                        <X />
+                      </AlertDialogCancel>
+                    </div>
                     <div className='overflow-hidden'>
                       <div className='flex justify-between'>
                         {/* edit form */}
-                        <div className="px-4 w-[50%] h-[772px]">
+                        <div className="px-4 w-[50%] h-[100%]">
                           <ScrollArea className="h-[772px] rounded-md border w-[100%]">
                             <form className='max-w-[100%] border shadow-2xl p-16 text-sm w-[100%]'>
                               <div id="main">
@@ -535,7 +553,7 @@ export default function Page() {
                                           <span ref={inputRefs.customerSignature}> <Textarea name="" id="" className=' h-[130px]' onBlur={async (e) => { handleChangeCustomerSignature(e), handleInputChangePosition("customerSignature", e, 'PreviewCustomerSignatureRef') }} ></Textarea></span>
                                         </div>
                                       </div>
-                                      {/* <div className="w-full h-[100px]"></div> */}
+                                      <div className="w-full h-[100px]"></div>
                                     </div>
                                   </div>
                                 </div>
@@ -684,7 +702,7 @@ export default function Page() {
                                             <div className='text-center' ref={previewRefs.PreviewCustomerSignatureRef}>{customerSignature}</div>
                                           </div>
                                         </div>
-                                        {/* <div className="w-full h-[100px]"></div> */}
+                                        <div className="w-full h-[100px]"></div>
                                       </div>
 
                                     </div>

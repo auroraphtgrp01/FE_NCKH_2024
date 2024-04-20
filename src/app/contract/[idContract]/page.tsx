@@ -465,10 +465,6 @@ export default function Page() {
                                                   className="w-[200px] justify-between"
                                                 // disabled={disabledValues[index] ? true : false}
                                                 >
-                                                  {values.length > 0 ?
-                                                    frameworks.find(framework => framework.value === values[index].value)?.label || "Select framework..."
-                                                    : "Select framework..."
-                                                  }
                                                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
                                               </PopoverTrigger>

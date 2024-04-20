@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Popover,
     PopoverContent,
@@ -9,27 +9,28 @@ import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, Com
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 import { cn } from '@/lib/utils';
 
-
 interface ComboBoxPicker {
     onSelectedData: (data: any) => void
+    propertiesFetch: string[],
+    setNewProperties: (data: string[]) => void
 }
 
-export default function ComboboxCustomize({ onSelectedData }: ComboBoxPicker) {
+export default function ComboboxCustomize({ onSelectedData, propertiesFetch, setNewProperties }: ComboBoxPicker) {
     const [inputValue, setInputValue] = useState("");
     const [openPopover, setOpenPopover] = useState(false);
     const [indexProperty, setIndexProperty] = useState<number>(-1);
-    const [properties, setProperty] = useState([
-        'City', 'Date', 'Title Contract', 'Number Contract', 'Law', 'Signing Date', 'End Date',
-        'Content', 'Supplier Name', 'Supplier Citizen ID', 'Supplier Surrogate', 'Supplier Address',
-        'Supplier Phone Number', 'Supplier Fax', 'Supplier Account Number', 'Supplier Treasury', 'Supplier Signature',
-        'Customer Name', 'Customer Citizen ID', 'Customer Surrogate', 'Customer Address', 'Customer Phone Number',
-        'Customer Account Number', 'Customer Signature'
-    ]);
+    const [properties, setProperty] = useState(
+        propertiesFetch
+    );
     const handleAddComboboxChange = (index: number, e: any) => {
         const clone = [...properties]
         clone.push(e)
         setProperty(clone)
     };
+
+    useEffect(() => {
+        handleExportNewPropertiesArray();
+    }, [properties]);
     const handleSelectComboboxChange = (index: number, e: any) => {
         setIndexProperty(index);
         onSelectedData(properties[index])
@@ -38,6 +39,15 @@ export default function ComboboxCustomize({ onSelectedData }: ComboBoxPicker) {
         clone[index] = e;
         setProperty(clone);
     };
+    const handleExportNewPropertiesArray = () => {
+        let newPropertiesCompare: string[] = [];
+        for (let i = 0; i < properties.length; i++) {
+            if (!propertiesFetch.includes(properties[i])) {
+                newPropertiesCompare.push(properties[i]);
+            }
+        }
+        setNewProperties(newPropertiesCompare);
+    }
     return (
         <div>
             <Popover open={openPopover} onOpenChange={setOpenPopover}>

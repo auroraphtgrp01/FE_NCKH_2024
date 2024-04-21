@@ -5,10 +5,11 @@ import { FunctionHandle } from "../func";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useContractContext } from "@/context/ContractProvider";
+import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 
 export default function PreviewContract() {
     const { inputRefs, previewRefs } = State()
-    const { contractAttribute, setContractAttribute }: any = useContractContext();
+    const { contractAttribute, setContractAttribute } = ContractState()
     const {
         formatDate,
         getDate,

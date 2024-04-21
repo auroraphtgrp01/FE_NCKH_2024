@@ -47,7 +47,6 @@ export function FunctionHandle() {
         setInputs(newInputs);
     };
     const formatDate = (inputDate: any) => {
-        console.log(inputDate);
         // const parts = inputDate.split("-"); // Tách chuỗi thành các phần riêng biệt
         // const year = parts[0];
         // const month = parts[1];

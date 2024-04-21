@@ -32,7 +32,9 @@ export default function Contract() {
         });
         setPropertiesAdd(updatedProperties);
     }
-
+    useEffect(() => {
+        console.log(properties);
+    }, [properties])
     function addProperty() {
         setPropertiesAdd(prevProperties => [
             ...prevProperties.slice(0, prevProperties.length - 1),
@@ -55,7 +57,6 @@ export default function Contract() {
                 <div className='mt-5' key={index}>
                     <ComboboxCustomize onSelectedData={setProperty} propertiesFetch={propertiesCBX} setNewProperties={(value) => {
                         setNewProperties(value)
-                        console.log(value);
                     }} >
                     </ComboboxCustomize>
                     <Input onChange={(e) => {

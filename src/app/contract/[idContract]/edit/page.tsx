@@ -7,9 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CalendarPicker } from "@/components/ui/calendar-picker";
-import { useContractContext } from "@/context/ContractProvider";
 import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 import { useParams } from "next/navigation";
+import ComboboxCustomize from "@/components/ComboBoxCustomize";
+import addPropertyArea from '../(component)/addPropertyArea';
+import AddPropertyArea from "../(component)/addPropertyArea";
 
 export default function DialogEditContract() {
     const { inputRefs, previewRefs } = State()
@@ -17,16 +19,21 @@ export default function DialogEditContract() {
     const { idContract } = useParams();
     const {
         formatDate,
-        getDate,
         convertToDateVN,
         extractDatePart,
-        renderContent,
         handleInputChangePosition
     } = FunctionHandle();
     useEffect(() => {
         console.log(contractAttribute);
 
     }, [contractAttribute])
+    const [propertiesCBX, setPropertiesCBX] = useState<string[]>([
+        'property1',
+    ])
+    const [newPropertiesArray, setNewProperties] = useState<string[]>([])
+    useEffect(() => {
+        console.log(newPropertiesArray);
+    }, [newPropertiesArray])
     const handleChangInput = (key: any, event: any) => {
         setContractAttribute({ ...contractAttribute, [key]: event.target.value });
     };
@@ -526,7 +533,9 @@ export default function DialogEditContract() {
                                                         <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
                                                     </div>
                                                     <div>
-                                                        {/* CBB */}
+                                                        <AddPropertyArea propertiesCBX={propertiesCBX} setPropertiesCBX={setPropertiesCBX}
+                                                            contractAttribute={contractAttribute} setContractAttribute={setContractAttribute}
+                                                            newPropertiesArray={newPropertiesArray} setNewProperties={setNewProperties} />
                                                     </div>
                                                     <div className="grid grid-cols-2 text-center mt-3">
                                                         <div className="mr-10">

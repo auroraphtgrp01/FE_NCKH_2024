@@ -13,9 +13,10 @@ interface ComboBoxPicker {
     onSelectedData: (data: any) => void
     propertiesFetch: string[],
     setNewProperties: (data: string[]) => void
+    newPropertiesArray: string[]
 }
 
-export default function ComboboxCustomize({ onSelectedData, propertiesFetch, setNewProperties }: ComboBoxPicker) {
+export default function ComboboxCustomize({ onSelectedData, propertiesFetch, setNewProperties, newPropertiesArray }: ComboBoxPicker) {
     const [inputValue, setInputValue] = useState("");
     const [openPopover, setOpenPopover] = useState(false);
     const [indexProperty, setIndexProperty] = useState<number>(-1);
@@ -26,11 +27,9 @@ export default function ComboboxCustomize({ onSelectedData, propertiesFetch, set
         const clone = [...properties]
         clone.push(e)
         setProperty(clone)
+        handleExportNewPropertiesArray(clone)
     };
 
-    useEffect(() => {
-        handleExportNewPropertiesArray();
-    }, [properties]);
     const handleSelectComboboxChange = (index: number, e: any) => {
         setIndexProperty(index);
         onSelectedData(properties[index])
@@ -39,14 +38,14 @@ export default function ComboboxCustomize({ onSelectedData, propertiesFetch, set
         clone[index] = e;
         setProperty(clone);
     };
-    const handleExportNewPropertiesArray = () => {
+    const handleExportNewPropertiesArray = (properties: any) => {
         let newPropertiesCompare: string[] = [];
         for (let i = 0; i < properties.length; i++) {
             if (!propertiesFetch.includes(properties[i])) {
                 newPropertiesCompare.push(properties[i]);
             }
         }
-        setNewProperties(newPropertiesCompare);
+        setNewProperties(newPropertiesArray.concat(newPropertiesCompare))
     }
     return (
         <div>

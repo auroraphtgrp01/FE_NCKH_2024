@@ -25,7 +25,6 @@ export default function DialogEditContract() {
     } = FunctionHandle();
     useEffect(() => {
         console.log(contractAttribute);
-
     }, [contractAttribute])
     const [propertiesCBX, setPropertiesCBX] = useState<string[]>([
         'property1',

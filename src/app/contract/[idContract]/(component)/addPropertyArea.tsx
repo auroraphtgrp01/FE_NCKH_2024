@@ -1,6 +1,5 @@
 import ComboboxCustomize from '@/components/ComboBoxCustomize'
 import { Input } from '@/components/ui/input'
-import { useContractContext } from '@/context/ContractProvider';
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button';
 
@@ -39,6 +38,9 @@ export default function AddPropertyArea(
     function handleInputChange(key: any, event: any) {
         setContractAttribute({ ...contractAttribute, [key]: event });
     };
+    function removeDuplicates(array: any) {
+        return array.filter((item: any, index: any) => array.indexOf(item) === index);
+    }
     function addProperty() {
         setPropertiesAdd(prevProperties => [
             ...prevProperties.slice(0, prevProperties.length - 1),
@@ -47,7 +49,6 @@ export default function AddPropertyArea(
         ]);
         const updatedContractAttribute = { ...contractAttribute, [properties]: inputValue };
         setContractAttribute(updatedContractAttribute);
-        setPropertiesCBX([...propertiesCBX, properties]);
         setInputValue('');
         setProperty('');
     }
@@ -55,9 +56,7 @@ export default function AddPropertyArea(
         <div>
             {propertiesAdd.map((item, index) => (
                 <div className='mt-5' key={index}>
-                    <ComboboxCustomize onSelectedData={setProperty} propertiesFetch={propertiesCBX} setNewProperties={(value) => {
-                        setNewProperties(value)
-                    }} newPropertiesArray={newPropertiesArray}>
+                    <ComboboxCustomize onSelectedData={setProperty} propertiesCBX={propertiesCBX} setPropertiesCBX={setPropertiesCBX} setNewProperties={setNewProperties} newPropertiesArray={newPropertiesArray}>
                     </ComboboxCustomize>
                     <Input onChange={(e) => {
                         handleChange(item.property, e.target.value)

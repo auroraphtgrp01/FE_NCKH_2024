@@ -1,12 +1,23 @@
-'use client'
-import { useContractContext } from '@/context/ContractProvider'
-import { Button } from '@/components/ui/button'
-import React, { useEffect, useState } from 'react'
 import ComboboxCustomize from '@/components/ComboBoxCustomize'
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/input'
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button';
 
-export default function Contract() {
-    const { contractAttribute, setContractAttribute }: any = useContractContext();
+
+export interface IAddPropertyAreaProps {
+    propertiesCBX: string[]
+    setPropertiesCBX: (value: string[]) => void
+    newPropertiesArray: string[]
+    setNewProperties: (value: string[]) => void,
+    contractAttribute: any,
+    setContractAttribute: (value: any) => void
+}
+
+export default function AddPropertyArea(
+    { propertiesCBX, setPropertiesCBX, newPropertiesArray, setNewProperties, contractAttribute, setContractAttribute }: IAddPropertyAreaProps
+) {
+    const [properties, setProperty] = useState<string>('')
+    const [inputValue, setInputValue] = useState('')
     const [propertiesAdd, setPropertiesAdd] = useState<any[]>([
         {
             property: '',
@@ -14,14 +25,6 @@ export default function Contract() {
             isCreated: false
         }
     ]);
-    const [newPropertiesArray, setNewProperties] = useState<string[]>([])
-    const [propertiesCBX, setPropertiesCBX] = useState<string[]>([
-        'city',
-        'date',
-        'titleContract',
-        'numberContract',
-    ])
-    const [properties, setProperty] = useState<string>('')
     function handleChange(property: string, value: string) {
         setInputValue(value);
         const updatedProperties = propertiesAdd.map((item) => {
@@ -32,9 +35,12 @@ export default function Contract() {
         });
         setPropertiesAdd(updatedProperties);
     }
-    useEffect(() => {
-        console.log(properties);
-    }, [properties])
+    function handleInputChange(key: any, event: any) {
+        setContractAttribute({ ...contractAttribute, [key]: event });
+    };
+    function removeDuplicates(array: any) {
+        return array.filter((item: any, index: any) => array.indexOf(item) === index);
+    }
     function addProperty() {
         setPropertiesAdd(prevProperties => [
             ...prevProperties.slice(0, prevProperties.length - 1),
@@ -46,31 +52,24 @@ export default function Contract() {
         setInputValue('');
         setProperty('');
     }
-    function handleInputChange(data: any, index: any) {
-
-        setContractAttribute({ ...contractAttribute, [propertiesAdd[index].property]: data })
-    }
-    const [inputValue, setInputValue] = useState('')
     return (
         <div>
             {propertiesAdd.map((item, index) => (
                 <div className='mt-5' key={index}>
-                    <ComboboxCustomize onSelectedData={setProperty} propertiesFetch={propertiesCBX} setNewProperties={(value) => {
-                        setNewProperties(value)
-                    }} >
+                    <ComboboxCustomize onSelectedData={setProperty} propertiesCBX={propertiesCBX} setPropertiesCBX={setPropertiesCBX} setNewProperties={setNewProperties} newPropertiesArray={newPropertiesArray}>
                     </ComboboxCustomize>
                     <Input onChange={(e) => {
                         handleChange(item.property, e.target.value)
                         if (item.isCreated) {
-                            handleInputChange(e.target.value, index)
+                            handleInputChange(item.property, e.target.value)
                         }
                     }} defaultValue={item.value}>
                     </Input>
                 </div>
             ))}
-            <Button variant={'destructive'} onClick={addProperty}>
-                ADD
+            <Button variant={'destructive'} onClick={addProperty} type='button'>
+                Add New Property
             </Button>
         </div>
-    );
+    )
 }

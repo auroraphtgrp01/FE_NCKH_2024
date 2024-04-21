@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Combobox } from '@/components/ComboBox'
 import { CalendarPicker } from '@/components/ui/calendar-picker'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -85,6 +86,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { DialogClose } from "@radix-ui/react-dialog";
+import ComboboxCustomize from '@/components/ComboBoxCustomize'
 export interface GrantPermission {
     readContract: boolean,
     editPartyInfo: boolean,
@@ -93,35 +95,23 @@ export interface GrantPermission {
 }
 
 export default function page() {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [date, setDate] = React.useState<Date>()
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [valueCombobox, setValueCombobox] = React.useState<Date>()
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isOpen, setIsOpen] = React.useState(false)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [openA, setOpenA] = React.useState(false)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [openB, setOpenB] = React.useState(false)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [per, setPer] = React.useState<GrantPermission>({
         readContract: true,
         chatWithParty: false,
         editPartyInfo: false,
         editTheTerm: false
     })
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [valuesA, setValuesA] = useState<{ value: string, label: string }[]>([{ value: 'Select framework...', label: 'Select framework...' }])
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [inputValueA, setInputvalueA] = useState("");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [inputsA, setInputsA] = useState<{ value: string }[]>([{ value: '' }]);
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [valuesB, setValuesB] = useState<{ value: string, label: string }[]>([{ value: 'Select framework...', label: 'Select framework...' }])
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [inputValueB, setInputvalueB] = useState("");
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [inputsB, setInputsB] = useState<{ value: string }[]>([{ value: '' }]);
     const handleSelectComboboxChangeA = (index: number, e: any) => {
         const clone = [...valuesA];
@@ -167,7 +157,6 @@ export default function page() {
     }
 
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [frameworksA, setFrameworksA] = useState([
         {
             value: "next111 .js",
@@ -190,7 +179,6 @@ export default function page() {
             label: "Astro",
         },
     ]);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [frameworksB, setFrameworksB] = useState([
         {
             value: "next111 .js",
@@ -213,6 +201,33 @@ export default function page() {
             label: "Astro",
         },
     ]);
+    const [propertiesA, setPropertyA] = useState<string>('')
+    const [propertiesCBXA, setPropertiesCBXA] = useState<string[]>([
+        'city',
+        'date',
+        'titleContract',
+        'numberContract',
+    ])
+    const [newPropertiesAArrayA, setNewPropertiesA] = useState<string[]>([])
+
+    useEffect(() => {
+        console.log('values A : ');
+        console.log(propertiesA);
+    }, [propertiesA])
+
+
+    const [propertiesB, setPropertyB] = useState<string>('')
+    const [propertiesCBXB, setPropertiesCBXB] = useState<string[]>([
+        'city',
+        'date',
+        'titleContract',
+        'numberContract',
+    ])
+    const [newPropertiesAArrayB, setNewPropertiesB] = useState<string[]>([])
+    useEffect(() => {
+        console.log('values B : ');
+        console.log(propertiesB);
+    }, [propertiesB])
     return (
         <div className='w-full flex'>
             <div className='flex  py-4'>
@@ -270,133 +285,20 @@ export default function page() {
                     <CardContent>
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Party A:</Label>
-                            {/* <div className='flex'>
-                                <Combobox setValue={setValueCombobox} value={valueCombobox}></Combobox>
+                            <div>
+                                <ComboboxCustomize onSelectedData={setPropertyA} propertiesFetch={propertiesCBXA} setNewProperties={setNewPropertiesA} >
+                                </ComboboxCustomize>
                                 <Button className='ms-2'>Invite</Button>
                                 <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
-                            </div> */}
-
-                            {/* CBB A*/}
-                            <div>
-                                {inputsA.map((input, index) => (
-                                    <div key={index} className='mt-3 flex' >
-                                        {/* CBB */}
-                                        {/* open={open} onOpenChange={setOpen} */}
-                                        <Popover open={openA} onOpenChange={setOpenA}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    aria-expanded={open}
-                                                    className=" justify-between truncate w-[160px]">
-                                                    {valuesA.length > 0 ?
-                                                        frameworksA.find(framework => framework.value === valuesA[index].value)?.label || "Select framework..."
-                                                        : "Select framework..."
-                                                    }
-                                                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0">
-                                                <Command>
-                                                    <CommandInput placeholder="Search framework..." className="h-9 text-ellipsis " onBlur={(e) => setInputvalueA(e.target.value)} />
-                                                    <CommandEmpty>
-                                                        {/*  */}
-                                                        <Button type="button" className='w-[80%]' onClick={(e) => { handleAddComboboxChangeA(index, inputValueA) }}>
-                                                            Thêm mới
-                                                        </Button>
-                                                    </CommandEmpty>
-                                                    <CommandList>
-                                                        <CommandGroup>
-                                                            {frameworksA.map((framework) => (
-                                                                <CommandItem className='cursor-pointer' style={{ pointerEvents: 'auto' }}
-                                                                    key={framework.value}
-                                                                    value={framework.value}
-                                                                    onSelect={(currentValue) => {
-                                                                        handleSelectComboboxChangeA(index, currentValue)
-                                                                        setOpenA(false)
-                                                                    }}
-                                                                >
-                                                                    {framework.label}
-                                                                    <CheckIcon
-                                                                        className={cn(
-                                                                            "ml-auto h-4 w-4",
-                                                                            valuesA.toString() === framework.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>
-                                        <Button className='ms-2'>Invite</Button>
-                                        <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Party B:</Label>
                             <div>
-                                {inputsB.map((input, index) => (
-                                    <div key={index} className='mt-3 flex'>
-                                        {/* CBB */}
-                                        {/* open={open} onOpenChange={setOpen} */}
-                                        <Popover open={openB} onOpenChange={setOpenB}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    aria-expanded={open}
-                                                    className=" justify-between truncate w-[160px]">
-                                                    {valuesB.length > 0 ?
-                                                        frameworksA.find(framework => framework.value === valuesB[index].value)?.label || "Select framework..."
-                                                        : "Select framework..."
-                                                    }
-                                                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0">
-                                                <Command>
-                                                    <CommandInput placeholder="Search framework..." className="h-9 text-ellipsis " onBlur={(e) => setInputvalueB(e.target.value)} />
-                                                    <CommandEmpty>
-                                                        {/*  */}
-                                                        <Button type="button" className='w-[80%]' onClick={(e) => { handleAddComboboxChangeB(index, inputValueB) }}>
-                                                            Thêm mới
-                                                        </Button>
-                                                    </CommandEmpty>
-                                                    <CommandList>
-                                                        <CommandGroup>
-                                                            {frameworksB.map((framework) => (
-                                                                <CommandItem className='cursor-pointer' style={{ pointerEvents: 'auto' }}
-                                                                    key={framework.value}
-                                                                    value={framework.value}
-                                                                    onSelect={(currentValue) => {
-                                                                        handleSelectComboboxChangeB(index, currentValue)
-                                                                        setOpenB(false)
-                                                                    }}
-                                                                >
-                                                                    {framework.label}
-                                                                    <CheckIcon
-                                                                        className={cn(
-                                                                            "ml-auto h-4 w-4",
-                                                                            valuesA.toString() === framework.value ? "opacity-100" : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>
-                                        <Button className='ms-2'>Invite</Button>
-                                        <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
-                                    </div>
-                                ))}
+                                <ComboboxCustomize onSelectedData={setPropertyB} propertiesFetch={propertiesCBXB} setNewProperties={setNewPropertiesB} >
+                                </ComboboxCustomize>
+                                <Button className='ms-2'>Invite</Button>
+                                <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
                             </div>
                         </div>
                         <div className="flex flex-col space-y-2 mt-2">

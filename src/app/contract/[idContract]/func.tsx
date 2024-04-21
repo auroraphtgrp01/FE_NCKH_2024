@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { State } from './state'; // Import custom hook State
 import { format, parse } from 'date-fns';
+import { log } from 'console';
 export function FunctionHandle() {
     const {
         city, setCity,
@@ -45,91 +46,14 @@ export function FunctionHandle() {
         newInputs[index].value = value;
         setInputs(newInputs);
     };
-
-    const handleDates = (newDate: Date) => {
-        setDate(newDate)
-
-    }
-    // function handleState
-    const handleChangeCity = (event: any) => {
-        setCity(event.target.value);
-    };
-
-    const handleChangeTitleContract = (event: any) => {
-        setTitleContract(event.target.value);
-    };
-    const handleChangeNumberContract = (event: any) => {
-        setNumberContract(event.target.value);
-    };
-    const handleChangeLaw = (event: any) => {
-        setLaw(event.target.value);
-    };
-
-    // config
-    const handleChangSigningDate = (event: any) => {
-        setSigningDate(event.target.value);
-    };
-
-    const handleChangeEndDate = (event: any) => {
-        setEndDate(event.target.value);
-    };
-    const handleChangContent = (event: any) => {
-        setContent(event.target.value);
-    };
-    const handleChangeSupplierName = (event: any) => {
-        setSupplierName(event.target.value);
-    };
-    const handleChangeSupplierCitizenID = (event: any) => {
-        setSupplierCitizenID(event.target.value);
-    };
-    const handleChangeSupplierSurrogate = (event: any) => {
-        setSupplierSurrogate(event.target.value);
-    };
-    const handleChangeSupplierAddress = (event: any) => {
-        setSupplierAddress(event.target.value);
-    };
-    const handleChangeSupplierPhoneNumber = (event: any) => {
-        setSupplierPhoneNumber(event.target.value);
-    };
-    const handleChangeSupplierFax = (event: any) => {
-        setSupplierFax(event.target.value);
-    };
-    const handleChangeSupplierAccountNumber = (event: any) => {
-        setSupplierAccountNumber(event.target.value);
-    };
-    const handleChangeSupplierTreasury = (event: any) => {
-        setSupplierTreasury(event.target.value);
-    };
-    const handleChangeCustomerName = (event: any) => {
-        setCustomerName(event.target.value);
-    };
-    const handleChangeCustomerCitizenID = (event: any) => {
-        setCustomerCitizenID(event.target.value);
-    };
-    const handleChangeCustomerSurrogate = (event: any) => {
-        setCustomerSurrogate(event.target.value);
-    };
-    const handleChangeCustomerAddress = (event: any) => {
-        setCustomerAddress(event.target.value);
-    };
-    const handleChangeCustomerPhoneNumber = (event: any) => {
-        setCustomerPhoneNumber(event.target.value);
-    };
-    const handleChangeCustomerAccountNumber = (event: any) => {
-        setCustomerAccountNumber(event.target.value);
-    };
-    const handleChangeSupplierSignature = (event: any) => {
-        setSupplierSignature(event.target.value);
-    };
-    const handleChangeCustomerSignature = (event: any) => {
-        setCustomerSignature(event.target.value);
-    };
     const formatDate = (inputDate: any) => {
-        const parts = inputDate.split("-"); // Tách chuỗi thành các phần riêng biệt
-        const year = parts[0];
-        const month = parts[1];
-        const day = parts[2];
-        return `${day}/${month}/${year}`;
+        // const parts = inputDate.split("-"); // Tách chuỗi thành các phần riêng biệt
+        // const year = parts[0];
+        // const month = parts[1];
+        // const day = parts[2];
+        // return `${day}/${month}/${year}`;
+        return 123
+
     };
     const getDate = (inputDate: any) => {
         const parts = inputDate.split("-"); // Tách chuỗi thành các phần riêng biệt
@@ -206,30 +130,6 @@ export function FunctionHandle() {
     return {
         addInput,
         handleInputChange,
-        handleDates,
-        handleChangeCity,
-        handleChangeTitleContract,
-        handleChangeNumberContract,
-        handleChangeLaw,
-        handleChangSigningDate,
-        handleChangeEndDate,
-        handleChangContent,
-        handleChangeSupplierName,
-        handleChangeSupplierCitizenID,
-        handleChangeSupplierSurrogate,
-        handleChangeSupplierAddress,
-        handleChangeSupplierPhoneNumber,
-        handleChangeSupplierFax,
-        handleChangeSupplierAccountNumber,
-        handleChangeSupplierTreasury,
-        handleChangeCustomerName,
-        handleChangeCustomerCitizenID,
-        handleChangeCustomerSurrogate,
-        handleChangeCustomerAddress,
-        handleChangeCustomerPhoneNumber,
-        handleChangeCustomerAccountNumber,
-        handleChangeSupplierSignature,
-        handleChangeCustomerSignature,
         formatDate,
         getDate,
         convertToDateVN,

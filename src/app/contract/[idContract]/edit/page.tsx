@@ -55,7 +55,7 @@ export default function DialogEditContract() {
                                                         CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM 2
                                                     </b>
                                                     <div>
-                                                        <b>Độc lập - Tự do - Hạnh phúc</b>
+                                                        <b>Độc lập - Tự do123 - Hạnh phúc</b>
                                                     </div>
                                                     <div>-------------------------------</div>
                                                     <div
@@ -603,8 +603,8 @@ export default function DialogEditContract() {
                             <PreviewContract></PreviewContract>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div >
+            </div >
         </div >
     )
 }

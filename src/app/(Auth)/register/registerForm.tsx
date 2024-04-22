@@ -48,11 +48,14 @@ import { fetchAPI } from "@/utils/fetchAPI"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { set } from "date-fns"
 import usePreventLeave from 'react-hook-use-prevent-leave';
+import { useRouter } from "next/navigation"
 
 export default function RegisterForm() {
   const [blockPage, setBlockPage] = React.useState<boolean>(true)
   const { wallet, setWallet }: any = useAppContext()
   const [isOpen, setIsOpen] = React.useState(false)
+  const Router = useRouter();
+
   const [registerId, setRegisterId] = React.useState<string>("")
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
@@ -84,6 +87,7 @@ export default function RegisterForm() {
         description: "Register Success. Please login to continue.",
         variant: "default",
       })
+      Router.push('/')
     }).catch((err) => {
       toast({
         title: "Register Fail",
@@ -104,11 +108,12 @@ export default function RegisterForm() {
       dateOfBirth: date?.toISOString(),
       addressWallet: wallet.accounts[0]
     }
-    fetchAPI('/users', 'POST', payload).then((res) => {
+    fetchAPI('/auth/register', 'POST', payload).then((res) => {
       if (res.status === 201) {
         setRegisterId(res.data.id)
         setIsOpen(true);
       }
+      
     }).catch((err) => {
       toast({
         title: "Register Fail",
@@ -117,6 +122,9 @@ export default function RegisterForm() {
       })
     })
   }
+
+  
+
   function handleSubmit(values: z.infer<typeof RegisterBody>) {
 
   }

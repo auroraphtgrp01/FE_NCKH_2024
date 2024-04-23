@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { use, useEffect, useState } from "react";
 import { State } from "../state";
@@ -13,6 +14,8 @@ import ComboboxCustomize from "@/components/ComboBoxCustomize";
 import addPropertyArea from '../(component)/addPropertyArea';
 import AddPropertyArea from "../(component)/addPropertyArea";
 import PreviewContract from '../(component)/PreviewContract';
+import AddPropertySingle from "../(component)/addPropertySingle";
+import AddAttributeArea from "../(component)/addAttributeArea";
 
 export default function DialogEditContract() {
     const { inputRefs, previewRefs } = State()
@@ -24,24 +27,22 @@ export default function DialogEditContract() {
         extractDatePart,
         handleInputChangePosition
     } = FunctionHandle();
-    useEffect(() => {
-        console.log(contractAttribute);
-    }, [contractAttribute])
     const [propertiesCBX, setPropertiesCBX] = useState<string[]>([
-        'property1',
+        'title',
+        'attribute'
     ])
     const [newPropertiesArray, setNewProperties] = useState<string[]>([])
-    useEffect(() => {
-        console.log(newPropertiesArray);
-    }, [newPropertiesArray])
     const handleChangInput = (key: any, event: any) => {
-        setContractAttribute({ ...contractAttribute, [key]: event.target.value });
+        if (key === 'date') {
+            setContractAttribute({ ...contractAttribute, [key]: event });
+        } else {
+            setContractAttribute({ ...contractAttribute, [key]: event.target.value });
+        }
     };
+
     return (
         <div>
-            <div className="w-full h-[95%] max-w-[100%] mt-5">
-                <div className="">
-                </div>
+            <div className="w-full h-dvd max-w-[100%] mt-5">
                 <div className="overflow-hidden">
                     <div className="flex justify-between h-[100%]">
                         <div className="px-1 w-[50%]">
@@ -69,7 +70,7 @@ export default function DialogEditContract() {
                                                             onBlur={(e) => {
                                                                 handleChangInput('city', e),
                                                                     handleInputChangePosition(
-                                                                        "date",
+                                                                        "city",
                                                                         e,
                                                                         "PreviewDateRef"
                                                                     );
@@ -533,9 +534,7 @@ export default function DialogEditContract() {
                                                         <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
                                                     </div>
                                                     <div>
-                                                        <AddPropertyArea propertiesCBX={propertiesCBX} setPropertiesCBX={setPropertiesCBX}
-                                                            contractAttribute={contractAttribute} setContractAttribute={setContractAttribute}
-                                                            newPropertiesArray={newPropertiesArray} setNewProperties={setNewProperties} />
+                                                        <AddAttributeArea contractAttribute={contractAttribute} setContractAttribute={setContractAttribute}></AddAttributeArea>
                                                     </div>
                                                     <div className="grid grid-cols-2 text-center mt-3">
                                                         <div className="mr-10">
@@ -600,7 +599,7 @@ export default function DialogEditContract() {
                             </ScrollArea>
                         </div>
                         <div className="px-1 w-[50%]">
-                            <PreviewContract></PreviewContract>
+                            <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute}></PreviewContract>
                         </div>
                     </div>
                 </div>

@@ -1,15 +1,22 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { State } from "../state";
 import { FunctionHandle } from "../func";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useContractContext } from "@/context/ContractProvider";
 import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
-
-export default function PreviewContract() {
+interface DKHTItem {
+    value: {
+        value: string;
+        type: string;
+    }[];
+    property: string;
+}
+export default function PreviewContract({ contractAttribute, setContractAttribute }: { contractAttribute: any, setContractAttribute: any }) {
     const { inputRefs, previewRefs } = State()
-    const { contractAttribute, setContractAttribute } = ContractState()
+    const [DKHD, setDKHD] = useState<any[]>([]);
     const {
         formatDate,
         getDate,
@@ -18,9 +25,27 @@ export default function PreviewContract() {
         renderContent,
         handleInputChangePosition
     } = FunctionHandle();
+
+    const createDKHT: DKHTItem[] = [];
+    useEffect(() => {
+        Object.keys(contractAttribute).forEach((key, index) => {
+            if (contractAttribute[key].type === 'DKHD') {
+                createDKHT.push({
+                    value: contractAttribute[key],
+                    property: key
+                })
+            }
+        })
+        setDKHD(createDKHT)
+    }, [contractAttribute])
+
+    useEffect(() => {
+        console.log(contractAttribute);
+    }, [contractAttribute])
+
     return (
         <div>
-            <ScrollArea className="h-[772px] rounded-xl border w-[100%]">
+            <ScrollArea className="h-[772px] rounded-md border w-[100%]">
                 <form className="max-w-[100%] border shadow-2xl p-16 text-sm w-[100%]">
                     <div id="main">
                         <div id="application">
@@ -213,9 +238,17 @@ export default function PreviewContract() {
                                 </div>
                                 <div>
                                     <div className="my-2">
-                                        <b>CÁC ĐIỀU KHOẢN CHÍNH</b>
+                                        <b id="">CÁC ĐIỀU KHOẢN CHÍNH</b>
                                     </div>
                                     <div className="my-2">
+                                        {
+                                            DKHD.map((item, index) => (
+                                                <div key={index}>
+                                                    <b>{`Điều ${index + 1}. ${item.property}`}</b>
+                                                    <p>{item.value.value}</p>
+                                                </div>
+                                            ))
+                                        }
 
                                     </div>
 

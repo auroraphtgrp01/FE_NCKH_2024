@@ -286,7 +286,7 @@ export default function page() {
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Party A:</Label>
                             <div>
-                                <ComboboxCustomize onSelectedData={setPropertyA} propertiesFetch={propertiesCBXA} setNewProperties={setNewPropertiesA} >
+                                <ComboboxCustomize onSelectedData={setPropertyA} propertiesCBX={propertiesCBXA} setNewProperties={setNewPropertiesA} newPropertiesArray={newPropertiesAArrayA} setPropertiesCBX={setPropertiesCBXA} >
                                 </ComboboxCustomize>
                                 <Button className='ms-2'>Invite</Button>
                                 <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
@@ -295,7 +295,7 @@ export default function page() {
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Party B:</Label>
                             <div>
-                                <ComboboxCustomize onSelectedData={setPropertyB} propertiesFetch={propertiesCBXB} setNewProperties={setNewPropertiesB} >
+                                <ComboboxCustomize onSelectedData={setPropertyB} propertiesCBX={propertiesCBXB} setNewProperties={setNewPropertiesB} newPropertiesArray={newPropertiesAArrayB} setPropertiesCBX={setPropertiesCBXB} >
                                 </ComboboxCustomize>
                                 <Button className='ms-2'>Invite</Button>
                                 <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>

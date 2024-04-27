@@ -34,7 +34,7 @@ export default function RootLayout({
             </div>
             <Toaster />
             <div className="">
-              <Footer />
+              {/* <Footer /> */}
             </div>
           </AppProvider>
         </ThemeProvider>

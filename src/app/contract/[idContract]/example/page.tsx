@@ -7,7 +7,6 @@ export default function page() {
         <div>
             <ContractProvider>
                 <Contract></Contract>
-
             </ContractProvider>
         </div>
     )

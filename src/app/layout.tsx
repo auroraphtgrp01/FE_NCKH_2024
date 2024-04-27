@@ -5,7 +5,7 @@ import { AppProvider, ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer"
-
+import { Toaster as Sonner } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["vietnamese"] });
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head></head>
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body className={inter.className} suppressHydrationWarning={true} >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -31,10 +31,11 @@ export default function RootLayout({
             <Header />
             <div className="container">
               {children}
+              <Sonner />
             </div>
             <Toaster />
-            <div className="mt-48">
-              <Footer />
+            <div className="">
+              {/* <Footer /> */}
             </div>
           </AppProvider>
         </ThemeProvider>

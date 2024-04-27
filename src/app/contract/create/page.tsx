@@ -1,233 +1,126 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
-import React, { useEffect, useState } from 'react'
-import { Combobox } from '@/components/ComboBox'
-import { CalendarPicker } from '@/components/ui/calendar-picker'
+import { use, useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
     Carousel,
+    CarouselApi,
     CarouselContent,
     CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
 } from "@/components/ui/carousel"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
-
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import Image from 'next/image'
 import { Textarea } from '@/components/ui/textarea'
-import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
-import { Switch } from '@/components/ui/switch'
-
-// Combobox
-import { format, parse } from "date-fns";
-
-import Link from "next/link";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-import {
-    Check,
-    FilePen,
-    FileSliders,
-    MessagesSquare,
-    SendHorizontal,
-    X,
-} from "lucide-react";
-
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { DialogClose } from "@radix-ui/react-dialog";
-import ComboboxCustomize from '@/components/ComboBoxCustomize'
-export interface GrantPermission {
-    readContract: boolean,
-    editPartyInfo: boolean,
-    chatWithParty: boolean,
-    editTheTerm: boolean
+import GrantPermission, { IPermission } from '@/components/GrantPermission'
+import { useAppContext } from '@/components/ThemeProvider'
+
+export const initPermission: IPermission = {
+    READ_CONTRACT: false,
+    EDIT_CONTRACT: false,
+    INVITE_PARTICIPANT: false,
+    CHANGE_STATUS_CONTRACT: false,
+    SET_OWNER_PARTY: false
 }
 
+export interface InvitationItem {
+    email: string
+    permission: IPermission
+}
+
+export interface ContractTemplate {
+    id: string
+    name: string
+    img: string
+}
+
+const initContractTemplate = [
+    {
+        id: '1',
+        name: 'Template 1',
+        img: '/avatar/profile-img.png'
+    },
+    {
+        id: '2',
+        name: 'Template 2',
+        img: '/avatar/profile-img.png'
+    },
+    {
+        id: '3',
+        name: 'Template 3',
+        img: '/avatar/profile-img.png'
+    },
+    {
+        id: '4',
+        name: 'Template 4',
+        img: '/avatar/profile-img.png'
+    },
+    {
+        id: '5',
+        name: 'Template 5',
+        img: '/avatar/profile-img.png'
+    }
+]
+
 export default function page() {
-    const [date, setDate] = React.useState<Date>()
-    const [valueCombobox, setValueCombobox] = React.useState<Date>()
-    const [isOpen, setIsOpen] = React.useState(false)
-    const [openA, setOpenA] = React.useState(false)
-    const [openB, setOpenB] = React.useState(false)
-    const [per, setPer] = React.useState<GrantPermission>({
-        readContract: true,
-        chatWithParty: false,
-        editPartyInfo: false,
-        editTheTerm: false
-    })
-    const [valuesA, setValuesA] = useState<{ value: string, label: string }[]>([{ value: 'Select framework...', label: 'Select framework...' }])
-    const [inputValueA, setInputvalueA] = useState("");
-    const [inputsA, setInputsA] = useState<{ value: string }[]>([{ value: '' }]);
-
-    const [valuesB, setValuesB] = useState<{ value: string, label: string }[]>([{ value: 'Select framework...', label: 'Select framework...' }])
-    const [inputValueB, setInputvalueB] = useState("");
-    const [inputsB, setInputsB] = useState<{ value: string }[]>([{ value: '' }]);
-    const handleSelectComboboxChangeA = (index: number, e: any) => {
-        const clone = [...valuesA];
-        clone[index].value = e;
-        clone[index].label = e;
-        setValuesA(clone);
-        console.log('ValuesA');
-        console.log(valuesA);
-    };
-    const handleAddComboboxChangeA = (index: number, e: any) => {
-        const clone = [...frameworksA]
-        clone.push({
-            value: e,
-            label: e,
-        })
-        setFrameworksA(clone)
-    };
-
-    const handleSelectComboboxChangeB = (index: number, e: any) => {
-        const clone = [...valuesB];
-        clone[index].value = e;
-        clone[index].label = e;
-        setValuesB(clone);
-        console.log('ValuesB');
-        console.log(valuesB);
-    };
-    const handleAddComboboxChangeB = (index: number, e: any) => {
-        const clone = [...frameworksB]
-        clone.push({
-            value: e,
-            label: e,
-        })
-        setFrameworksB(clone)
-    };
-    function onChangePer(key: keyof GrantPermission): void {
-        let pers = { ...per }
-        pers[key] = !pers[key]
-        setPer(pers)
-        return undefined
+    const [template, setTemplate] = useState<ContractTemplate[]>(initContractTemplate)
+    const [isOpen, setOpen] = useState(false)
+    const { wallet, setWallet }: any = useAppContext()
+    const [invitationInput, setInvitationInput] = useState('')
+    const [invitation, setInvitation] = useState<InvitationItem[]>([])
+    const [indexPerson, setIndexPerson] = useState<number>(-1)
+    const [nameOfContractInput, setNameOfContractInput] = useState('')
+    const [templateSelect, setTemplateSelect] = useState<ContractTemplate>(template[0])
+    const [contract, setContract] = useState<any>({})
+    const [messages, setMessages] = useState('')
+    function onAddInvitation(): void {
+        const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
+        if (!isEmail.test(invitationInput)) {
+            alert('Email is invalid !')
+            return
+        }
+        setInvitation([...invitation, { email: invitationInput, permission: initPermission }])
+        setInvitationInput('')
     }
-    function openGrantPermission() {
-        setIsOpen(true)
+    function updatePermission(data: IPermission): void {
+        invitation[indexPerson].permission = data
+        setInvitation([...invitation])
     }
-
-
-    const [frameworksA, setFrameworksA] = useState([
-        {
-            value: "next111 .js",
-            label: "Next11.js",
-        },
-        {
-            value: "sveltekit",
-            label: "SvelteKit",
-        },
-        {
-            value: "nuxt.js",
-            label: "Nuxt.js",
-        },
-        {
-            value: "remix",
-            label: "Remix",
-        },
-        {
-            value: "astro",
-            label: "Astro",
-        },
-    ]);
-    const [frameworksB, setFrameworksB] = useState([
-        {
-            value: "next111 .js",
-            label: "Next11.js",
-        },
-        {
-            value: "sveltekit",
-            label: "SvelteKit",
-        },
-        {
-            value: "nuxt.js",
-            label: "Nuxt.js",
-        },
-        {
-            value: "remix",
-            label: "Remix",
-        },
-        {
-            value: "astro",
-            label: "Astro",
-        },
-    ]);
-    const [propertiesA, setPropertyA] = useState<string>('')
-    const [propertiesCBXA, setPropertiesCBXA] = useState<string[]>([
-        'city',
-        'date',
-        'titleContract',
-        'numberContract',
-    ])
-    const [newPropertiesAArrayA, setNewPropertiesA] = useState<string[]>([])
-
+    const [api, setApi] = useState<CarouselApi>()
+    const [current, setCurrent] = useState(0)
     useEffect(() => {
-        console.log('values A : ');
-        console.log(propertiesA);
-    }, [propertiesA])
-
-
-    const [propertiesB, setPropertyB] = useState<string>('')
-    const [propertiesCBXB, setPropertiesCBXB] = useState<string[]>([
-        'city',
-        'date',
-        'titleContract',
-        'numberContract',
-    ])
-    const [newPropertiesAArrayB, setNewPropertiesB] = useState<string[]>([])
+        if (!api) {
+            return
+        }
+        api.on("select", () => {
+            setCurrent(api.selectedScrollSnap())
+        })
+    }, [api])
     useEffect(() => {
-        console.log('values B : ');
-        console.log(propertiesB);
-    }, [propertiesB])
+        console.log(templateSelect);
+
+    }, [templateSelect])
+    function onClickCreateContractButton() {
+        setContract({
+            addressWallet: wallet.accounts[0],
+            name: nameOfContractInput,
+            template: templateSelect,
+            invitation: invitation,
+            messagesForInvitation: messages
+        })
+    }
+    useEffect(() => {
+        console.log(contract);
+    }, [contract])
     return (
         <div className='w-full flex'>
             <div className='flex  py-4'>
@@ -239,11 +132,13 @@ export default function page() {
                     <CardContent>
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Address Wallet: </Label>
-                            <Input disabled readOnly />
+                            <Input disabled readOnly defaultValue={wallet.accounts[0]} />
                         </div>
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label >Name of Contract: </Label>
-                            <Input />
+                            <Input defaultValue={nameOfContractInput} onChange={(e) =>
+                                setNameOfContractInput(e.target.value)
+                            } />
                         </div>
 
                         <div className="flex flex-col space-y-2 mt-2">
@@ -254,14 +149,15 @@ export default function page() {
                                 }}
                                 orientation="vertical"
                                 className="w-full max-w-xs"
+                                setApi={setApi}
                             >
-                                <CarouselContent className="-mt-1 h-[280px]">
-                                    {Array.from({ length: 5 }).map((_, index) => (
+                                <CarouselContent className="-mt-1 h-[280px]" >
+                                    {template.map((item, index) => (
                                         <CarouselItem key={index} className="pt-1 md:basis-1/2">
                                             <div className="p-1">
                                                 <Card>
-                                                    <CardContent className="flex  justify-center p-6">
-                                                        <Image alt='' src={'/avatar/profile-img.png'} width={'200'} height={'300'}></Image>
+                                                    <CardContent className="flex justify-center p-6">
+                                                        <Image alt='' src={item.img} width={'200'} height={'300'}></Image>
                                                     </CardContent>
                                                 </Card>
                                             </div>
@@ -272,53 +168,76 @@ export default function page() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button className='w-full me-2' variant={'destructive'}>Choose a Template</Button>
+                        <Button className='w-full me-2' variant={'destructive'} onClick={() => {
+                            setTemplateSelect(template[current])
+                        }}>Choose a Template</Button>
                     </CardFooter>
                 </Card>
             </div>
             <div className='flex py-4 ms-4'>
-                <Card className='min-w-[350px]'>
+                <Card className='min-w-[450px]'>
                     <CardHeader>
                         <CardTitle>Infomation of Contract</CardTitle>
-                        <CardDescription>Please fill in the inputsA to continue</CardDescription>
+                        <CardDescription>Please fill in all to continue</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-col space-y-2 mt-2">
-                            <Label >Party A:</Label>
-                            <div>
-                                <ComboboxCustomize onSelectedData={setPropertyA} propertiesFetch={propertiesCBXA} setNewProperties={setNewPropertiesA} >
-                                </ComboboxCustomize>
-                                <Button className='ms-2'>Invite</Button>
-                                <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
+                            <Label >Invitation Participants:</Label>
+                            <div className='flex'>
+                                <Input className='me-2' onChange={(e) => {
+                                    setInvitationInput(e.target.value)
+                                }} value={invitationInput} onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        onAddInvitation()
+                                    }
+                                }}></Input>
+                                <Button onClick={onAddInvitation}>Invite</Button>
                             </div>
                         </div>
-                        <div className="flex flex-col space-y-2 mt-2">
-                            <Label >Party B:</Label>
-                            <div>
-                                <ComboboxCustomize onSelectedData={setPropertyB} propertiesFetch={propertiesCBXB} setNewProperties={setNewPropertiesB} >
-                                </ComboboxCustomize>
-                                <Button className='ms-2'>Invite</Button>
-                                <Button className='ms-2' variant={'destructive'} onClick={openGrantPermission}>Permissions</Button>
-                            </div>
-                        </div>
-                        <div className="flex flex-col space-y-2 mt-2">
-                            <Label>Start Date: </Label>
-                            <CalendarPicker onDateChange={setDate} selectedDate={date} />
-                        </div>
-                        <div className="flex flex-col space-y-2 mt-2">
-                            <Label>End Date: </Label>
-                            <CalendarPicker onDateChange={setDate} selectedDate={date} />
+                        <div className="flex flex-col space-y-2 mt-2 ">
+                            <ScrollArea className="h-72 rounded-md border px-2">
+                                <Table className=''>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="">#</TableHead>
+                                            <TableHead>Email</TableHead>
+                                            <TableHead className="text-center">Permission</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {invitation.map((inv, index) => (
+                                            <TableRow key={inv.email}>
+                                                <TableCell>{index}</TableCell>
+                                                <TableCell>{inv.email}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className='flex'>
+                                                        <Button variant={'default'} className='me-2' onClick={() => {
+                                                            setIndexPerson(index)
+                                                            setOpen(true)
+                                                        }}>Grant</Button>
+                                                        <Button variant={'destructive'}>Delete</Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </ScrollArea>
                         </div>
                         <div className="flex flex-col space-y-2 mt-2">
                             <Label>Message for Invitation: </Label>
                             <Textarea
                                 placeholder="Message"
                                 className="resize-none w-full min-h-[150px]"
+                                defaultValue={messages}
+                                onChange={(e) => {
+                                    setMessages(e.target.value)
+                                }}
                             />
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button className='w-full me-2'>Create Contract</Button>
+                        <Button className='w-full me-2' onClick={onClickCreateContractButton}>Create Contract</Button>
                         <Button className='w=full' variant={'destructive'}>Cancel</Button>
                     </CardFooter>
                 </Card>
@@ -327,68 +246,15 @@ export default function page() {
                 <Card className='min-w-[630px]'>
                     <CardHeader>
                         <CardTitle className='text-center font-semibold text-lg '>
-                            Preview the Contract
+                            {template[current]?.name}
                         </CardTitle>
                         <CardDescription>Preview the contract here - Please choose a template</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {/* // gắn html của hợp đồng vào dây */}
                     </CardContent>
                 </Card>
             </div>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogPortal >
-                    <DialogOverlay>
-                        <DialogContent className="sm:max-w-[450px]" >
-                            <DialogHeader >
-                                <DialogTitle>Grant Permisison  </DialogTitle>
-                                <DialogDescription>
-                                    Grant Permisison of the contract to Party
-                                </DialogDescription>
-                            </DialogHeader>
-                            <Accordion type="single" defaultValue="item-1" >
-                                <AccordionItem value="item-1">
-                                    <AccordionTrigger >
-                                        <div className='flex items-center space-x-2 me-2'>
-                                            <Switch id="" />
-                                            <Label htmlFor="">Full Access to Contract</Label>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        <div>
-                                            <div className="grid gap-4 py-4">
-                                                <div className="flex items-center space-x-2">
-                                                    <div className='flex items-center space-x-2 me-2'>
-                                                        <Switch id="" />
-                                                        <Label htmlFor="">Read the Contract</Label>
-                                                    </div>
-                                                    <div className='flex items-center space-x-2'>
-                                                        <Switch id="" />
-                                                        <Label htmlFor="">Edit the Party Info</Label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="grid gap-4 py-4 ">
-                                                <div className="flex items-center space-x-2">
-                                                    <div className='flex items-center space-x-2 me-6'>
-                                                        <Switch id="" />
-                                                        <Label htmlFor="">Chat with Party</Label>
-                                                    </div>
-                                                    <div className='flex items-center space-x-2'>
-                                                        <Switch id="" />
-                                                        <Label htmlFor="">Edit terms in the contract </Label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                        </DialogContent>
-                    </DialogOverlay>
-                </DialogPortal>
-            </Dialog>
+            <GrantPermission isOpen={isOpen} setOpen={setOpen} permission={invitation[indexPerson]?.permission} callback={updatePermission}></GrantPermission>
         </div >
     )
 }

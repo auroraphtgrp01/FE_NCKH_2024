@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head></head>
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body className={inter.className} suppressHydrationWarning={true} >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -33,7 +33,7 @@ export default function RootLayout({
               {children}
             </div>
             <Toaster />
-            <div className="mt-48">
+            <div className="">
               <Footer />
             </div>
           </AppProvider>

@@ -18,7 +18,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 
 
-export default function AddAttributeArea({ contractAttribute, setContractAttribute }: { contractAttribute: any, setContractAttribute: any }) {
+export default function AddAttributeArea({ contractAttribute, setContractAttribute, index }: { contractAttribute: any, setContractAttribute: any, index?: number }) {
     const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditional).map((key) => ({
         key,
         value: EContractAttributeTypeAdditional[key as keyof typeof EContractAttributeTypeAdditional],
@@ -40,12 +40,25 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
             value: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? textArea : inputValue,
             property: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? inputValue : undefined,
             id: uuidRandom(),
-            type: SelectType as EContractAttributeType
+            type: SelectType as EContractAttributeType,
+            isCreate: false
         }
-        setContractAttribute([
-            ...contractAttribute,
-            newContractAttribute
-        ])
+        if (!index) {
+            setContractAttribute([
+                ...contractAttribute,
+                newContractAttribute
+            ])
+            setInputValue('')
+            setTextArea('')
+        }
+        else {
+            const newContractAttributeArray = [...contractAttribute]
+            newContractAttributeArray.splice(index, 0, newContractAttribute)
+            newContractAttributeArray.splice(index + 1, 1)
+            setContractAttribute(newContractAttributeArray)
+            setInputValue('')
+            setTextArea('')
+        }
         setInputValue('')
         setTextArea('')
     }

@@ -5,7 +5,7 @@ import { AppProvider, ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer"
-
+import { Toaster as Sonner } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["vietnamese"] });
 
 export const metadata: Metadata = {
@@ -31,6 +31,7 @@ export default function RootLayout({
             <Header />
             <div className="container">
               {children}
+              <Sonner />
             </div>
             <Toaster />
             <div className="">

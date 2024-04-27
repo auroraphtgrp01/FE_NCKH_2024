@@ -20,11 +20,12 @@ export enum EContractAttributeTypeAdditional {
 
 export interface IContractAttribute {
     id: string
-    type: EContractAttributeType
-    value: string
+    type?: EContractAttributeType
+    value?: string
     property?: string
 	createdBy?: string
 	updatedBy?: string
+	isCreate?: boolean
 }
 
 export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {

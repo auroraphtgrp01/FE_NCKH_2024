@@ -29,13 +29,13 @@ export default function RootLayout({
           disableTransitionOnChange>
           <AppProvider>
             <Header />
-            <div className="container">
+            <div className="container px-0">
               {children}
               <Sonner />
             </div>
             <Toaster />
             <div className="">
-              {/* <Footer /> */}
+              <Footer />
             </div>
           </AppProvider>
         </ThemeProvider>

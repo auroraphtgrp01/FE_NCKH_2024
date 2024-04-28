@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select"
 import { v4 as uuidRandom } from 'uuid';
 
-import { EContractAttributeType, EContractAttributeTypeAdditional, IContractAttribute } from '@/interface/contract.i';
+import { EContractAttributeType, EContractAttributeTypeAdditional, EStatusAttribute, IContractAttribute } from '@/interface/contract.i';
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 
@@ -41,7 +41,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
             property: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? inputValue : undefined,
             id: uuidRandom(),
             type: SelectType as EContractAttributeType,
-            isCreate: false
+            statusAttribute: EStatusAttribute.CREATE
         }
         if (!index) {
             setContractAttribute([

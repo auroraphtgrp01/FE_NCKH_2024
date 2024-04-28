@@ -26,6 +26,14 @@ export interface IContractAttribute {
 	createdBy?: string
 	updatedBy?: string
 	isCreate?: boolean
+	statusAttribute?: EStatusAttribute
+}
+
+export enum EStatusAttribute {
+	CREATE = "Create",
+	UPDATE = "Update",
+	PREPARE = "Prepare",
+	NOT_CHANGE = "Not Change",
 }
 
 export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {

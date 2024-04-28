@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import parse from 'html-react-parser';
 import { Icons } from '@/components/ui/icons'
-import { IContractAttribute } from '@/interface/contract.i'
+import { EStatusAttribute, IContractAttribute } from '@/interface/contract.i'
 import { v4 as uuidRandom } from 'uuid';
 export interface IInputWithTooltipProps extends React.InputHTMLAttributes<HTMLInputElement> {
     description?: string
@@ -27,7 +27,7 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
         const newContractAttribute: IContractAttribute = {
             value: '',
             id: uuidRandom(),
-            isCreate: true
+            statusAttribute: EStatusAttribute.PREPARE
         }
         const newContractAttributeArray = [...contractAttribute]
         newContractAttributeArray.splice(index + 1, 0, newContractAttribute)

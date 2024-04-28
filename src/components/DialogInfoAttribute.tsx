@@ -1,25 +1,16 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
     TableRow,
 } from "@/components/ui/table"
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { IContractAttribute } from "@/interface/contract.i"
 
 export default function DialogInfoAttribute({ isDetailAttributeDialog, setIsDetailAttributeDialog, infoOfAttribute }: { isDetailAttributeDialog: boolean, setIsDetailAttributeDialog: (item: boolean) => void, infoOfAttribute: any }) {
     return (

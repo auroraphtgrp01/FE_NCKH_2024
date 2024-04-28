@@ -5,14 +5,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 import PreviewContract from '../(component)/PreviewContract';
-import { EContractAttributeType, IContractAttribute, IDefinitionContractAttribute } from "@/interface/contract.i";
+import { EContractAttributeType, EStatusAttribute, IContractAttribute, IDefinitionContractAttribute } from "@/interface/contract.i";
 import { InputWithTooltip } from "@/components/InputWithTooltip";
 import AddAttributeArea from '../../../../components/AddAttributeArea';
 import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 import DialogInfoAttribute from '../../../../components/DialogInfoAttribute';
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert"
+import { Terminal } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export default function DialogEditContract() {
     const [contractAttribute, setContractAttribute] = useState(initContractAttribute);
+    const [contractAttributeRaw, setContractAttributeRaw] = useState<IContractAttribute[]>(initContractAttribute);
     const { idContract } = useParams();
     const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false)
     const [infoOfContractAttribute, setInfoOfContractAttribute] = useState()
@@ -26,12 +42,12 @@ export default function DialogEditContract() {
         if (attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE) {
             updatedAttributes[index] = {
                 ...attributeToUpdate,
-                property: e.target.value
+                property: e.target.value,
             };
         } else {
             updatedAttributes[index] = {
                 ...attributeToUpdate,
-                value: e.target.value
+                value: e.target.value,
             };
         }
         setContractAttribute(updatedAttributes);
@@ -41,14 +57,75 @@ export default function DialogEditContract() {
         const attributeToUpdate = updatedAttributes[index];
         updatedAttributes[index] = {
             ...attributeToUpdate,
-            value: e.target.value
+            value: e.target.value,
         };
         setContractAttribute(updatedAttributes);
     }
+    function compareChangesOfContractAttribute() {
+        const updatedAttributes = [...contractAttribute];
+
+        updatedAttributes.forEach((item, index) => {
+            const rawItem = contractAttributeRaw[index];
+            if (item.type === EContractAttributeType.CONTRACT_ATTRIBUTE) {
+                if (item.value !== rawItem.value || item.property !== rawItem.property) {
+                    updatedAttributes[index] = {
+                        ...item,
+                        statusAttribute: EStatusAttribute.UPDATE
+                    };
+                }
+            } else {
+                if (item.value !== rawItem.value) {
+                    updatedAttributes[index] = {
+                        ...item,
+                        statusAttribute: EStatusAttribute.UPDATE
+                    };
+                }
+            }
+        });
+        // call api to update contract attribute
+    }
+
+    const handleOnClickSaveChanges = () => {
+        compareChangesOfContractAttribute()
+        console.log(contractAttribute);
+    }
     return (
         <div>
+            <div className="mt-2 border-b-2 border-solid border-[#cccccc4a] flex ">
+                <div className="ms-1 mt-3">
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink>
+                                    Home
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbLink>
+                                    Components
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </div>
 
-            <div className="w-full h-[95%] max-w-[100%] mt-5">
+                <div className="ml-auto mr-auto w-[60%] mb-2">
+                    <Alert variant={'destructive'} className="border-2">
+                        <AlertTitle className="text-center">THONG BAO TAI DAY</AlertTitle>
+                    </Alert>
+                </div>
+
+                <div className="ml-auto mb-2 mt-1">
+                    <Button className="me-2" type='button' onClick={handleOnClickSaveChanges} >Save Changes</Button>
+                    <Button className="" variant={'destructive'}>Back</Button>
+                </div>
+            </div>
+            <div className="w-full h-[95%] max-w-[100%] mt-2">
                 <div className="overflow-hidden">
                     <div className="flex justify-between h-[100%]">
                         <div className="px-1 w-[50%]">
@@ -135,7 +212,7 @@ export default function DialogEditContract() {
                                                                 </h2>
                                                             </div>
                                                         )}
-                                                        {item.isCreate && (
+                                                        {item.statusAttribute === EStatusAttribute.PREPARE && (
                                                             <div>
                                                                 <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} />
                                                             </div>

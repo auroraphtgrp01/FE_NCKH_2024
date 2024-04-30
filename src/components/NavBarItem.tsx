@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
+import * as React from "react";
+import Link from "next/link";
 
-import { cn } from "../lib/utils"
-import { Icons } from "../components/ui/icons"
+import { cn } from "../lib/utils";
+import { Icons } from "../components/ui/icons";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,7 +13,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "../components/ui/navigation-menu"
+} from "../components/ui/navigation-menu";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -51,7 +51,7 @@ const components: { title: string; href: string; description: string }[] = [
     description:
       "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
   },
-]
+];
 
 export default function NavbarItem() {
   return (
@@ -60,11 +60,18 @@ export default function NavbarItem() {
         <NavigationMenuList>
           <NavigationMenuItem>
             <Link href="/dashboard" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()} >
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                 Dashboard
               </NavigationMenuLink>
             </Link>
-            <NavigationMenuTrigger className="ms-4">Smart Contract</NavigationMenuTrigger>
+            <NavigationMenuTrigger className="ms-4">
+              Smart Contract
+            </NavigationMenuTrigger>
+            <Link href="/supplier" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Supplier
+              </NavigationMenuLink>
+            </Link>
             <NavigationMenuContent>
               <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                 <li className="row-span-3">
@@ -95,7 +102,6 @@ export default function NavbarItem() {
                 </Link>
               </ul>
             </NavigationMenuContent>
-
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -161,7 +167,7 @@ export default function NavbarItem() {
         </NavigationMenuList>
       </NavigationMenu> */}
     </div>
-  )
+  );
 }
 
 const ListItem = React.forwardRef<
@@ -186,6 +192,6 @@ const ListItem = React.forwardRef<
         </a>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
+ListItem.displayName = "ListItem";

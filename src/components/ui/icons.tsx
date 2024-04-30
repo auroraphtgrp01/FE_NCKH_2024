@@ -5,7 +5,7 @@ import {
   LucideIcon,
   ScanFace,
   KeyRound,
-  Key, Check, BadgePlus, BadgeX, BadgeInfo
+  Key, Check, BadgePlus, BadgeX, BadgeInfo, ShieldPlus, UserRoundPlus
 } from "lucide-react"
 import Image from "next/image"
 
@@ -21,6 +21,8 @@ export const Icons = {
   badgePlus: BadgePlus,
   badgeX: BadgeX,
   badgeInfo: BadgeInfo,
+  shieldPlus: ShieldPlus,
+  userRoundPlus: UserRoundPlus,
   logo: (props: LucideProps) => (
     <Image src={'/metamask.png'} alt="" height={48} width={48} />
   ),

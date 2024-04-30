@@ -56,6 +56,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { fetchAPI } from "@/utils/fetchAPI"
+import BreadCrumbHeader from "@/components/BreadCrumbHeader"
 
 export interface Participant {
     userId: string
@@ -223,6 +224,7 @@ export default function DataTableDemo() {
 
     return (
         <div className="w-full">
+            <BreadCrumbHeader />
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter emails..."

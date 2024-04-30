@@ -12,7 +12,7 @@ export default function PreviewContract({ contractAttribute, setContractAttribut
   return (
     <div>
       <ScrollArea className="min-h-[772px] rounded-xl border w-[100%]">
-        <form className="max-w-[100%] min-h-[772px] border shadow-2xl p-10 text-sm w-[100%]">
+        <form className="max-w-[100%] min-h-[781px] border shadow-2xl p-10 text-sm w-[100%]">
           <div id="main">
             <div id="application">
               {contractAttribute?.map((item: IContractAttribute, index) => (

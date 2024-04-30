@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer"
 import { Toaster as Sonner } from "@/components/ui/sonner"
+import NavbarVertical from "@/components/NavbarVertical";
 const inter = Inter({ subsets: ["vietnamese"] });
 
 export const metadata: Metadata = {
@@ -28,15 +29,24 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange>
           <AppProvider>
-            <Header />
-            <div className="container px-0">
-              {children}
-              <Sonner />
+            {/* <Header /> */}
+            <div className="flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden">
+              <NavbarVertical />
+              <div className="flex flex-col">
+                <main className="grid flex-1 items-start">
+                  <div className="flex min-h-screen w-full flex-col">
+                    <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+                      <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 px-6 ">
+                        {children}
+                        <Footer />
+                      </div>
+                    </div>
+                    <Sonner />
+                    <Toaster />
+                  </div>
+                </main>
+              </div>
             </div>
-            <Toaster />
-            {/* <div className="">
-              <Footer />
-            </div> */}
           </AppProvider>
         </ThemeProvider>
       </body>

@@ -34,6 +34,7 @@ import {
 import { fetchAPI } from '@/utils/fetchAPI'
 import { useToast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 export const initPermission: IPermission = {
     READ_CONTRACT: false,
     EDIT_CONTRACT: false,
@@ -146,32 +147,9 @@ export default function page() {
     }
     return (
         <div>
-            <div className="mt-2 border-b-2 border-solid border-[#f0f0f0] flex ">
-                <div className="ms-1 mt-2 mb-2">
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>
-                                    Home
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>
-                                    Components
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
-                </div>
-            </div>
-            <div className='w-full flex'>
-
-                <div className='flex  py-4'>
+            <BreadCrumbHeader />
+            <div className='w-full flex container'>
+                <div className='flex py-4'>
                     <Card className='min-w-[320px]'>
                         <CardHeader>
                             <CardTitle>Create a new Contract</CardTitle>

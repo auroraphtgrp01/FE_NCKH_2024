@@ -1,18 +1,14 @@
 
 export const Footer = () => {
     return (
-        <footer id="footer" className="fixed bottom-0 left-0 right-0">
+        <footer className="fixed bottom-0 left-0 right-0 ms-[55px] backdrop-blur">
             <hr className="" />
-            <section className="container pb-5 text-center">
-                <h3 className="mt-5">
+            <section className="container pb-4 text-center">
+                <h3 className="mt-2 ml-auto mr-auto">
                     &copy; Topic Leader 2024 by{" "}
-                    <a
-                        target="_blank"
-                        href="#"
-                        className="text-primary transition-all border-primary hover:border-b-2"
-                    >
+                    <span className="text-primary">
                         Le Minh Tuan
-                    </a>
+                    </span>
                 </h3>
             </section>
         </footer>

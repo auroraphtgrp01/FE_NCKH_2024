@@ -8,6 +8,8 @@ export enum EContractAttributeType {
 		CONTRACT_HEADING_2 = "Contract Heading 2",
 		CONTRACT_ATTRIBUTE = "Contract Attribute",
 		CONTRACT_SIGNATURE = "Contract Signature",
+		CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET = "Contract Attribute Party Address Wallet",
+		CONTRACT_ATTRIBUTE_ADDRESS_WALLET_RECEIVE = "Contract Attribute Address Wallet Receive",
 }
 
 export enum EContractAttributeTypeAdditional {

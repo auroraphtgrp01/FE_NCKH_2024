@@ -104,7 +104,7 @@ export default function RegisterForm() {
       dateOfBirth: date?.toISOString(),
       addressWallet: wallet.accounts[0]
     }
-    fetchAPI('/users', 'POST', payload).then((res) => {
+    fetchAPI('/auth/register', 'POST', payload).then((res) => {
       if (res.status === 201) {
         setRegisterId(res.data.id)
         setIsOpen(true);

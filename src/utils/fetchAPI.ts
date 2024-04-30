@@ -1,9 +1,13 @@
 import axios from "axios"
 
-export const fetchAPI = async (path: string, method: string, body?: any, token?: string) => {
+export const fetchAPI = async (path: string, method: string, body?: any) => {
+    const accessToken = JSON.parse(localStorage.getItem('user-info') as string)?.access_token
+
+    console.log('accessToken', accessToken);
+    
     const headers = {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
     }
     return await axios({
         method,

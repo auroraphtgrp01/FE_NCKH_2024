@@ -23,7 +23,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from "@/components/ui/button";
 import GrantPermission, { IPermission } from '@/components/GrantPermission'
 import { useAppContext } from '@/components/ThemeProvider'
-
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { fetchAPI } from '@/utils/fetchAPI'
+import { useToast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/navigation'
 export const initPermission: IPermission = {
     READ_CONTRACT: false,
     EDIT_CONTRACT: false,
@@ -42,16 +52,6 @@ export interface ContractTemplate {
     name: string
     img: string
 }
-
-
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 
 const initContractTemplate = [
     {
@@ -89,9 +89,11 @@ export default function page() {
     const [invitation, setInvitation] = useState<InvitationItem[]>([])
     const [indexPerson, setIndexPerson] = useState<number>(-1)
     const [nameOfContractInput, setNameOfContractInput] = useState('')
-    const [templateSelect, setTemplateSelect] = useState<ContractTemplate>(template[0])
+    const [templateSelect, setTemplateSelect] = useState<any>(undefined)
     const [contract, setContract] = useState<any>({})
     const [messages, setMessages] = useState('')
+    const Router = useRouter();
+    const { toast } = useToast()
     function onAddInvitation(): void {
         const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
         if (!isEmail.test(invitationInput)) {
@@ -115,22 +117,33 @@ export default function page() {
             setCurrent(api.selectedScrollSnap())
         })
     }, [api])
-    useEffect(() => {
-        console.log(templateSelect);
-
-    }, [templateSelect])
     function onClickCreateContractButton() {
-        setContract({
-            addressWallet: wallet.accounts[0],
+        const payload = {
+            addressWallet: JSON.parse(localStorage.getItem('user-info') as string)?.addressWallet,
             name: nameOfContractInput,
-            template: templateSelect,
+            template: templateSelect?.id || null,
             invitation: invitation,
             messagesForInvitation: messages
+        }
+        fetchAPI('/contracts', 'POST', payload).then((res) => {
+            if (res.status === 201) {
+                toast({
+                    title: "Create contract success",
+                    description: "You have successfully created a contract",
+                    variant: "default",
+                    duration: 2000,
+                })
+                Router.push(`/contract/${res.data.contract.id}`)
+            }
+        }).catch((err) => {
+            toast({
+                title: "Create contract failed",
+                description: "Please check your information again",
+                variant: "destructive",
+                duration: 2000,
+            })
         })
     }
-    useEffect(() => {
-        console.log(contract);
-    }, [contract])
     return (
         <div>
             <div className="mt-2 border-b-2 border-solid border-[#f0f0f0] flex ">
@@ -162,12 +175,12 @@ export default function page() {
                     <Card className='min-w-[320px]'>
                         <CardHeader>
                             <CardTitle>Create a new Contract</CardTitle>
-                            <CardDescription>Please fill in the inputsA to continue</CardDescription>
+                            <CardDescription>Please fill to continue</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-col space-y-2 mt-2">
                                 <Label >Address Wallet: </Label>
-                                <Input disabled readOnly defaultValue={wallet.accounts[0]} />
+                                <Input disabled readOnly defaultValue={JSON.parse(localStorage.getItem('user-info') as string)?.addressWallet} />
                             </div>
                             <div className="flex flex-col space-y-2 mt-2">
                                 <Label >Name of Contract: </Label>

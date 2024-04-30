@@ -34,9 +34,9 @@ export default function RootLayout({
               <Sonner />
             </div>
             <Toaster />
-            <div className="">
+            {/* <div className="">
               <Footer />
-            </div>
+            </div> */}
           </AppProvider>
         </ThemeProvider>
       </body>

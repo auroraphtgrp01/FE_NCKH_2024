@@ -133,8 +133,8 @@ export default function page() {
     }, [contract])
     return (
         <div>
-            <div className="mt-2 border-b-2 border-solid border-[#cccccc4a] flex ">
-                <div className="ms-1 mt-2">
+            <div className="mt-2 border-b-2 border-solid border-[#f0f0f0] flex ">
+                <div className="ms-1 mt-2 mb-2">
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
@@ -154,10 +154,6 @@ export default function page() {
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
-                </div>
-                <div className="ml-auto mb-2">
-                    <Button className="me-2">Save Changes</Button>
-                    <Button className="" variant={'destructive'}>Back</Button>
                 </div>
             </div>
             <div className='w-full flex'>
@@ -282,7 +278,7 @@ export default function page() {
                     </Card>
                 </div>
                 <div className='flex py-4 ms-4 '>
-                    <Card className='min-w-[630px]'>
+                    <Card className='min-w-[600px]'>
                         <CardHeader>
                             <CardTitle className='text-center font-semibold text-lg '>
                                 {template[current]?.name}

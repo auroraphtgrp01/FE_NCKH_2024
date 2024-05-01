@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Footer } from "@/components/Footer"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import NavbarVertical from "@/components/NavbarVertical";
+import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["vietnamese"] });
 
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head></head>
-      <body className={inter.className} suppressHydrationWarning={true} >
+      <body className={cn(inter.className, 'overflow-hidden')} suppressHydrationWarning={true} >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -30,7 +31,7 @@ export default function RootLayout({
           disableTransitionOnChange>
           <AppProvider>
             {/* <Header /> */}
-            <div className="flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden">
+            <div className="flex min-h-screen w-full flex-col overflow-hidden">
               <NavbarVertical />
               <div className="flex flex-col">
                 <main className="grid flex-1 items-start">

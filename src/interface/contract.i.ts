@@ -13,12 +13,20 @@ export enum EContractAttributeType {
 }
 
 export enum EContractAttributeTypeAdditional {
+	CONTRACT_NUMBER = "Contract Number",
 	CONTRACT_TEXT = "Contract Text",
 	CONTRACT_HEADING_1 = "Contract Heading 1",
 	CONTRACT_HEADING_2 = "Contract Heading 2",
 	CONTRACT_ATTRIBUTE = "Contract Attribute",
 	CONTRACT_SIGNATURE = "Contract Signature",
 }
+
+export enum EContractAttributeTypeAdditionalHeader {
+	CONTRACT_HEADER = "Contract Header",
+	CONTRACT_HEADER_DATE = "Contract Header Date",
+	CONTRACT_TITLE = "Contract Title",
+}
+
 
 export interface IContractAttribute {
     id?: string

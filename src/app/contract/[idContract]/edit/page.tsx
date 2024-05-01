@@ -156,9 +156,9 @@ export default function DialogEditContract() {
                 </div>
 
                 <div className="ml-auto mr-auto w-[60%] mb-2">
-                    <Alert variant={'destructive'} className="border-2">
+                    {/* <Alert variant={'destructive'} className="border-2">
                         <AlertTitle className="text-center">THONG BAO TAI DAY</AlertTitle>
-                    </Alert>
+                    </Alert> */}
                 </div>
 
                 <div className="ml-auto mb-2 mt-1">
@@ -186,9 +186,9 @@ export default function DialogEditContract() {
                                                         )}
                                                         {item.type === EContractAttributeType.CONTRACT_HEADER_DATE && (
                                                             <div className="flex justify-end items-end mt-5 font-semibold italic">
-                                                                <Input className="text-center w-[50%] justify-end ml-auto " defaultValue={item.value} onBlur={(e) => {
+                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onBlur={(e) => {
                                                                     handleChangeAttributeInput(e, index)
-                                                                }} />
+                                                                }} description="" alignCenter={true} className="text-center w-[50%] justify-end ml-auto" defaultValue={item.value} />
                                                             </div>
                                                         )}
                                                         {item.type === EContractAttributeType.CONTRACT_TITLE && (

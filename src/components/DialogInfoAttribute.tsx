@@ -39,11 +39,11 @@ export default function DialogInfoAttribute({ isDetailAttributeDialog, setIsDeta
                                 </TableRow>
                                 <TableRow >
                                     <TableCell><b>Created By:</b>  </TableCell>
-                                    <TableCell>{infoOfAttribute?.createdBy ? infoOfAttribute.createdBy : 'N/A'}</TableCell>
+                                    <TableCell>{infoOfAttribute?.createdBy?.email ? infoOfAttribute?.createdBy?.email : 'N/A'}</TableCell>
                                 </TableRow>
                                 <TableRow >
                                     <TableCell><b>Updated By: </b></TableCell>
-                                    <TableCell> {infoOfAttribute?.updatedBy ? infoOfAttribute.updatedBy : 'N/A'}</TableCell>
+                                    <TableCell>{infoOfAttribute?.updatedBy?.email ? infoOfAttribute?.updatedBy?.email : 'N/A'}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

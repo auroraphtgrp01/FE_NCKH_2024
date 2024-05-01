@@ -28,18 +28,18 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
     const handleAddNewItem = () => {
         const newContractAttribute: IContractAttribute = {
             value: '',
-            id: uuidRandom(),
+            id: '',
             statusAttribute: EStatusAttribute.PREPARE
         }
         const newContractAttributeArray = [...contractAttribute]
-        newContractAttributeArray.splice(index + 1, 0, newContractAttribute)
+        newContractAttributeArray.splice(index, 0, newContractAttribute)
         setContractAttribute(newContractAttributeArray)
     }
     const handleDeleteItem = () => {
         setDeleteArray([...deleteArray as any, contractAttribute[index].id])
-        const newContractAttributeArray = [...contractAttribute]; // Tạo một bản sao của mảng contractAttribute
-        newContractAttributeArray.splice(index, 1); // Xóa phần tử tại vị trí index
-        setContractAttribute(newContractAttributeArray); // Cập nhật state với mảng mới đã chỉnh sửa
+        const newContractAttributeArray = [...contractAttribute];
+        newContractAttributeArray.splice(index, 1);
+        setContractAttribute(newContractAttributeArray);
     }
 
     const handleOpenDetail = () => {
@@ -55,14 +55,14 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
                     </TooltipTrigger>
                     <TooltipContent className='bg-transparent' side='left'>
                         <div className='flex flex-col'>
-                            <Button variant={'destructive'} type='button' onClick={handleDeleteItem}>
-                                <Icons.badgeX />
+                            <Button variant={'default'} className='' onClick={handleAddNewItem} type='button'>
+                                <Icons.badgePlus />
                             </Button>
-                            <Button variant={'secondary'} className='mt-1' type='button' onClick={handleOpenDetail}>
+                            <Button variant={'blue'} className='px-1 mt-2' type='button' onClick={handleOpenDetail}>
                                 <Icons.badgeInfo />
                             </Button>
-                            <Button variant={'default'} className='mt-1' onClick={handleAddNewItem} type='button'>
-                                <Icons.badgePlus />
+                            <Button variant={'destructive'} type='button' onClick={handleDeleteItem} className='mt-2'>
+                                <Icons.badgeX />
                             </Button>
                         </div>
                     </TooltipContent>

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select"
 import { v4 as uuidRandom } from 'uuid';
 
-import { EContractAttributeType, EContractAttributeTypeAdditional, EStatusAttribute, IContractAttribute } from '@/interface/contract.i';
+import { EContractAttributeType, EContractAttributeTypeAdditional, EContractAttributeTypeAdditionalHeader, EStatusAttribute, IContractAttribute } from '@/interface/contract.i';
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 
@@ -25,7 +25,14 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
     }));
     const [contractAttributeTypeArray, setContractAttributeType] = useState<any[]>(contractAttributeTypeArr)
     useEffect(() => {
-        if (contractAttribute.length > 5) {
+        if (index && index < 5) {
+            const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditionalHeader).map((key) => ({
+                key,
+                value: EContractAttributeTypeAdditionalHeader[key as keyof typeof EContractAttributeTypeAdditionalHeader],
+            }));
+            setContractAttributeType(contractAttributeTypeArray)
+        }
+        if (contractAttribute.length > 4) {
             const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditional).map((key) => ({
                 key,
                 value: EContractAttributeTypeAdditional[key as keyof typeof EContractAttributeTypeAdditional],

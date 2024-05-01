@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
+import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 
 export default function DialogEditContract() {
     const [contractAttribute, setContractAttribute] = useState<any[]>([]);
@@ -132,45 +133,12 @@ export default function DialogEditContract() {
     }
     return (
         <div>
-            <div className="mt-2 border-b-2 border-solid border-[#cccccc4a] flex ">
-                <div className="ms-1 mt-3">
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>
-                                    Home
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>
-                                    Components
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
-                </div>
-
-                <div className="ml-auto mr-auto w-[60%] mb-2">
-                    {/* <Alert variant={'destructive'} className="border-2">
-                        <AlertTitle className="text-center">THONG BAO TAI DAY</AlertTitle>
-                    </Alert> */}
-                </div>
-
-                <div className="ml-auto mb-2 mt-1">
-                    <Button className="me-2" type='button' onClick={handleOnClickSaveChanges} >Save Changes</Button>
-                    <Button className="" variant={'destructive'}>Back</Button>
-                </div>
-            </div>
-            <div className="w-full h-[95%] max-w-[100%] mt-2">
-                <div className="overflow-hidden">
-                    <div className="flex justify-between h-[100%]">
-                        <div className="px-1 w-[50%]">
-                            <ScrollArea className="h-[772px] rounded-md border w-[100%]">
+            <div className="flex min-h-screen w-full flex-col ">
+                <BreadCrumbHeader />
+                <div className="flex justify-center ">
+                    <main className="flex items-start py-4">
+                        <div className="px-1 ">
+                            <ScrollArea className="h-[772px] rounded-md border ">
                                 <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%]">
                                     <div id="main">
                                         <div id="application">
@@ -266,10 +234,10 @@ export default function DialogEditContract() {
                                 </form>
                             </ScrollArea>
                         </div>
-                        <div className="px-1 w-[50%]">
+                        <div className="px-1">
                             <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
                         </div>
-                    </div>
+                    </main>
                 </div>
             </div>
             <DialogInfoAttribute setIsDetailAttributeDialog={setIsDetailAttributeDialog} isDetailAttributeDialog={isDetailAttributeDialog} infoOfAttribute={infoOfContractAttribute} />

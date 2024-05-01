@@ -23,7 +23,7 @@ export default function ChatBox({
   return (
     <>
       {showChat && (
-        <div className="mt-5 w-[330px] h-[440px] justify-between rounded-2xl border bg-card text-card-foreground shadow-sm fixed right-2 bottom-2">
+        <div className="mt-5 w-[330px] h-[440px] justify-between rounded-2xl border bg-card text-card-foreground shadow-sm fixed right-3 translate-y-[-60px] bottom-0">
           <div className="space-y-1.5 p-6 flex flex-row items-center">
             <div className="flex items-center space-x-4">
               <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">

@@ -3,7 +3,7 @@ import React, { use, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import PreviewContract from '../(component)/PreviewContract';
 import { EContractAttributeType, EStatusAttribute, IContractAttribute, IDefinitionContractAttribute } from "@/interface/contract.i";
 import { InputWithTooltip } from "@/components/InputWithTooltip";
@@ -24,6 +24,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { fetchAPI } from "@/utils/fetchAPI";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function DialogEditContract() {
     const [contractAttribute, setContractAttribute] = useState<any[]>([]);
@@ -32,6 +33,8 @@ export default function DialogEditContract() {
     const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false)
     const [infoOfContractAttribute, setInfoOfContractAttribute] = useState()
     const [deleteArray, setDeleteArray] = useState<any[]>([])
+    const { toast } = useToast()
+    const Router = useRouter();
     const getData = React.useCallback(async (idContract: string) => {
         return await fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
             .then((response) => {
@@ -80,7 +83,7 @@ export default function DialogEditContract() {
     function compareChangesOfContractAttribute() {
         const updatedAttributes = [...contractAttribute];
 
-        const payload = updatedAttributes.map((item, index) => {
+        let payload = updatedAttributes.map((item, index) => {
             const updatedItem = {
                 ...item,
                 index
@@ -100,13 +103,28 @@ export default function DialogEditContract() {
             }
             return updatedItem;
         });
-        console.log(payload);
-
         fetchAPI('/contracts/attribute', 'PATCH', {
             id: idContract,
             updatedAttributes: payload,
             deleteArray
+        }).then((response) => {
+            payload = []
+            setDeleteArray([])
+            Router.push(`/contract/${idContract}`)
+            toast({
+                title: "Update Successfully",
+                description: "Your changes have been saved successfully",
+                variant: "default",
+            })
         })
+            .catch((error) => {
+                toast({
+                    title: "Update Failed",
+                    description: "Your changes have not been saved successfully",
+                    variant: "destructive",
+                })
+            }
+            )
     }
 
     const handleOnClickSaveChanges = () => {
@@ -161,14 +179,14 @@ export default function DialogEditContract() {
                                                     <div key={uuidv4()}>
                                                         {item.type === EContractAttributeType.CONTRACT_HEADER && (
                                                             <h5 className="text-center font-bold flex pt-1">
-                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onChange={(e) => {
+                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onBlur={(e) => {
                                                                     handleChangeAttributeInput(e, index)
                                                                 }} description="" alignCenter={true} className="text-center w-[50%] justify-center ml-auto mr-auto" defaultValue={item.value} />
                                                             </h5>
                                                         )}
                                                         {item.type === EContractAttributeType.CONTRACT_HEADER_DATE && (
                                                             <div className="flex justify-end items-end mt-5 font-semibold italic">
-                                                                <Input className="text-center w-[50%] justify-end ml-auto " defaultValue={item.value} onChange={(e) => {
+                                                                <Input className="text-center w-[50%] justify-end ml-auto " defaultValue={item.value} onBlur={(e) => {
                                                                     handleChangeAttributeInput(e, index)
                                                                 }} />
                                                             </div>
@@ -176,7 +194,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_TITLE && (
                                                             <div>
                                                                 <h1 className="text-center font-bold text-2xl mt-4 uppercase">
-                                                                    <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onChange={(e) => {
+                                                                    <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onBlur={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
                                                                 </h1>
@@ -185,7 +203,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_NUMBER && (
                                                             <div>
                                                                 <h2 className="text-center font-bold mt-1">
-                                                                    <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onChange={(e) => {
+                                                                    <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onBlur={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
                                                                 </h2>
@@ -194,7 +212,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_TEXT && (
                                                             <div>
                                                                 <h2 className="mt-6">
-                                                                    <Textarea onChange={(e) => {
+                                                                    <Textarea onBlur={(e) => {
                                                                         handleValueOfTextarea(e, index)
                                                                     }} className="mr-auto " defaultValue={item.value} />
                                                                 </h2>
@@ -203,7 +221,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (
                                                             <div>
                                                                 <h1 className="mt-6 font-bold text-[18px]">
-                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onChange={(e) => {
+                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onBlur={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
                                                                 </h1>
@@ -212,7 +230,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_HEADING_2 && (
                                                             <div>
                                                                 <h1 className="mt-1 font-bold text-[18px]">
-                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onChange={(e) => {
+                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onBlur={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
                                                                 </h1>
@@ -222,12 +240,12 @@ export default function DialogEditContract() {
                                                             <div>
                                                                 <h2 className="mt-2 text-[14px] flex w-full">
                                                                     <b className="">
-                                                                        <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onChange={(e) => {
+                                                                        <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
                                                                             handleChangeAttributeInput(e, index)
                                                                         }} />
                                                                     </b>
                                                                     <span className="text-wrap ms-2 w-[80%]">
-                                                                        <Textarea onChange={(e) => {
+                                                                        <Textarea onBlur={(e) => {
                                                                             handleValueOfTextarea(e, index)
                                                                         }} className="mr-auto " defaultValue={item.value} />
                                                                     </span>

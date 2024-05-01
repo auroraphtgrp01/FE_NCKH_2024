@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,14 +8,12 @@ import PreviewContract from '../(component)/PreviewContract';
 import { EContractAttributeType, EStatusAttribute, IContractAttribute, IDefinitionContractAttribute } from "@/interface/contract.i";
 import { InputWithTooltip } from "@/components/InputWithTooltip";
 import AddAttributeArea from '../../../../components/AddAttributeArea';
-import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
+import { v4 as uuidv4 } from 'uuid';
 import DialogInfoAttribute from '../../../../components/DialogInfoAttribute';
 import {
     Alert,
-    AlertDescription,
     AlertTitle,
 } from "@/components/ui/alert"
-import { Terminal } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import {
     Breadcrumb,
@@ -28,20 +26,31 @@ import {
 import { fetchAPI } from "@/utils/fetchAPI";
 
 export default function DialogEditContract() {
-    const [contractAttribute, setContractAttribute] = useState(initContractAttribute);
-    const [contractAttributeRaw, setContractAttributeRaw] = useState<IContractAttribute[]>(initContractAttribute);
+    const [contractAttribute, setContractAttribute] = useState<any[]>([]);
+    const [contractAttributeRaw, setContractAttributeRaw] = useState<any[]>([]);
     const { idContract } = useParams();
     const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false)
     const [infoOfContractAttribute, setInfoOfContractAttribute] = useState()
     const [deleteArray, setDeleteArray] = useState<any[]>([])
-    useEffect(() => {
-        fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
+    const getData = React.useCallback(async (idContract: string) => {
+        return await fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
             .then((response) => {
                 setContractAttribute(response.data.contractAttributes);
-                setContractAttributeRaw(response.data.contractAttributes)
-            }).catch((error) => {
+                setContractAttributeRaw(response.data.contractAttributes);
             })
-    }, [])
+            .catch((error) => {
+            });
+    }, [setContractAttribute, setContractAttributeRaw]);
+
+    React.useLayoutEffect(() => {
+        if (idContract) {
+            getData(idContract as string);
+        }
+    }, [idContract, getData]);
+    useEffect(() => {
+        console.log(contractAttribute);
+    }, [contractAttribute])
+
     const handleChangeAttributeInput = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const updatedAttributes = [...contractAttribute];
         const attributeToUpdate = updatedAttributes[index];
@@ -127,6 +136,7 @@ export default function DialogEditContract() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </div>
+
                 <div className="ml-auto mr-auto w-[60%] mb-2">
                     <Alert variant={'destructive'} className="border-2">
                         <AlertTitle className="text-center">THONG BAO TAI DAY</AlertTitle>
@@ -138,23 +148,22 @@ export default function DialogEditContract() {
                     <Button className="" variant={'destructive'}>Back</Button>
                 </div>
             </div>
-            <div className="w-full h-[780px] max-w-[100%] mt-2">
+            <div className="w-full h-[95%] max-w-[100%] mt-2">
                 <div className="overflow-hidden">
                     <div className="flex justify-between h-[100%]">
                         <div className="px-1 w-[50%]">
                             <ScrollArea className="h-[772px] rounded-md border w-[100%]">
-                                <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%] min-h-[772px]">
+                                <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%]">
                                     <div id="main">
                                         <div id="application">
                                             <div>
                                                 {contractAttribute.map((item: IContractAttribute, index) => (
-                                                    <div key={index}>
+                                                    <div key={uuidv4()}>
                                                         {item.type === EContractAttributeType.CONTRACT_HEADER && (
                                                             <h5 className="text-center font-bold flex pt-1">
                                                                 <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onChange={(e) => {
                                                                     handleChangeAttributeInput(e, index)
                                                                 }} description="" alignCenter={true} className="text-center w-[50%] justify-center ml-auto mr-auto" defaultValue={item.value} />
-
                                                             </h5>
                                                         )}
                                                         {item.type === EContractAttributeType.CONTRACT_HEADER_DATE && (

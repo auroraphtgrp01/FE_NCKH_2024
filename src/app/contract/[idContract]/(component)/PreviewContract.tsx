@@ -6,9 +6,6 @@ import { EContractAttributeType, IContractAttribute } from "@/interface/contract
 import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 
 export default function PreviewContract({ contractAttribute, setContractAttribute }: { contractAttribute: IContractAttribute[], setContractAttribute: (item: any) => void }) {
-  useEffect(() => {
-    console.log(contractAttribute);
-  }, [])
   return (
     <div>
       <ScrollArea className="min-h-[772px] rounded-xl border w-[100%]">

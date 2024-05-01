@@ -37,12 +37,11 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
     }
     const handleDeleteItem = () => {
         setDeleteArray([...deleteArray as any, contractAttribute[index].id])
-        const newContractAttributeArray = [...contractAttribute]
-        newContractAttributeArray.splice(index, 1)
-        console.log(newContractAttributeArray);
-        
-        setContractAttribute(newContractAttributeArray)
+        const newContractAttributeArray = [...contractAttribute]; // Tạo một bản sao của mảng contractAttribute
+        newContractAttributeArray.splice(index, 1); // Xóa phần tử tại vị trí index
+        setContractAttribute(newContractAttributeArray); // Cập nhật state với mảng mới đã chỉnh sửa
     }
+
     const handleOpenDetail = () => {
         setInfoOfContractAttribute(contractAttribute[index])
         setIsDetailOpen(true)

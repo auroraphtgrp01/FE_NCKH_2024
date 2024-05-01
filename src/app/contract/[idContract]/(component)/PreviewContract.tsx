@@ -40,14 +40,14 @@ export default function PreviewContract({ contractAttribute, setContractAttribut
                   )}
                   {item.type === EContractAttributeType.CONTRACT_TEXT && (
                     <div>
-                      <h2 className="mt-6">
+                      <h2 className="mt-6 whitespace-pre-line">
                         {item.value}
                       </h2>
                     </div>
                   )}
                   {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (
                     <div>
-                      <h1 className="mt-6 font-bold text-[18px]">
+                      <h1 className="mt-3 font-bold text-[18px]">
                         {item.value}
                       </h1>
                     </div>
@@ -61,7 +61,7 @@ export default function PreviewContract({ contractAttribute, setContractAttribut
                   )}
                   {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
                     <div>
-                      <h2 className="mt-3 text-[14px] ms-2">
+                      <h2 className="mt-2 text-[14px] text-justify">
                         -  <b className="ms-1">{item.property}</b>: {" "}
                         <span className="text-wrap ">
                           {item.value}

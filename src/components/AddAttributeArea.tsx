@@ -84,7 +84,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                 <Input className='w-[32%]'
                     onChange={(e) => {
                         setInputValue(e.target.value)
-                    }} defaultValue={inputValue} />
+                    }} value={inputValue} />
                 <Select onValueChange={(e: EContractAttributeType) => {
                     setSelectType(e)
                 }}>
@@ -108,7 +108,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                 <div>
                     <Textarea onChange={(e) => {
                         setTextArea(e.target.value)
-                    }} className='mt-2 w-[100%]' defaultValue={textArea} />
+                    }} className='mt-2 w-[100%]' value={textArea} />
                 </div>
             )}
         </div>

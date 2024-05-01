@@ -133,7 +133,7 @@ export default function DialogEditContract() {
     return (
         <div>
             <div className="mt-2 border-b-2 border-solid border-[#cccccc4a] flex ">
-                <div className="ms-1 mt-3">
+                <div className="ms-1 mt-3 ">
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
@@ -166,11 +166,11 @@ export default function DialogEditContract() {
                     <Button className="" variant={'destructive'}>Back</Button>
                 </div>
             </div>
-            <div className="w-full h-[95%] max-w-[100%] mt-2">
+            <div className="w-full h-[95%] max-w-[100%] mt-2 ">
                 <div className="overflow-hidden">
                     <div className="flex justify-between h-[100%]">
                         <div className="px-1 w-[50%]">
-                            <ScrollArea className="h-[772px] rounded-md border w-[100%]">
+                            <ScrollArea className="h-[772px] rounded-xl border w-[100%] ">
                                 <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%]">
                                     <div id="main">
                                         <div id="application">
@@ -210,12 +210,12 @@ export default function DialogEditContract() {
                                                             </div>
                                                         )}
                                                         {item.type === EContractAttributeType.CONTRACT_TEXT && (
-                                                            <div>
-                                                                <h2 className="mt-6">
-                                                                    <Textarea onBlur={(e) => {
-                                                                        handleValueOfTextarea(e, index)
-                                                                    }} className="mr-auto " defaultValue={item.value} />
-                                                                </h2>
+                                                            <div className="mt-6">
+                                                                <Textarea
+                                                                    onBlur={(e) => handleValueOfTextarea(e, index)}
+                                                                    className="mr-auto"
+                                                                    defaultValue={item.value}
+                                                                />
                                                             </div>
                                                         )}
                                                         {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (

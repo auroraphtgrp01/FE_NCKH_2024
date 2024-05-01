@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,6 +25,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { fetchAPI } from "@/utils/fetchAPI";
 
 export default function DialogEditContract() {
     const [contractAttribute, setContractAttribute] = useState(initContractAttribute);
@@ -32,9 +33,15 @@ export default function DialogEditContract() {
     const { idContract } = useParams();
     const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false)
     const [infoOfContractAttribute, setInfoOfContractAttribute] = useState()
+    const [deleteArray, setDeleteArray] = useState<any[]>([])
     useEffect(() => {
-        console.log(infoOfContractAttribute);
-    }, [infoOfContractAttribute])
+        fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
+            .then((response) => {
+                setContractAttribute(response.data.contractAttributes);
+                setContractAttributeRaw(response.data.contractAttributes)
+            }).catch((error) => {
+            })
+    }, [])
     const handleChangeAttributeInput = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const updatedAttributes = [...contractAttribute];
         const attributeToUpdate = updatedAttributes[index];
@@ -64,30 +71,37 @@ export default function DialogEditContract() {
     function compareChangesOfContractAttribute() {
         const updatedAttributes = [...contractAttribute];
 
-        updatedAttributes.forEach((item, index) => {
+        const payload = updatedAttributes.map((item, index) => {
+            const updatedItem = {
+                ...item,
+                index
+            };
             const rawItem = contractAttributeRaw[index];
+            if (item.statusAttribute === EStatusAttribute.CREATE) {
+                return updatedItem;
+            }
             if (item.type === EContractAttributeType.CONTRACT_ATTRIBUTE) {
-                if (item.value !== rawItem.value || item.property !== rawItem.property) {
-                    updatedAttributes[index] = {
-                        ...item,
-                        statusAttribute: EStatusAttribute.UPDATE
-                    };
+                if (item?.value !== rawItem?.value || item.property !== rawItem.property) {
+                    updatedItem.statusAttribute = EStatusAttribute.UPDATE;
                 }
             } else {
-                if (item.value !== rawItem.value) {
-                    updatedAttributes[index] = {
-                        ...item,
-                        statusAttribute: EStatusAttribute.UPDATE
-                    };
+                if (item?.value !== rawItem?.value) {
+                    updatedItem.statusAttribute = EStatusAttribute.UPDATE;
                 }
             }
+            return updatedItem;
         });
-        // call api to update contract attribute
+        console.log(payload);
+
+        fetchAPI('/contracts/attribute', 'PATCH', {
+            id: idContract,
+            updatedAttributes: payload,
+            deleteArray
+        })
     }
 
     const handleOnClickSaveChanges = () => {
         compareChangesOfContractAttribute()
-        console.log(contractAttribute);
     }
     return (
         <div>
@@ -113,7 +127,6 @@ export default function DialogEditContract() {
                         </BreadcrumbList>
                     </Breadcrumb>
                 </div>
-
                 <div className="ml-auto mr-auto w-[60%] mb-2">
                     <Alert variant={'destructive'} className="border-2">
                         <AlertTitle className="text-center">THONG BAO TAI DAY</AlertTitle>
@@ -125,12 +138,12 @@ export default function DialogEditContract() {
                     <Button className="" variant={'destructive'}>Back</Button>
                 </div>
             </div>
-            <div className="w-full h-[95%] max-w-[100%] mt-2">
+            <div className="w-full h-[780px] max-w-[100%] mt-2">
                 <div className="overflow-hidden">
                     <div className="flex justify-between h-[100%]">
                         <div className="px-1 w-[50%]">
                             <ScrollArea className="h-[772px] rounded-md border w-[100%]">
-                                <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%]">
+                                <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%] min-h-[772px]">
                                     <div id="main">
                                         <div id="application">
                                             <div>
@@ -138,7 +151,7 @@ export default function DialogEditContract() {
                                                     <div key={index}>
                                                         {item.type === EContractAttributeType.CONTRACT_HEADER && (
                                                             <h5 className="text-center font-bold flex pt-1">
-                                                                <InputWithTooltip setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onChange={(e) => {
+                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onChange={(e) => {
                                                                     handleChangeAttributeInput(e, index)
                                                                 }} description="" alignCenter={true} className="text-center w-[50%] justify-center ml-auto mr-auto" defaultValue={item.value} />
 
@@ -181,7 +194,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (
                                                             <div>
                                                                 <h1 className="mt-6 font-bold text-[18px]">
-                                                                    <InputWithTooltip setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onChange={(e) => {
+                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onChange={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
                                                                 </h1>
@@ -190,7 +203,7 @@ export default function DialogEditContract() {
                                                         {item.type === EContractAttributeType.CONTRACT_HEADING_2 && (
                                                             <div>
                                                                 <h1 className="mt-1 font-bold text-[18px]">
-                                                                    <InputWithTooltip setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onChange={(e) => {
+                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onChange={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
                                                                 </h1>
@@ -200,7 +213,7 @@ export default function DialogEditContract() {
                                                             <div>
                                                                 <h2 className="mt-2 text-[14px] flex w-full">
                                                                     <b className="">
-                                                                        <InputWithTooltip setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onChange={(e) => {
+                                                                        <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onChange={(e) => {
                                                                             handleChangeAttributeInput(e, index)
                                                                         }} />
                                                                     </b>

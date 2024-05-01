@@ -21,7 +21,8 @@ export enum EContractAttributeTypeAdditional {
 }
 
 export interface IContractAttribute {
-    id: string
+    id?: string
+	index?: number
     type?: EContractAttributeType
     value?: string
     property?: string
@@ -39,4 +40,12 @@ export enum EStatusAttribute {
 }
 
 export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {
+}
+
+export interface IContractParticipant {
+	id: string
+	address: string
+	name: string
+	email: string
+	status: string
 }

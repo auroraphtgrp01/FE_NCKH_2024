@@ -354,67 +354,7 @@ export default function DataTableDemo() {
                                     The information here is extracted from the database. You can re-fetch it from the chain-network
                                 </DialogDescription>
                             </DialogHeader>
-                            <div className="grid gap-4 py-4 justify-center">
-                                <div className="flex">
-                                    <Card className="me-4 min-w-[250px]">
-                                        <CardHeader className="">
-                                            <CardTitle>Party A</CardTitle>
-                                            <CardDescription>{participants[0].company}</CardDescription>
-                                            <Avatar className="min-w-[50px] min-h-[50px] !mt-5 m-auto">
-                                                <AvatarImage src={participants[1].avatar} className="" />
-                                                <AvatarFallback>CN</AvatarFallback>
-                                            </Avatar>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <form>
-                                                <div className="grid w-full items-center gap-4">
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Full Name:</Label>
-                                                        <Input id="name" value={participants[0].fullName} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Address Wallet:</Label>
-                                                        <Input id="name" value={participants[0].addressWallet} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Position: </Label>
-                                                        <Input id="name" value={participants[0].position} disabled readOnly />
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </CardContent>
-                                    </Card>
-                                    <Card className="min-w-[250px]">
-                                        <CardHeader className="">
-                                            <CardTitle>Party B</CardTitle>
-                                            <CardDescription >{participants[1].company}</CardDescription>
-                                            <Avatar className="min-w-[50px] min-h-[50px] !mt-5 m-auto">
-                                                <AvatarImage src={participants[1].avatar} className="" />
-                                                <AvatarFallback>CN</AvatarFallback>
-                                            </Avatar>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <form>
-                                                <div className="grid w-full items-center gap-4">
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Full Name:</Label>
-                                                        <Input id="name" value={participants[1].fullName} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Address Wallet:</Label>
-                                                        <Input id="name" value={participants[1].addressWallet} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Position: </Label>
-                                                        <Input id="name" value={participants[1].position} disabled readOnly />
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </CardContent>
-                                    </Card>
-
-                                </div>
-                            </div>
+                        
                         </DialogContent>
                     </DialogOverlay>
                 </DialogPortal>

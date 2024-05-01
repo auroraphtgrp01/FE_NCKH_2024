@@ -20,9 +20,11 @@ export interface IInputWithTooltipProps extends React.InputHTMLAttributes<HTMLIn
     setContractAttribute: (item: IContractAttribute[]) => void
     setIsDetailOpen: (item: boolean) => void
     setInfoOfContractAttribute: (item: any) => void
+    deleteArray?: any[]
+    setDeleteArray: (item: any) => void
 }
 
-const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipProps>(({ className, type, description, alignCenter, index, contractAttribute, setIsDetailOpen, setInfoOfContractAttribute, setContractAttribute, ...props }, ref) => {
+const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipProps>(({ className, type, description, alignCenter, index, contractAttribute, deleteArray, setIsDetailOpen, setInfoOfContractAttribute, setContractAttribute, setDeleteArray, ...props }, ref) => {
     const handleAddNewItem = () => {
         const newContractAttribute: IContractAttribute = {
             value: '',
@@ -34,8 +36,11 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
         setContractAttribute(newContractAttributeArray)
     }
     const handleDeleteItem = () => {
+        setDeleteArray([...deleteArray as any, contractAttribute[index].id])
         const newContractAttributeArray = [...contractAttribute]
         newContractAttributeArray.splice(index, 1)
+        console.log(newContractAttributeArray);
+        
         setContractAttribute(newContractAttributeArray)
     }
     const handleOpenDetail = () => {
@@ -54,7 +59,7 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
                             <Button variant={'destructive'} type='button' onClick={handleDeleteItem}>
                                 <Icons.badgeX />
                             </Button>
-                            <Button variant={'blue'} className='mt-1' type='button' onClick={handleOpenDetail}>
+                            <Button variant={'secondary'} className='mt-1' type='button' onClick={handleOpenDetail}>
                                 <Icons.badgeInfo />
                             </Button>
                             <Button variant={'default'} className='mt-1' onClick={handleAddNewItem} type='button'>

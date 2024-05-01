@@ -19,10 +19,20 @@ import { Input } from '@/components/ui/input';
 
 
 export default function AddAttributeArea({ contractAttribute, setContractAttribute, index }: { contractAttribute: any, setContractAttribute: any, index?: number }) {
-    const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditional).map((key) => ({
+    const contractAttributeTypeArr: { key: string, value: string }[] = Object.keys(EContractAttributeType).map((key) => ({
         key,
-        value: EContractAttributeTypeAdditional[key as keyof typeof EContractAttributeTypeAdditional],
+        value: EContractAttributeType[key as keyof typeof EContractAttributeType],
     }));
+    const [contractAttributeTypeArray, setContractAttributeType] = useState<any[]>(contractAttributeTypeArr)
+    useEffect(() => {
+        if (contractAttribute.length > 5) {
+            const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditional).map((key) => ({
+                key,
+                value: EContractAttributeTypeAdditional[key as keyof typeof EContractAttributeTypeAdditional],
+            }));
+            setContractAttributeType(contractAttributeTypeArray)
+        }
+    }, [contractAttribute])
     const { toast } = useToast()
     const [SelectType, setSelectType] = useState<EContractAttributeType>()
     const [inputValue, setInputValue] = useState<any>()
@@ -39,7 +49,6 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
         const newContractAttribute: IContractAttribute = {
             value: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? textArea : inputValue,
             property: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? inputValue : undefined,
-            id: uuidRandom(),
             type: SelectType as EContractAttributeType,
             statusAttribute: EStatusAttribute.CREATE
         }

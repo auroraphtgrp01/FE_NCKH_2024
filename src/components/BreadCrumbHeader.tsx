@@ -150,10 +150,8 @@ export default function BreadCrumbHeader() {
                     </div>
                     <ModeToggle />
                 </div>
-            </header>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogPortal >
-                    <DialogOverlay>
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                    <DialogPortal >
                         <DialogContent onKeyDown={(e) => {
                             if (e.key === 'Enter' && pin.length == 6) {
                                 onSubmit()
@@ -185,9 +183,9 @@ export default function BreadCrumbHeader() {
                                 <Button type='submit' onClick={onSubmit}>Submit</Button>
                             </div>
                         </DialogContent>
-                    </DialogOverlay>
-                </DialogPortal>
-            </Dialog >
+                    </DialogPortal>
+                </Dialog >
+            </header>
         </div>
     )
 }

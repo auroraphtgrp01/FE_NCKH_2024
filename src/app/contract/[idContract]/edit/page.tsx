@@ -132,113 +132,111 @@ export default function DialogEditContract() {
         compareChangesOfContractAttribute()
     }
     return (
-        <div>
-            <div className="flex min-h-screen w-full flex-col ">
+        <div className="h-[100%]">
+            <div className="flex h-[100%] w-full flex-col ">
                 <BreadCrumbHeader />
-                <div className="flex justify-center ">
-                    <main className="flex items-start py-4">
-                        <div className="px-1 ">
-                            <ScrollArea className="h-[772px] rounded-md border ">
-                                <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%]">
-                                    <div id="main">
-                                        <div id="application">
-                                            <div>
-                                                {contractAttribute.map((item: IContractAttribute, index) => (
-                                                    <div key={uuidv4()}>
-                                                        {item.type === EContractAttributeType.CONTRACT_HEADER && (
-                                                            <h5 className="text-center font-bold flex pt-1">
-                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onBlur={(e) => {
+                <main className="flex mx-10 my-2 gap-2">
+                    <div className="px-1 w-[50%] h-[77%] border rounded-lg">
+                        <ScrollArea className=" w-[100%]  h-[100%] ">
+                            <form className="max-w-[100%] p-10 text-sm w-[100%]">
+                                <div id="main">
+                                    <div id="application">
+                                        <div>
+                                            {contractAttribute.map((item: IContractAttribute, index) => (
+                                                <div key={uuidv4()}>
+                                                    {item.type === EContractAttributeType.CONTRACT_HEADER && (
+                                                        <h5 className="text-center font-bold flex pt-1">
+                                                            <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onBlur={(e) => {
+                                                                handleChangeAttributeInput(e, index)
+                                                            }} description="" alignCenter={true} className="text-center w-[50%] justify-center ml-auto mr-auto" defaultValue={item.value} />
+                                                        </h5>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_HEADER_DATE && (
+                                                        <div className="flex justify-center items-end mt-5 font-semibold italic">
+                                                            <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onBlur={(e) => {
+                                                                handleChangeAttributeInput(e, index)
+                                                            }} description="" alignCenter={true} className="text-center w-[50%] justify-end ml-auto" defaultValue={item.value} />
+                                                        </div>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_TITLE && (
+                                                        <div>
+                                                            <h1 className="text-center font-bold text-2lg mt-4 uppercase">
+                                                                <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onBlur={(e) => {
                                                                     handleChangeAttributeInput(e, index)
-                                                                }} description="" alignCenter={true} className="text-center w-[50%] justify-center ml-auto mr-auto" defaultValue={item.value} />
-                                                            </h5>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_HEADER_DATE && (
-                                                            <div className="flex justify-end items-end mt-5 font-semibold italic">
-                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} onBlur={(e) => {
+                                                                }} />
+                                                            </h1>
+                                                        </div>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_NUMBER && (
+                                                        <div>
+                                                            <h2 className="text-center font-bold mt-1">
+                                                                <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onBlur={(e) => {
                                                                     handleChangeAttributeInput(e, index)
-                                                                }} description="" alignCenter={true} className="text-center w-[50%] justify-end ml-auto" defaultValue={item.value} />
-                                                            </div>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_TITLE && (
-                                                            <div>
-                                                                <h1 className="text-center font-bold text-2xl mt-4 uppercase">
-                                                                    <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onBlur={(e) => {
+                                                                }} />
+                                                            </h2>
+                                                        </div>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_TEXT && (
+                                                        <div className="mt-6">
+                                                            <Textarea
+                                                                onBlur={(e) => handleValueOfTextarea(e, index)}
+                                                                className="mr-auto"
+                                                                defaultValue={item.value}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (
+                                                        <div>
+                                                            <h1 className="mt-6 font-bold text-[18px]">
+                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onBlur={(e) => {
+                                                                    handleChangeAttributeInput(e, index)
+                                                                }} />
+                                                            </h1>
+                                                        </div>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_HEADING_2 && (
+                                                        <div>
+                                                            <h1 className="mt-1 font-bold text-[18px]">
+                                                                <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onBlur={(e) => {
+                                                                    handleChangeAttributeInput(e, index)
+                                                                }} />
+                                                            </h1>
+                                                        </div>
+                                                    )}
+                                                    {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
+                                                        <div>
+                                                            <h2 className="mt-2 text-[14px] flex w-full">
+                                                                <b className="">
+                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
                                                                         handleChangeAttributeInput(e, index)
                                                                     }} />
-                                                                </h1>
-                                                            </div>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_NUMBER && (
-                                                            <div>
-                                                                <h2 className="text-center font-bold mt-1">
-                                                                    <Input className="text-center w-[50%] ml-auto mr-auto " defaultValue={item.value} onBlur={(e) => {
-                                                                        handleChangeAttributeInput(e, index)
-                                                                    }} />
-                                                                </h2>
-                                                            </div>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_TEXT && (
-                                                            <div>
-                                                                <h2 className="mt-6">
+                                                                </b>
+                                                                <span className="text-wrap ms-2 w-[80%]">
                                                                     <Textarea onBlur={(e) => {
                                                                         handleValueOfTextarea(e, index)
                                                                     }} className="mr-auto " defaultValue={item.value} />
-                                                                </h2>
-                                                            </div>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (
-                                                            <div>
-                                                                <h1 className="mt-6 font-bold text-[18px]">
-                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onBlur={(e) => {
-                                                                        handleChangeAttributeInput(e, index)
-                                                                    }} />
-                                                                </h1>
-                                                            </div>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_HEADING_2 && (
-                                                            <div>
-                                                                <h1 className="mt-1 font-bold text-[18px]">
-                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.value} description={''} onBlur={(e) => {
-                                                                        handleChangeAttributeInput(e, index)
-                                                                    }} />
-                                                                </h1>
-                                                            </div>
-                                                        )}
-                                                        {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
-                                                            <div>
-                                                                <h2 className="mt-2 text-[14px] flex w-full">
-                                                                    <b className="">
-                                                                        <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
-                                                                            handleChangeAttributeInput(e, index)
-                                                                        }} />
-                                                                    </b>
-                                                                    <span className="text-wrap ms-2 w-[80%]">
-                                                                        <Textarea onBlur={(e) => {
-                                                                            handleValueOfTextarea(e, index)
-                                                                        }} className="mr-auto " defaultValue={item.value} />
-                                                                    </span>
-                                                                </h2>
-                                                            </div>
-                                                        )}
-                                                        {item.statusAttribute === EStatusAttribute.PREPARE && (
-                                                            <div>
-                                                                <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} />
+                                                                </span>
+                                                            </h2>
+                                                        </div>
+                                                    )}
+                                                    {item.statusAttribute === EStatusAttribute.PREPARE && (
+                                                        <div>
+                                                            <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
+                                        <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} />
                                     </div>
-                                </form>
-                            </ScrollArea>
-                        </div>
-                        <div className="px-1">
-                            <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
-                        </div>
-                    </main>
-                </div>
+                                </div>
+                            </form>
+                        </ScrollArea>
+                    </div>
+                    <div className="px-1 w-[50%] h-[77%] border rounded-lg">
+                        <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
+                    </div>
+                </main>
             </div>
             <DialogInfoAttribute setIsDetailAttributeDialog={setIsDetailAttributeDialog} isDetailAttributeDialog={isDetailAttributeDialog} infoOfAttribute={infoOfContractAttribute} />
         </div>

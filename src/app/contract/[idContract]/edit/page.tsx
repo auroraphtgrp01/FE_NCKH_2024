@@ -135,8 +135,8 @@ export default function DialogEditContract() {
         <div className="h-[100%]">
             <div className="flex h-[100%] w-full flex-col ">
                 <BreadCrumbHeader />
-                <main className="flex mx-10 my-2 gap-2">
-                    <div className="px-1 w-[50%] h-[77%] border rounded-lg">
+                <main className="flex mx-10 gap-2">
+                    <div className="px-1 w-[50%] h-[74%] border rounded-lg my-2">
                         <ScrollArea className=" w-[100%]  h-[100%] ">
                             <form className="max-w-[100%] p-10 text-sm w-[100%]">
                                 <div id="main">
@@ -233,7 +233,7 @@ export default function DialogEditContract() {
                             </form>
                         </ScrollArea>
                     </div>
-                    <div className="px-1 w-[50%] h-[77%] border rounded-lg">
+                    <div className="px-1 w-[50%] h-[74%] border rounded-lg my-2">
                         <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
                     </div>
                 </main>

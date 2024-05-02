@@ -30,13 +30,13 @@ import { Icons } from '@/components/ui/icons'
 import { useRouter } from 'next/navigation'
 
 export default function BreadCrumbHeader() {
+    const { userInfo, setUserInfo }: any = useAppContext()
     const [hasProvider, setHasProvider] = useState<boolean | null>(null);
     const [isExitsAccount, setAccount] = useState<boolean | null>(null)
-    const { wallet, setWallet }: any = useAppContext()
+    const [wallet, setWallet]: any = useState()
     const Router = useRouter();
     const [isOpen, setIsOpen] = useState(false)
     const [pin, setPin] = useState<string>("")
-    const [userInfo, setUserInfo] = useState<any>(null)
     const { toast } = useToast()
     useEffect(() => {
         const getProvider = async () => {
@@ -60,7 +60,7 @@ export default function BreadCrumbHeader() {
                 toast({
                     title: "Login success",
                     description: "You have successfully logged in",
-                    variant: "default",
+                    variant: "success",
                     duration: 2000,
                 })
             } else {

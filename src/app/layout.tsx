@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head></head>
-      <body className={cn(inter.className, 'overflow-hidden')} suppressHydrationWarning={true} >
+      <body className={cn(inter.className)} suppressHydrationWarning={true} >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

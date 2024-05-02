@@ -5,7 +5,7 @@ import {
   LucideIcon,
   ScanFace,
   KeyRound,
-  Key, Check, BadgePlus, BadgeX, BadgeInfo, ShieldPlus, UserRoundPlus, Newspaper, Layers, Briefcase, LogOut
+  Key, Check, BadgePlus, BadgeX, BadgeInfo, ShieldPlus, UserRoundPlus, Newspaper, Layers, Briefcase, LogOut, MoonStar, CloudSun
 } from "lucide-react"
 import Image from "next/image"
 
@@ -27,8 +27,10 @@ export const Icons = {
   layers: Layers,
   briefcase: Briefcase,
   logout: LogOut,
+  moonStar: MoonStar,
+  cloudSun: CloudSun,
   logo: (props: LucideProps) => (
-    <Image src={'/metamask.png'} alt="" height={48} width={48} />
+    <Image src={'/metamask.png'} alt="" height={62} width={62} />
   ),
   gitHub: (props: LucideProps) => (
     <svg viewBox="0 0 438.549 438.549" {...props}>

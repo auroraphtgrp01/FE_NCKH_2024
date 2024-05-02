@@ -10,19 +10,6 @@ import { InputWithTooltip } from "@/components/InputWithTooltip";
 import AddAttributeArea from '../../../../components/AddAttributeArea';
 import { v4 as uuidv4 } from 'uuid';
 import DialogInfoAttribute from '../../../../components/DialogInfoAttribute';
-import {
-    Alert,
-    AlertTitle,
-} from "@/components/ui/alert"
-import { Button } from "@/components/ui/button";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";

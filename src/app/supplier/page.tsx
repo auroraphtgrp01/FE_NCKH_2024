@@ -30,7 +30,7 @@ export default function page() {
       </div>
       <div className="mt-5 grid">
         <div className="grid pl-4 grid-cols-5 justify-around">
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -59,7 +59,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -88,7 +88,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -117,7 +117,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -146,7 +146,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -175,7 +175,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -204,7 +204,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -233,7 +233,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -262,7 +262,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img
@@ -291,7 +291,7 @@ export default function page() {
               </CardFooter>
             </a>
           </Card>
-          <Card className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+          <Card className="w-[93%] h-[94%] mb-[18px] rounded-md hover:scale-105 hover:delay-250 duration-300">
             <a href="link-supplier">
               <CardHeader className="p-0 h-[60%]">
                 <img

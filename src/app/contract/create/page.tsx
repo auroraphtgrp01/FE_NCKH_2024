@@ -131,7 +131,7 @@ export default function page() {
                 toast({
                     title: "Create contract success",
                     description: "You have successfully created a contract",
-                    variant: "default",
+                    variant: "success",
                     duration: 2000,
                 })
                 Router.push(`/contract/${res.data.contract.id}`)

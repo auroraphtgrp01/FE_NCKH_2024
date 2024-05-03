@@ -110,7 +110,7 @@ export default function NavbarVertical() {
                         </div>
                     </div>
                 </nav>
-                <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
+                <nav className="mt-auto translate-y-[11px] flex flex-col items-center gap-4 px-2 sm:py-5">
                     {userInfo !== null &&
                         <TooltipProvider >
                             <Tooltip delayDuration={50}>

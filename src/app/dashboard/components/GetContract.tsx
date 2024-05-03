@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useAppContext } from "@/components/ThemeProvider"
 import Web3 from "web3"
 import { Icons } from "@/components/ui/icons"
+import { fetchAPI } from "@/utils/fetchAPI"
 
 export interface ContractData {
   dataContract: any | undefined
@@ -71,6 +72,7 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
     try {
       const methodCall = payload.methodCall
       const result: string[][] = await contract.methods.getContractInformationArray().call();
+      console.log(result);
       return arrayToObject(result as any);
     } catch (error) {
       console.error("Error:", error);
@@ -86,7 +88,7 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
         variant: "destructive"
       })
     } else {
-      axios.get(`http://localhost:3000/smart-contracts/abi`).then((res) => {
+      fetchAPI('/smart-contracts/abi', "GET").then((res) => {
         setABI(res.data.abi)
       })
         .catch((error) => {
@@ -128,7 +130,7 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
             <FormItem>
               <FormLabel>Address Wallet: </FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} className="w-96" readOnly value={wallet.accounts[0]} />
+                <Input placeholder="" {...field} className="w-96" readOnly />
               </FormControl>
               <FormMessage />
             </FormItem>

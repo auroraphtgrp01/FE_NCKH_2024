@@ -28,6 +28,7 @@ import detectEthereumProvider from '@metamask/detect-provider'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { Icons } from '@/components/ui/icons'
 import { useRouter } from 'next/navigation'
+import Web3 from 'web3'
 
 export default function BreadCrumbHeader() {
     const { userInfo, setUserInfo }: any = useAppContext()
@@ -54,8 +55,17 @@ export default function BreadCrumbHeader() {
                 "PIN": pin
             })
             if (login.status == 201) {
-                localStorage.setItem('user-info', JSON.stringify(login.data))
-                setUserInfo(login.data)
+                const web3 = new Web3(window.ethereum);
+                const balance = await web3.eth.getBalance(wallet.accounts[0]);
+                const balanceEth = web3.utils.fromWei(balance, 'ether');
+                setUserInfo({
+                    data: login.data,
+                    balance: Number(balanceEth).toFixed(3)
+                })
+                localStorage.setItem('user-info', JSON.stringify({
+                    data: login.data,
+                    balance: Number(balanceEth).toFixed(3)
+                }))
                 setIsOpen(false)
                 toast({
                     title: "Login success",
@@ -93,6 +103,7 @@ export default function BreadCrumbHeader() {
             setIsOpen(true)
         } else {
             if (!isExitsAccount) {
+                setUserInfo({ accounts: accounts[0] })
                 toast({
                     title: "Account not found",
                     description: "Please register to create an account",
@@ -107,31 +118,15 @@ export default function BreadCrumbHeader() {
     return (
         <div>
             <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
-                <Breadcrumb className="mb-3">
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link href="#">Dashboard</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link href="#">Orders</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Recent Orders</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
                 <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
                     <div className='flex me-2'>
                         {checkLogin() && (
-                            <div>
+                            <div className='flex'>
                                 <Button variant={"outline"} type="button">
-                                    <Icons.login className="h-5 w-5 me-2" /> {userInfo?.addressWallet}
+                                    <Icons.login className="h-5 w-5 me-2" /> {userInfo?.data?.addressWallet}
+                                </Button>
+                                <Button variant={"outline"} type="button" className='ms-2'>
+                                    <Icons.walletMinimal className="h-5 w-5 me-2" />{userInfo?.balance} ETH
                                 </Button>
                             </div>
                         )}
@@ -140,11 +135,6 @@ export default function BreadCrumbHeader() {
                                 <Button variant={"outline"} onClick={handleConnect}>
                                     <Icons.login className="h-5 w-5 me-2" /> <div className="font-semibold">  CONNECT TO METAMASK </div>
                                 </Button>
-                                <Link href="/register">
-                                    <Button variant={"outline"} className="ms-2">
-                                        <Icons.key className="h-5 w-5 me-2" /> <div className="font-semibold"> REGISTER </div>
-                                    </Button>
-                                </Link>
                             </div>
                         )}
                     </div>

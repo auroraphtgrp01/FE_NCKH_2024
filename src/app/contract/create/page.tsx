@@ -85,7 +85,7 @@ const initContractTemplate = [
 export default function page() {
     const [template, setTemplate] = useState<ContractTemplate[]>(initContractTemplate)
     const [isOpen, setOpen] = useState(false)
-    const { wallet, setWallet }: any = useAppContext()
+    const { userInfo, setUserInfo }: any = useAppContext()
     const [invitationInput, setInvitationInput] = useState('')
     const [invitation, setInvitation] = useState<InvitationItem[]>([])
     const [indexPerson, setIndexPerson] = useState<number>(-1)
@@ -120,7 +120,7 @@ export default function page() {
     }, [api])
     function onClickCreateContractButton() {
         const payload = {
-            addressWallet: JSON.parse(localStorage.getItem('user-info') as string)?.addressWallet,
+            addressWallet: userInfo?.data?.addressWallet,
             name: nameOfContractInput,
             template: templateSelect?.id || null,
             invitation: invitation,
@@ -158,7 +158,7 @@ export default function page() {
                         <CardContent>
                             <div className="flex flex-col space-y-2 mt-2">
                                 <Label >Address Wallet: </Label>
-                                <Input disabled readOnly defaultValue={JSON.parse(localStorage.getItem('user-info') as string)?.addressWallet} />
+                                <Input disabled readOnly defaultValue={userInfo?.data?.addressWallet} />
                             </div>
                             <div className="flex flex-col space-y-2 mt-2">
                                 <Label >Name of Contract: </Label>

@@ -23,6 +23,7 @@ import { useAppContext } from "@/components/ThemeProvider"
 import Web3 from "web3"
 import { Icons } from "@/components/ui/icons"
 import { fetchAPI } from "@/utils/fetchAPI"
+import { ethers } from "ethers"
 
 export interface ContractData {
   dataContract: any | undefined
@@ -71,14 +72,18 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
     const contract = new web3.eth.Contract(payload.abi, payload.addressContract)
     try {
       const methodCall = payload.methodCall
-      const result: string[][] = await contract.methods.getContractInformationArray().call();
-      console.log(result);
-      return arrayToObject(result as any);
+      const result: string[][] = await contract.methods.getContractInformation().call();
+      console.log(">>", JSON.parse(refactorTest(result)))
     } catch (error) {
       console.error("Error:", error);
       return [];
     }
   }
+  function refactorTest(jsonData: any) {
+    const data = ethers.toUtf8String(jsonData[0])
+    return data
+  }
+
   async function fetchABI() {
     const nameContract = selectedValue
     if (false) {

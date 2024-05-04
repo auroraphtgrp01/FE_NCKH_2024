@@ -452,7 +452,7 @@ export default function Page() {
                                         <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
                                     </div>
                                 </main>
-                                <AlertDialogFooter className='fixed bottom-4 right-5'>
+                                <AlertDialogFooter className='fixed bottom-0 right-5'>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction>Continue</AlertDialogAction>
                                 </AlertDialogFooter>

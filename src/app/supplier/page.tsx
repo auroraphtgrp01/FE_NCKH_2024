@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 import React from "react";
-
+import { Star } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -53,9 +53,9 @@ export default function page() {
         </div>
       </div>
       <div className="mt-5 grid">
-        <div className="grid pl-4 grid-cols-5 justify-around">
+        <div className="grid pl-4 grid-cols-6 gap-4">
           {suppliersWithImages.map((value, index) => (
-            <Card key={value.id} className="w-[260px] h-[350px] mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
+            <Card key={value.id} className="mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
               <Link href={`/supplier/${value.id}`} onClick={() => handlegetInforSupplier(index)}>
                 <CardHeader className="p-0 h-[60%]">
                   <img
@@ -65,20 +65,21 @@ export default function page() {
                   />
                 </CardHeader>
                 <CardContent className="mt-2">
-                  <CardTitle className="mb-1 font-semibold text-lg">
+                  <CardTitle className="mb-1 font-semibold text-lg truncate">
                     {value.Name}
                   </CardTitle>
-                  <CardDescription className="text-sm mt-2">
+                  <CardDescription className="text-sm mt-2 line-clamp-2">
                     {value.Description}
                   </CardDescription>
                 </CardContent>
                 <CardFooter>
-                  <div className="inline-flex justify-between">
-                    <div className="flex text-[13px] pr-5">
-                      <p className="text-primary mr-1">163</p> <p> Sản phẩm</p>
+                  <div className="inline-flex justify-between items-center">
+                    <div className="flex text-[13px] pr-5 items-center">
+                      <p className="text-primary mr-1">163</p>
+                      <p className="text-nowrap"> Sản phẩm</p>
                     </div>
-                    <div className="flex text-[13px] pl-5">
-                      <p className="text-primary mr-1">4.6</p> <p> Đánh giá</p>
+                    <div className="flex text-[13px] pl-5 items-center">
+                      <p className="text-primary mr-1">4.6</p> <Star className="text-yellow-300 text-[13px]" />
                     </div>
                   </div>
                 </CardFooter>

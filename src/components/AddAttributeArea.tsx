@@ -13,19 +13,36 @@ import {
 } from "@/components/ui/select"
 import { v4 as uuidRandom } from 'uuid';
 
-import { EContractAttributeType, EContractAttributeTypeAdditional, IContractAttribute } from '@/interface/contract.i';
+import { EContractAttributeType, EContractAttributeTypeAdditional, EContractAttributeTypeAdditionalHeader, EStatusAttribute, IContractAttribute } from '@/interface/contract.i';
 import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 
 
 export default function AddAttributeArea({ contractAttribute, setContractAttribute, index }: { contractAttribute: any, setContractAttribute: any, index?: number }) {
-    const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditional).map((key) => ({
+    const contractAttributeTypeArr: { key: string, value: string }[] = Object.keys(EContractAttributeType).map((key) => ({
         key,
-        value: EContractAttributeTypeAdditional[key as keyof typeof EContractAttributeTypeAdditional],
+        value: EContractAttributeType[key as keyof typeof EContractAttributeType],
     }));
+    const [contractAttributeTypeArray, setContractAttributeType] = useState<any[]>(contractAttributeTypeArr)
+    useEffect(() => {
+        if (index && index < 5) {
+            const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditionalHeader).map((key) => ({
+                key,
+                value: EContractAttributeTypeAdditionalHeader[key as keyof typeof EContractAttributeTypeAdditionalHeader],
+            }));
+            setContractAttributeType(contractAttributeTypeArray)
+        }
+        if (contractAttribute.length > 4) {
+            const contractAttributeTypeArray: { key: string, value: string }[] = Object.keys(EContractAttributeTypeAdditional).map((key) => ({
+                key,
+                value: EContractAttributeTypeAdditional[key as keyof typeof EContractAttributeTypeAdditional],
+            }));
+            setContractAttributeType(contractAttributeTypeArray)
+        }
+    }, [contractAttribute])
     const { toast } = useToast()
     const [SelectType, setSelectType] = useState<EContractAttributeType>()
-    const [inputValue, setInputValue] = useState<any>()
+    const [inputValue, setInputValue] = useState<any>('')
     const [textArea, setTextArea] = useState<string>('')
     function handleAddAttribute() {
         if (!SelectType || !inputValue || (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE && !textArea)) {
@@ -39,9 +56,8 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
         const newContractAttribute: IContractAttribute = {
             value: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? textArea : inputValue,
             property: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? inputValue : undefined,
-            id: uuidRandom(),
             type: SelectType as EContractAttributeType,
-            isCreate: false
+            statusAttribute: EStatusAttribute.CREATE
         }
         if (!index) {
             setContractAttribute([
@@ -68,7 +84,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                 <Input className='w-[32%]'
                     onChange={(e) => {
                         setInputValue(e.target.value)
-                    }} defaultValue={inputValue} />
+                    }} value={inputValue} />
                 <Select onValueChange={(e: EContractAttributeType) => {
                     setSelectType(e)
                 }}>
@@ -92,7 +108,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                 <div>
                     <Textarea onChange={(e) => {
                         setTextArea(e.target.value)
-                    }} className='mt-2 w-[100%]' defaultValue={textArea} />
+                    }} className='mt-2 w-[100%]' value={textArea} />
                 </div>
             )}
         </div>

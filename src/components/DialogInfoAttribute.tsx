@@ -1,25 +1,16 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
     TableRow,
 } from "@/components/ui/table"
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { IContractAttribute } from "@/interface/contract.i"
 
 export default function DialogInfoAttribute({ isDetailAttributeDialog, setIsDetailAttributeDialog, infoOfAttribute }: { isDetailAttributeDialog: boolean, setIsDetailAttributeDialog: (item: boolean) => void, infoOfAttribute: any }) {
     return (
@@ -48,11 +39,11 @@ export default function DialogInfoAttribute({ isDetailAttributeDialog, setIsDeta
                                 </TableRow>
                                 <TableRow >
                                     <TableCell><b>Created By:</b>  </TableCell>
-                                    <TableCell>{infoOfAttribute?.createdBy ? infoOfAttribute.createdBy : 'N/A'}</TableCell>
+                                    <TableCell>{infoOfAttribute?.createdBy?.email ? infoOfAttribute?.createdBy?.email : 'N/A'}</TableCell>
                                 </TableRow>
                                 <TableRow >
                                     <TableCell><b>Updated By: </b></TableCell>
-                                    <TableCell> {infoOfAttribute?.updatedBy ? infoOfAttribute.updatedBy : 'N/A'}</TableCell>
+                                    <TableCell>{infoOfAttribute?.updatedBy?.email ? infoOfAttribute?.updatedBy?.email : 'N/A'}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

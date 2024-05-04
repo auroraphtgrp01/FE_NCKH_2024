@@ -56,6 +56,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { fetchAPI } from "@/utils/fetchAPI"
+import BreadCrumbHeader from "@/components/BreadCrumbHeader"
 
 export interface Participant {
     userId: string
@@ -223,6 +224,13 @@ export default function DataTableDemo() {
 
     return (
         <div className="w-full">
+            <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+                <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+                    <div className='flex'>
+                        <BreadCrumbHeader />
+                    </div>
+                </div>
+            </header>
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter emails..."
@@ -352,67 +360,7 @@ export default function DataTableDemo() {
                                     The information here is extracted from the database. You can re-fetch it from the chain-network
                                 </DialogDescription>
                             </DialogHeader>
-                            <div className="grid gap-4 py-4 justify-center">
-                                <div className="flex">
-                                    <Card className="me-4 min-w-[250px]">
-                                        <CardHeader className="">
-                                            <CardTitle>Party A</CardTitle>
-                                            <CardDescription>{participants[0].company}</CardDescription>
-                                            <Avatar className="min-w-[50px] min-h-[50px] !mt-5 m-auto">
-                                                <AvatarImage src={participants[1].avatar} className="" />
-                                                <AvatarFallback>CN</AvatarFallback>
-                                            </Avatar>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <form>
-                                                <div className="grid w-full items-center gap-4">
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Full Name:</Label>
-                                                        <Input id="name" value={participants[0].fullName} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Address Wallet:</Label>
-                                                        <Input id="name" value={participants[0].addressWallet} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Position: </Label>
-                                                        <Input id="name" value={participants[0].position} disabled readOnly />
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </CardContent>
-                                    </Card>
-                                    <Card className="min-w-[250px]">
-                                        <CardHeader className="">
-                                            <CardTitle>Party B</CardTitle>
-                                            <CardDescription >{participants[1].company}</CardDescription>
-                                            <Avatar className="min-w-[50px] min-h-[50px] !mt-5 m-auto">
-                                                <AvatarImage src={participants[1].avatar} className="" />
-                                                <AvatarFallback>CN</AvatarFallback>
-                                            </Avatar>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <form>
-                                                <div className="grid w-full items-center gap-4">
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Full Name:</Label>
-                                                        <Input id="name" value={participants[1].fullName} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Address Wallet:</Label>
-                                                        <Input id="name" value={participants[1].addressWallet} disabled readOnly />
-                                                    </div>
-                                                    <div className="flex flex-col space-y-1.5">
-                                                        <Label htmlFor="name">Position: </Label>
-                                                        <Input id="name" value={participants[1].position} disabled readOnly />
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </CardContent>
-                                    </Card>
 
-                                </div>
-                            </div>
                         </DialogContent>
                     </DialogOverlay>
                 </DialogPortal>

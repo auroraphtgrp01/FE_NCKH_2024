@@ -62,6 +62,17 @@
     backdrop-filter: blur(15px) saturate(70%) !important;
   }
 
+  .wrapper-container {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 1.5rem
+      /* 32px */
+    ;
+    padding-left: 1.5rem
+      /* 32px */
+    ;
+  }
 }
 
 @layer base {
@@ -72,4 +83,6 @@
   body {
     @apply bg-background text-foreground;
   }
+
+
 }

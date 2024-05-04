@@ -42,18 +42,20 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useAppContext } from "@/components/ThemeProvider"
-import React from "react"
+import React, { useEffect } from "react"
 import { toast, useToast } from "@/components/ui/use-toast"
 import { fetchAPI } from "@/utils/fetchAPI"
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog"
 import { set } from "date-fns"
 import usePreventLeave from 'react-hook-use-prevent-leave';
+import { useRouter } from "next/navigation"
 
 export default function RegisterForm() {
   const [blockPage, setBlockPage] = React.useState<boolean>(true)
-  const { wallet, setWallet }: any = useAppContext()
+  const { userInfo, setUserInfo }: any = useAppContext()
   const [isOpen, setIsOpen] = React.useState(false)
   const [registerId, setRegisterId] = React.useState<string>("")
+  const Router = useRouter()
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
   })
@@ -63,6 +65,10 @@ export default function RegisterForm() {
   function togglePageBlock(): void {
     setBlockPage((prev) => !prev);
   }
+  useEffect(() => {
+    console.log(userInfo);
+
+  }, [userInfo])
   usePreventLeave(blockPage);
   const [date, setDate] = React.useState<Date>()
   const { toast } = useToast()
@@ -84,6 +90,7 @@ export default function RegisterForm() {
         description: "Register Success. Please login to continue.",
         variant: "default",
       })
+      Router.push('/')
     }).catch((err) => {
       toast({
         title: "Register Fail",
@@ -94,17 +101,19 @@ export default function RegisterForm() {
     setIsOpen(false)
   }
   function onSubmit(values: z.infer<typeof RegisterBody>) {
-    if (!date || !wallet.accounts[0]) return toast({
+    if (!date || !userInfo?.accounts) return toast({
       title: "Empty Field",
       description: "Please fill all field to register account",
       variant: "destructive",
     })
+    console.log(values);
+    
     const payload = {
       ...values,
       dateOfBirth: date?.toISOString(),
-      addressWallet: wallet.accounts[0]
+      addressWallet: userInfo?.accounts
     }
-    fetchAPI('/users', 'POST', payload).then((res) => {
+    fetchAPI('/auth/register', 'POST', payload).then((res) => {
       if (res.status === 201) {
         setRegisterId(res.data.id)
         setIsOpen(true);
@@ -138,7 +147,7 @@ export default function RegisterForm() {
                   <FormItem>
                     <FormLabel>Address Wallet: </FormLabel>
                     <FormControl>
-                      <Input placeholder="" {...field} disabled value={wallet.accounts[0]} />
+                      <Input placeholder="" {...field} disabled value={userInfo?.accounts} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -191,6 +200,30 @@ export default function RegisterForm() {
                     <FormLabel>Full Name: </FormLabel>
                     <FormControl>
                       <Input placeholder="" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role: </FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select your role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Role</SelectLabel>
+                            <SelectItem value="Customer">Customer</SelectItem>
+                            <SelectItem value="Supplier">Supplier</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

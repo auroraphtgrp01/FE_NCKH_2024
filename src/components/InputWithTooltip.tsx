@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import parse from 'html-react-parser';
 import { Icons } from '@/components/ui/icons'
-import { IContractAttribute } from '@/interface/contract.i'
+import { EStatusAttribute, IContractAttribute } from '@/interface/contract.i'
 import { v4 as uuidRandom } from 'uuid';
 export interface IInputWithTooltipProps extends React.InputHTMLAttributes<HTMLInputElement> {
     description?: string
@@ -20,24 +20,28 @@ export interface IInputWithTooltipProps extends React.InputHTMLAttributes<HTMLIn
     setContractAttribute: (item: IContractAttribute[]) => void
     setIsDetailOpen: (item: boolean) => void
     setInfoOfContractAttribute: (item: any) => void
+    deleteArray?: any[]
+    setDeleteArray: (item: any) => void
 }
 
-const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipProps>(({ className, type, description, alignCenter, index, contractAttribute, setIsDetailOpen, setInfoOfContractAttribute, setContractAttribute, ...props }, ref) => {
+const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipProps>(({ className, type, description, alignCenter, index, contractAttribute, deleteArray, setIsDetailOpen, setInfoOfContractAttribute, setContractAttribute, setDeleteArray, ...props }, ref) => {
     const handleAddNewItem = () => {
         const newContractAttribute: IContractAttribute = {
             value: '',
-            id: uuidRandom(),
-            isCreate: true
+            id: '',
+            statusAttribute: EStatusAttribute.PREPARE
         }
         const newContractAttributeArray = [...contractAttribute]
-        newContractAttributeArray.splice(index + 1, 0, newContractAttribute)
+        newContractAttributeArray.splice(index, 0, newContractAttribute)
         setContractAttribute(newContractAttributeArray)
     }
     const handleDeleteItem = () => {
-        const newContractAttributeArray = [...contractAttribute]
-        newContractAttributeArray.splice(index, 1)
-        setContractAttribute(newContractAttributeArray)
+        setDeleteArray([...deleteArray as any, contractAttribute[index].id])
+        const newContractAttributeArray = [...contractAttribute];
+        newContractAttributeArray.splice(index, 1);
+        setContractAttribute(newContractAttributeArray);
     }
+
     const handleOpenDetail = () => {
         setInfoOfContractAttribute(contractAttribute[index])
         setIsDetailOpen(true)
@@ -51,14 +55,14 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
                     </TooltipTrigger>
                     <TooltipContent className='bg-transparent' side='left'>
                         <div className='flex flex-col'>
-                            <Button variant={'destructive'} type='button' onClick={handleDeleteItem}>
-                                <Icons.badgeX />
+                            <Button variant={'default'} className='' onClick={handleAddNewItem} type='button'>
+                                <Icons.badgePlus />
                             </Button>
-                            <Button variant={'blue'} className='mt-1' type='button' onClick={handleOpenDetail}>
+                            <Button variant={'blue'} className='px-1 mt-2' type='button' onClick={handleOpenDetail}>
                                 <Icons.badgeInfo />
                             </Button>
-                            <Button variant={'default'} className='mt-1' onClick={handleAddNewItem} type='button'>
-                                <Icons.badgePlus />
+                            <Button variant={'destructive'} type='button' onClick={handleDeleteItem} className='mt-2'>
+                                <Icons.badgeX />
                             </Button>
                         </div>
                     </TooltipContent>

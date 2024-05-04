@@ -4,13 +4,12 @@ import * as React from "react"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { type ThemeProviderProps } from "next-themes/dist/types"
 
-type initialState = { accounts: [] };
 
-const init: initialState = { accounts: [] }
+const init = localStorage.getItem('user-info') ? JSON.parse(localStorage.getItem('user-info') as string) : null
 
 interface AppContextValue {
-  wallet: initialState,
-  setWallet: (str: initialState) => void
+  userInfo: any,
+  setUserInfo: (str: any) => void
 }
 
 interface AppContextProps {
@@ -32,9 +31,9 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 export const AppProvider: React.FC<AppContextProps> = ({
   children
 }) => {
-  const [wallet, setWallet] = React.useState(init)
+  const [userInfo, setUserInfo] = React.useState(init)
   const value: AppContextValue = {
-    wallet, setWallet
+    userInfo, setUserInfo
   }
   return <AppContext.Provider value={value}>
     {children}

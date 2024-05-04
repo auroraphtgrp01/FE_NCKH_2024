@@ -6,13 +6,10 @@ import { EContractAttributeType, IContractAttribute } from "@/interface/contract
 import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 
 export default function PreviewContract({ contractAttribute, setContractAttribute }: { contractAttribute: IContractAttribute[], setContractAttribute: (item: any) => void }) {
-  useEffect(() => {
-    console.log(contractAttribute);
-  }, [])
   return (
-    <div>
-      <ScrollArea className="h-[772px] rounded-md border w-[100%]">
-        <form className="max-w-[100%] border shadow-2xl p-10 text-sm w-[100%]">
+    <div className="h-[100%]">
+      <ScrollArea className="min-h-[750px] h-[755px] rounded-xl  w-[100%] flex-1">
+        <form className="max-w-[100%]  p-10 text-sm w-[100%]">
           <div id="main">
             <div id="application">
               {contractAttribute?.map((item: IContractAttribute, index) => (
@@ -43,14 +40,14 @@ export default function PreviewContract({ contractAttribute, setContractAttribut
                   )}
                   {item.type === EContractAttributeType.CONTRACT_TEXT && (
                     <div>
-                      <h2 className="mt-6">
+                      <h2 className="mt-6 whitespace-pre-line">
                         {item.value}
                       </h2>
                     </div>
                   )}
                   {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (
                     <div>
-                      <h1 className="mt-6 font-bold text-[18px]">
+                      <h1 className="mt-3 font-bold text-[18px]">
                         {item.value}
                       </h1>
                     </div>
@@ -64,7 +61,7 @@ export default function PreviewContract({ contractAttribute, setContractAttribut
                   )}
                   {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
                     <div>
-                      <h2 className="mt-3 text-[14px] ms-2">
+                      <h2 className="mt-2 text-[14px] text-justify">
                         -  <b className="ms-1">{item.property}</b>: {" "}
                         <span className="text-wrap ">
                           {item.value}

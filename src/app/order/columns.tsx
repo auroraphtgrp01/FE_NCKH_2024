@@ -15,78 +15,93 @@ import {
 import { Input } from "postcss";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
+export type TOrderDetail = {
   id: string;
-  // amount: number;
-  // status: string;
-  // email: string;
-  produtcs: string;
-  dec: string;
-  quantity: string;
-  unitprice: number;
-  taxes: string;
-  dics: string;
-  taxexcl: string;
+  name: string;
+  description?: string;
+  quantity?: number;
+  price: number;
+  image: string[];
+  taxPrice?: number;
+  discount?: number;
+  taxExclude?: number;
 };
+function test(data: any) {
+  console.log(typeof data, data);
 
-export const columns: ColumnDef<Payment>[] = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
-  {
-    accessorKey: "produtcs",
-    header: () => <div className="font-semibold ">Produtcs</div>,
-  },
-  {
-    accessorKey: "dec",
-    header: () => <div className="font-semibold ">Decription</div>,
-  },
-  {
-    accessorKey: "quantity",
-    header: () => <div className="font-semibold ">Quantity</div>,
-  },
-  {
-    accessorKey: "unitprice",
-    header: () => <div className="font-semibold ">Unit Price</div>,
-    cell: ({ row }) => {
-      const quantity = parseFloat(row.getValue("unitprice"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(quantity);
+  return "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+}
 
-      return <div className="font-semibold">{formatted}</div>;
+function getFirstPathImage(images: string[]) {
+  return images.length > 0
+    ? images[0]
+    : "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg";
+}
+
+export const columns: ColumnDef<TOrderDetail>[] = [
+  {
+    accessorKey: "name",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Products</div>;
     },
+    cell: ({ row }) => <div className="text-start">{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "taxes",
-    header: () => <div className="font-semibold ">Taxes</div>,
+    accessorKey: "description",
+    header: ({ column }) => {
+      return <div className="font-semibold">Description</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-start">{row.getValue("description")}</div>
+    ),
   },
   {
-    accessorKey: "dics",
-    header: () => <div className="font-semibold ">Dics.%</div>,
+    accessorKey: "price",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Price</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-start">{row.getValue("price")}</div>
+    ),
   },
   {
-    accessorKey: "taxexcl",
-    header: () => <div className="font-semibold ">Tax excl</div>,
+    accessorKey: "image",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Image</div>;
+    },
+    cell: ({ row }) => (
+      <img
+        className="w-14 hover:scale-[2] hover:delay-250 duration-300"
+        src={getFirstPathImage(row.getValue("image"))}
+        alt="Product Image"
+      />
+    ),
+  },
+  {
+    accessorKey: "taxPrice",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Tax Price</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-start">{row.getValue("taxPrice")}</div>
+    ),
+  },
+  {
+    accessorKey: "discount",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Discount</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-start">{row.getValue("discount")}</div>
+    ),
+  },
+  {
+    accessorKey: "taxExclude",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Price without tax</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-start">{row.getValue("taxExclude")}</div>
+    ),
   },
 ];

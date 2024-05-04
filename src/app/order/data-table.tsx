@@ -31,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings2 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -69,7 +68,7 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center py-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="mr-auto">
               Tax incl.
               <Settings2 size={20} strokeWidth={1.5} />
             </Button>
@@ -95,8 +94,8 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border bg-gray-100">
-        <Table>
+      <div className="rounded-md border">
+        {/* <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -115,7 +114,7 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="bg-gray-50">
+          <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
@@ -145,25 +144,25 @@ export function DataTable<TData, TValue>({
             <TableRow className="justify-start">
               <TableCell colSpan={2}>
                 <Input
-                  className="border-t-0 border-l-0 border-r-0 border-b-2 text-center mx-5"
+                  className="text-center mx-5"
                   placeholder="Add a product"
                 ></Input>
               </TableCell>
               <TableCell>
                 <Input
-                  className="border-t-0 border-l-0 border-r-0 border-b-2 text-center w-[50%] mx-5"
+                  className="text-center w-[50%] mx-5"
                   placeholder="Add a section"
                 ></Input>
               </TableCell>
               <TableCell>
                 <Input
-                  className="border-t-0 border-l-0 border-r-0 border-b-2 text-center w-[50%] mx-5"
+                  className="text-center w-[50%] mx-5"
                   placeholder="Add a note"
                 ></Input>
               </TableCell>
               <TableCell>
                 <Input
-                  className="border-t-0 border-l-0 border-r-0 border-b-2 text-center w-[50%] mx-5"
+                  className="text-center w-[50%] mx-5"
                   placeholder="Catalog"
                 ></Input>
               </TableCell>
@@ -172,25 +171,77 @@ export function DataTable<TData, TValue>({
               <TableCell></TableCell>
             </TableRow>
           </TableBody>
+        </Table> */}
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+            <TableRow className="justify-start hover:bg-transparent">
+              <TableCell colSpan={7}>
+                <div className="flex">
+                  <Input
+                    className="mx-1 w-[15%]"
+                    placeholder="Add a product"
+                  ></Input>
+                  <Input
+                    className="w-[30%] mx-1"
+                    placeholder="Add a note"
+                  ></Input>
+                  <Input
+                    className="w-[15%] mx-1"
+                    placeholder="Add a tax price"
+                  ></Input>
+                  <Input
+                    className="w-[15%] mx-1"
+                    placeholder="Add a discount"
+                  ></Input>
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
       </div>
     </div>
   );

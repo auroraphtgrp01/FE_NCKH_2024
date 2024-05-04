@@ -380,13 +380,34 @@ export default function DataTableDemo() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>Continue</AlertDialogAction>
+                  <AlertDialogAction className="dark:text-white">
+                    Continue
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button className="ms-2" variant={"destructive"}>
-              <Trash2 size={20} strokeWidth={2.5} />
-            </Button>
+            {/* dialog delete */}
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Button className="ms-2" variant={"destructive"}>
+                  <Trash2 size={20} strokeWidth={2.5} />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Warning: Once deleted, this action cannot be reversed.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="dark:text-white">
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         );
       },

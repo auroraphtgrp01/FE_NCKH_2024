@@ -224,7 +224,13 @@ export default function DataTableDemo() {
 
     return (
         <div className="w-full">
-            <BreadCrumbHeader />
+            <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+                <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+                    <div className='flex'>
+                        <BreadCrumbHeader />
+                    </div>
+                </div>
+            </header>
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter emails..."
@@ -354,7 +360,7 @@ export default function DataTableDemo() {
                                     The information here is extracted from the database. You can re-fetch it from the chain-network
                                 </DialogDescription>
                             </DialogHeader>
-                        
+
                         </DialogContent>
                     </DialogOverlay>
                 </DialogPortal>

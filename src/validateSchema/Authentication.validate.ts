@@ -9,6 +9,7 @@ export const RegisterBody = z
         phoneNumber: z.string().min(10).max(11),
         gender: z.string(),
         dateOfBirth: z.optional(z.string()),
+        role: z.string(),
     })
     .strict()
 

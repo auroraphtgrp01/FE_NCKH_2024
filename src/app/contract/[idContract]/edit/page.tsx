@@ -13,6 +13,7 @@ import DialogInfoAttribute from '../../../../components/DialogInfoAttribute';
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
+import { Button } from "@/components/ui/button";
 
 export default function DialogEditContract() {
     const [contractAttribute, setContractAttribute] = useState<any[]>([]);
@@ -121,7 +122,16 @@ export default function DialogEditContract() {
     return (
         <div className="h-[100%]">
             <div className="flex h-[100%] w-full flex-col ">
-                <BreadCrumbHeader />
+                <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+                    <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+                        <div className='flex translate-x-[-40px]'>
+                            <BreadCrumbHeader />
+                            <Button variant={'default'} onClick={handleOnClickSaveChanges} className="ms-2">
+                                Save Changes
+                            </Button>
+                        </div>
+                    </div>
+                </header>
                 <main className="flex mx-10 gap-2">
                     <div className="px-1 w-[50%] h-[74%] border rounded-lg my-2">
                         <ScrollArea className=" w-[100%]  h-[100%] ">

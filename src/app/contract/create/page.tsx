@@ -147,7 +147,13 @@ export default function page() {
     }
     return (
         <div>
-            <BreadCrumbHeader />
+            <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+                <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+                    <div className='flex translate-x-[-35px]'>
+                        <BreadCrumbHeader />
+                    </div>
+                </div>
+            </header>
             <div className='w-full flex container'>
                 <div className='flex py-4'>
                     <Card className='min-w-[320px]'>

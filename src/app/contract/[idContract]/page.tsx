@@ -66,7 +66,13 @@ export default function Dashboard() {
   }
   return (
     <div className="flex min-h-screen w-full flex-col ">
-      <BreadCrumbHeader />
+      <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+        <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+          <div className='flex translate-x-[-15px]'>
+            <BreadCrumbHeader />
+          </div>
+        </div>
+      </header>
       <div className="flex justify-center">
         <main className="flex items-start py-4">
           <div className="min-w-[300px] px-3 flex-1">

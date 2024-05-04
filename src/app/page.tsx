@@ -10,7 +10,13 @@ import { Button, buttonVariants } from "@/components/ui/button";
 export default function Home() {
   return (
     <div>
-      <BreadCrumbHeader />
+      <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+        <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+          <div className='flex'>
+            <BreadCrumbHeader />
+          </div>
+        </div>
+      </header>
       <main className="flex-col justify-between mt-10">
         <section className="container grid lg:grid-cols-2 place-items-center py-20 md:py-32 gap-10">
           <div className="text-center lg:text-start space-y-6">

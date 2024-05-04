@@ -117,65 +117,63 @@ export default function BreadCrumbHeader() {
 
     return (
         <div>
-            <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
-                <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
-                    <div className='flex me-2'>
-                        {checkLogin() && (
-                            <div className='flex'>
-                                <Button variant={"outline"} type="button">
-                                    <Icons.login className="h-5 w-5 me-2" /> {userInfo?.data?.addressWallet}
-                                </Button>
-                                <Button variant={"outline"} type="button" className='ms-2'>
-                                    <Icons.walletMinimal className="h-5 w-5 me-2" />{userInfo?.balance} ETH
-                                </Button>
-                            </div>
-                        )}
-                        {!checkLogin() && (
-                            <div className='flex'>
-                                <Button variant={"outline"} onClick={handleConnect}>
-                                    <Icons.login className="h-5 w-5 me-2" /> <div className="font-semibold">  CONNECT TO METAMASK </div>
-                                </Button>
-                            </div>
-                        )}
+            <div className='flex'>
+                {checkLogin() && (
+                    <div className='flex'>
+                        <Button variant={"outline"} type="button">
+                            <Icons.login className="h-5 w-5 me-2" /> {userInfo?.data?.addressWallet}
+                        </Button>
+                        <Button variant={"outline"} type="button" className='ms-2'>
+                            <Icons.walletMinimal className="h-5 w-5 me-2" />{userInfo?.balance} ETH
+                        </Button>
                     </div>
+                )}
+                {!checkLogin() && (
+                    <div className='flex'>
+                        <Button variant={"outline"} onClick={handleConnect}>
+                            <Icons.login className="h-5 w-5 me-2" /> <div className="font-semibold">  CONNECT TO METAMASK </div>
+                        </Button>
+                    </div>
+                )}
+                <div className='ms-2'>
                     <ModeToggle />
                 </div>
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogPortal >
-                        <DialogContent onKeyDown={(e) => {
-                            if (e.key === 'Enter' && pin.length == 6) {
-                                onSubmit()
-                            }
-                        }} >
-                            <DialogHeader >
-                                <DialogTitle>Set your PIN to log in</DialogTitle>
-                                <DialogDescription>
-                                    Please Set Your Pin Code to 6 Digits.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4 justify-center">
-                                <InputOTP onChange={(e) => { setPin(e) }} maxLength={6} className="text-center justify-center">
-                                    <InputOTPGroup>
-                                        <InputOTPSlot index={0} />
-                                        <InputOTPSlot index={1} />
-                                    </InputOTPGroup>
-                                    <InputOTPSeparator />
-                                    <InputOTPGroup>
-                                        <InputOTPSlot index={2} />
-                                        <InputOTPSlot index={3} />
-                                    </InputOTPGroup>
-                                    <InputOTPSeparator />
-                                    <InputOTPGroup>
-                                        <InputOTPSlot index={4} />
-                                        <InputOTPSlot index={5} />
-                                    </InputOTPGroup>
-                                </InputOTP>
-                                <Button type='submit' onClick={onSubmit}>Submit</Button>
-                            </div>
-                        </DialogContent>
-                    </DialogPortal>
-                </Dialog >
-            </header>
-        </div>
+            </div>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogPortal >
+                    <DialogContent onKeyDown={(e) => {
+                        if (e.key === 'Enter' && pin.length == 6) {
+                            onSubmit()
+                        }
+                    }} >
+                        <DialogHeader >
+                            <DialogTitle>Set your PIN to log in</DialogTitle>
+                            <DialogDescription>
+                                Please Set Your Pin Code to 6 Digits.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4 justify-center">
+                            <InputOTP onChange={(e) => { setPin(e) }} maxLength={6} className="text-center justify-center">
+                                <InputOTPGroup>
+                                    <InputOTPSlot index={0} />
+                                    <InputOTPSlot index={1} />
+                                </InputOTPGroup>
+                                <InputOTPSeparator />
+                                <InputOTPGroup>
+                                    <InputOTPSlot index={2} />
+                                    <InputOTPSlot index={3} />
+                                </InputOTPGroup>
+                                <InputOTPSeparator />
+                                <InputOTPGroup>
+                                    <InputOTPSlot index={4} />
+                                    <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                            </InputOTP>
+                            <Button type='submit' onClick={onSubmit}>Submit</Button>
+                        </div>
+                    </DialogContent>
+                </DialogPortal>
+            </Dialog >
+        </div >
     )
 }

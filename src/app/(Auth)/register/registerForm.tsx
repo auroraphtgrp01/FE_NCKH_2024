@@ -101,15 +101,17 @@ export default function RegisterForm() {
     setIsOpen(false)
   }
   function onSubmit(values: z.infer<typeof RegisterBody>) {
-    if (!date || !userInfo.accounts) return toast({
+    if (!date || !userInfo?.accounts) return toast({
       title: "Empty Field",
       description: "Please fill all field to register account",
       variant: "destructive",
     })
+    console.log(values);
+    
     const payload = {
       ...values,
       dateOfBirth: date?.toISOString(),
-      addressWallet: userInfo.accounts
+      addressWallet: userInfo?.accounts
     }
     fetchAPI('/auth/register', 'POST', payload).then((res) => {
       if (res.status === 201) {
@@ -145,7 +147,7 @@ export default function RegisterForm() {
                   <FormItem>
                     <FormLabel>Address Wallet: </FormLabel>
                     <FormControl>
-                      <Input placeholder="" {...field} disabled value={userInfo.accounts} />
+                      <Input placeholder="" {...field} disabled value={userInfo?.accounts} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -198,6 +200,30 @@ export default function RegisterForm() {
                     <FormLabel>Full Name: </FormLabel>
                     <FormControl>
                       <Input placeholder="" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role: </FormLabel>
+                    <FormControl>
+                      <Select onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select your role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Role</SelectLabel>
+                            <SelectItem value="Customer">Customer</SelectItem>
+                            <SelectItem value="Supplier">Supplier</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

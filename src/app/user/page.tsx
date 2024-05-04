@@ -356,7 +356,7 @@ export default function DataTableDemo() {
                       </div>
                       <div className="grid grid-cols-3 items-center">
                         <Label className="text-right pr-3" htmlFor="">
-                          Role ID
+                          Role
                         </Label>
                         <Select>
                           <SelectTrigger className="w-[180px]">

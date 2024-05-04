@@ -22,21 +22,7 @@ const suppliersWithImages = supplierList.map(supplier => ({
   ...supplier,
   imageUrl: imageMap.get(supplier.IdImage)
 }));
-function handlegetInforSupplier(index: number) {
-  if (index >= 0 && index < suppliersWithImages.length) {
-    const value = suppliersWithImages[index];
-    const payLoad = {
-      name: value.Name,
-      taxCode: value.taxCode,
-      email: value.email,
-      phoneNumber: value.phoneNumber,
-      address: value.address,
-      userId: 1,
-    };
-    console.log('information supplier');
-    console.log(payLoad);
-  }
-}
+
 export default function page() {
   return (
     <div className="mb-14">
@@ -53,33 +39,35 @@ export default function page() {
         </div>
       </div>
       <div className="mt-5 grid">
-        <div className="grid pl-4 grid-cols-6 gap-4">
+        <div className="grid grid-cols-6 gap-3 custom-grid">
           {suppliersWithImages.map((value, index) => (
-            <Card key={value.id} className="mb-4 rounded-md hover:scale-105 hover:delay-250 duration-300">
-              <Link href={`/supplier/${value.id}`} onClick={() => handlegetInforSupplier(index)}>
-                <CardHeader className="p-0 h-[60%]">
+            <Card key={value.id} className="mb-0 rounded-md hover:scale-105 hover:delay-250 duration-300">
+              <Link href={`/supplier/${value.id}`}>
+                <CardHeader className="p-0">
                   <img
-                    className="rounded-t-md h-[200px]"
+                    className="rounded-t-md w-full h-[128px]"
                     src={value.imageUrl}
                     alt=""
                   />
                 </CardHeader>
-                <CardContent className="mt-2">
+                <CardContent className="mt-2 p-3">
                   <CardTitle className="mb-1 font-semibold text-lg truncate">
                     {value.Name}
                   </CardTitle>
-                  <CardDescription className="text-sm mt-2 line-clamp-2">
+                  <CardDescription className="text-sm mt-2 line-clamp-2 text-justify">
                     {value.Description}
                   </CardDescription>
                 </CardContent>
-                <CardFooter>
-                  <div className="inline-flex justify-between items-center">
-                    <div className="flex text-[13px] pr-5 items-center">
-                      <p className="text-primary mr-1">163</p>
-                      <p className="text-nowrap"> Sản phẩm</p>
+                <CardFooter className="p-3">
+                  <div className="flex basis-full justify-between items-center ">
+                    <div className="flex items-center">
+                      <p className="text-black mr-1 text-[13px] ">163</p>
+                      <p className="text-nowrap text-primary text-[13px] "> Sản phẩm</p>
                     </div>
-                    <div className="flex text-[13px] pl-5 items-center">
-                      <p className="text-primary mr-1">4.6</p> <Star className="text-yellow-300 text-[13px]" />
+                    <div className="flex items-center text-right">
+                      <p className="text-black mr-1 text-[13px] ">4.6 </p>
+                      {/* <Star className="text-primary w-[20px]" /> */}
+                      <p className="text-nowrap text-primary text-[13px] "> Đánh giá</p>
                     </div>
                   </div>
                 </CardFooter>

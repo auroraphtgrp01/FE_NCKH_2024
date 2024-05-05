@@ -17,9 +17,12 @@ import {
   ArrowUpDown,
   CheckCheck,
   ChevronDown,
+  FilePen,
   FileSearch,
   MoreHorizontal,
   RefreshCw,
+  Trash2,
+  UserCog,
   X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -82,14 +85,29 @@ import Link from "next/link";
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog";
 import { fetchAPI } from "@/utils/fetchAPI";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-export interface Participant {
-  userId: string;
-  fullName: string;
+export interface User {
+  name: string;
+  phoneNumber: string;
+  email: string;
+  indentifyNumber: string;
   addressWallet: string;
-  position: string;
-  company: string;
-  avatar?: string;
+  gender: string;
+  dateOfBirth: string;
+  role: string;
+  status: string;
+  suppliers: string;
 }
 const data: Contract[] = [
   {
@@ -121,7 +139,7 @@ export type Contract = {
   suppliers: string;
 };
 
-const initParticipants: Participant[] = [
+const initParticipants: User[] = [
   {
     name: "",
     phoneNumber: "",
@@ -139,24 +157,14 @@ const initParticipants: Participant[] = [
 export default function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [participants, setParticipants] =
-    React.useState<Participant[]>(initParticipants);
+    React.useState<User[]>(initParticipants);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [isOpen, setIsOpen] = React.useState(false);
-  async function handleOpenParticipant(addressWallet: string) {
-    await getParticipants(addressWallet);
-    setIsOpen(true);
-  }
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
-  const getParticipants = async (addressWallet: string) => {
-    fetchAPI(`/contract/participants/${addressWallet}`, "GET").then((res) => {
-      setParticipants(res.data);
-    });
-  };
 
   const columns: ColumnDef<Contract>[] = [
     {
@@ -237,9 +245,18 @@ export default function DataTableDemo() {
       ),
     },
     {
-      accessorKey: "dateOfBirth",
+      accessorKey: "gender",
       header: () => {
         return <div className="text-center font-semibold">Gender</div>;
+      },
+      cell: ({ row }) => (
+        <div className="lowercase text-center">{row.getValue("gender")}</div>
+      ),
+    },
+    {
+      accessorKey: "dateOfBirth",
+      header: () => {
+        return <div className="text-center font-semibold">Date Of Birth</div>;
       },
       cell: ({ row }) => (
         <div className="lowercase text-center">
@@ -275,25 +292,116 @@ export default function DataTableDemo() {
       ),
     },
     {
-      accessorKey: "participants",
+      accessorKey: "action",
       header: () => <div className="text-center font-semibold">Action</div>,
       cell: ({ row }) => {
         return (
           <div className="text-center">
-            <Button
-              onClick={() => handleOpenParticipant(row.getValue("address"))}
-            >
-              <RefreshCw size={17} strokeWidth={2.5} />
-            </Button>
-            <Link
-              href={`/contract/detail/${row.getValue("typeID")}/${row.getValue(
-                "address"
-              )}`}
-            >
-              <Button className="ms-2" variant={"destructive"}>
-                <X size={20} strokeWidth={2.5} />
-              </Button>
-            </Link>
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Button>
+                  <FilePen
+                    size={17}
+                    strokeWidth={2.4}
+                    className="dark:text-white"
+                  />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <div className="grid gap-3 pr-4 py-4">
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Name
+                        </Label>
+                        <Input id="" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Address Wallet
+                        </Label>
+                        <Input id="" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Email
+                        </Label>
+                        <Input id="" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Gender
+                        </Label>
+                        <Input id="" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Date Of Birth
+                        </Label>
+                        <Input id="e" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Phone Number
+                        </Label>
+                        <Input id="e" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Indentify Number
+                        </Label>
+                        <Input id="e" className="col-span-2" />
+                      </div>
+                      <div className="grid grid-cols-3 items-center">
+                        <Label className="text-right pr-3" htmlFor="">
+                          Role
+                        </Label>
+                        <Select>
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="light">Customer</SelectItem>
+                            <SelectItem value="dark">Admin</SelectItem>
+                            <SelectItem value="system">Supplier</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="dark:text-white">
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            {/* dialog delete */}
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Button className="ms-2" variant={"destructive"}>
+                  <Trash2 size={20} strokeWidth={2.5} />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Warning: Once deleted, this action cannot be reversed.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="dark:text-white">
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         );
       },
@@ -322,13 +430,14 @@ export default function DataTableDemo() {
   return (
     <div className="w-full">
       <BreadCrumbHeader />
-      <div className="flex justify-between py-5">
+      <div className="flex justify-between py-4">
         <Select>
-          <SelectTrigger className="w-[8%]">
-            <SelectValue placeholder="Role" />
+          <SelectTrigger className="w-[5%]">
+            <SelectValue />
+            <UserCog size={20} strokeWidth={2} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="light">User</SelectItem>
+            <SelectItem value="light">Customer</SelectItem>
             <SelectItem value="dark">Admin</SelectItem>
             <SelectItem value="system">Suppier</SelectItem>
           </SelectContent>

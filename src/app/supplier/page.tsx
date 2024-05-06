@@ -14,14 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Info } from "lucide-react";
-import { products, images, supplierList } from './data'
 import Link from "next/link";
-const imageMap = new Map(images.map(image => [image.id, image.url]));
-
-const suppliersWithImages = supplierList.map(supplier => ({
-  ...supplier,
-  imageUrl: imageMap.get(supplier.IdImage)
-}));
 
 export default function page() {
   return (
@@ -40,40 +33,45 @@ export default function page() {
       </div>
       <div className="mt-5 grid">
         <div className="grid grid-cols-6 gap-3 custom-grid">
-          {suppliersWithImages.map((value, index) => (
-            <Card key={value.id} className="mb-0 rounded-md hover:scale-105 hover:delay-250 duration-300">
-              <Link href={`/supplier/${value.id}`}>
-                <CardHeader className="p-0">
-                  <img
-                    className="rounded-t-md w-full h-[128px]"
-                    src={value.imageUrl}
-                    alt=""
-                  />
-                </CardHeader>
-                <CardContent className="mt-2 p-3">
-                  <CardTitle className="mb-1 font-semibold text-lg truncate">
-                    {value.Name}
-                  </CardTitle>
-                  <CardDescription className="text-sm mt-2 line-clamp-2 text-justify">
-                    {value.Description}
-                  </CardDescription>
-                </CardContent>
-                <CardFooter className="p-3">
-                  <div className="flex basis-full justify-between items-center ">
-                    <div className="flex items-center">
-                      <p className="text-black mr-1 text-[13px] ">163</p>
-                      <p className="text-nowrap text-primary text-[13px] "> Sản phẩm</p>
-                    </div>
-                    <div className="flex items-center text-right">
-                      <p className="text-black mr-1 text-[13px] ">4.6 </p>
-                      {/* <Star className="text-primary w-[20px]" /> */}
-                      <p className="text-nowrap text-primary text-[13px] "> Đánh giá</p>
-                    </div>
-                  </div>
-                </CardFooter>
-              </Link>
-            </Card>
-          ))}
+          {(() => {
+            const cards = [];
+            for (let i = 0; i < 20; i++) {
+              cards.push(
+                <Card key={i} className="mb-0 rounded-md hover:scale-105 hover:delay-250 duration-300">
+                  <Link href={`/supplier/${i + 1}`}>
+                    <CardHeader className="p-0">
+                      <img
+                        className="rounded-t-md w-full h-[128px]"
+                        src='https://admin.cms.ueb.edu.vn//Uploads/image/News/Thumbnails/2022/1/Thumbnails03012022052442.quan-tri-dai-hoc.jpg'
+                        alt=""
+                      />
+                    </CardHeader>
+                    <CardContent className="mt-2 p-3">
+                      <CardTitle className="mb-1 font-semibold text-lg truncate">
+                        Nhà cung cấp Orace {i + 1}
+                      </CardTitle>
+                      <CardDescription className="text-sm mt-2 line-clamp-2 text-justify">
+                        Đây là nhà cung cấp logistic số 1 thế giới
+                      </CardDescription>
+                    </CardContent>
+                    <CardFooter className="p-3">
+                      <div className="flex basis-full justify-between items-center ">
+                        <div className="flex items-center">
+                          <p className="text-black mr-1 text-[13px] ">163</p>
+                          <p className="text-nowrap text-primary text-[13px] "> Sản phẩm</p>
+                        </div>
+                        <div className="flex items-center text-right">
+                          <p className="text-black mr-1 text-[13px] ">4.6 </p>
+                          <p className="text-nowrap text-primary text-[13px] "> Đánh giá</p>
+                        </div>
+                      </div>
+                    </CardFooter>
+                  </Link>
+                </Card>
+              );
+            }
+            return cards;
+          })()}
         </div>
       </div>
     </div >

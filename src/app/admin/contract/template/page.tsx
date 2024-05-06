@@ -398,10 +398,6 @@ export default function Page() {
                             </AlertDialogContent>
                         </AlertDialog>
 
-
-                        {/* end */}
-
-                        {/* start */}
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant={"destructive"}>
@@ -419,13 +415,9 @@ export default function Page() {
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction>Continue</AlertDialogAction>
-                                    {/* start */}
-
-                                    {/* end */}
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-
                     </div>
                 )
             },

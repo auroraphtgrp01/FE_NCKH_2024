@@ -200,7 +200,7 @@ export default function DialogEditContract() {
                                                             </h1>
                                                         </div>
                                                     )}
-                                                    {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
+                                                    {(item.type === EContractAttributeType.CONTRACT_ATTRIBUTE || item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET) && (
                                                         <div>
                                                             <h2 className="mt-2 text-[14px] flex w-full">
                                                                 <b className="">

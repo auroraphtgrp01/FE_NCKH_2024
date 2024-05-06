@@ -59,7 +59,7 @@ export default function PreviewContract({ contractAttribute, setContractAttribut
                       </h2>
                     </div>
                   )}
-                  {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
+                  {(item.type === EContractAttributeType.CONTRACT_ATTRIBUTE || item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET) && (
                     <div>
                       <h2 className="mt-2 text-[14px] text-justify">
                         -  <b className="ms-1">{item.property}</b>: {" "}

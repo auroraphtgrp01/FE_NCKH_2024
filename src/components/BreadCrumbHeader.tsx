@@ -56,6 +56,7 @@ export default function BreadCrumbHeader() {
             })
             if (login.status == 201) {
                 const web3 = new Web3(window.ethereum);
+                console.log(wallet.accounts[0]);
                 const balance = await web3.eth.getBalance(wallet.accounts[0]);
                 const balanceEth = web3.utils.fromWei(balance, 'ether');
                 setUserInfo({
@@ -66,6 +67,7 @@ export default function BreadCrumbHeader() {
                     data: login.data,
                     balance: Number(balanceEth).toFixed(3)
                 }))
+                
                 setIsOpen(false)
                 toast({
                     title: "Login success",

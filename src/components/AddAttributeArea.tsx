@@ -11,7 +11,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { v4 as uuidRandom } from 'uuid';
 
 import { EContractAttributeType, EContractAttributeTypeAdditional, EContractAttributeTypeAdditionalHeader, EStatusAttribute, IContractAttribute } from '@/interface/contract.i';
 import { useToast } from '@/components/ui/use-toast';
@@ -45,7 +44,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
     const [inputValue, setInputValue] = useState<any>('')
     const [textArea, setTextArea] = useState<string>('')
     function handleAddAttribute() {
-        if (!SelectType || !inputValue || (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE && !textArea)) {
+        if (!SelectType && (SelectType !== EContractAttributeType.CONTRACT_PARTY_INFO) || !inputValue && (SelectType !== EContractAttributeType.CONTRACT_PARTY_INFO) || (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE && !textArea)) {
             toast({
                 title: "Empty Field",
                 description: "Please fill all the fields",
@@ -59,21 +58,77 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
             type: SelectType as EContractAttributeType,
             statusAttribute: EStatusAttribute.CREATE
         }
+        const partyAttributeArr = [
+            {
+                value: "BÊN A",
+                property: undefined,
+                type: EContractAttributeType.CONTRACT_HEADING_2,
+                statusAttribute: EStatusAttribute.CREATE
+            },
+            {
+                value: "",
+                property: 'Tên Công Ty / Tổ Chức',
+                type: EContractAttributeType.CONTRACT_ATTRIBUTE,
+                statusAttribute: EStatusAttribute.CREATE
+            },
+            {
+                value: "",
+                property: 'Họ và Tên',
+                type: EContractAttributeType.CONTRACT_ATTRIBUTE,
+                statusAttribute: EStatusAttribute.CREATE
+            },
+            {
+                value: "",
+                property: 'Địa chỉ',
+                type: EContractAttributeType.CONTRACT_ATTRIBUTE,
+                statusAttribute: EStatusAttribute.CREATE
+            },
+            {
+                value: "",
+                property: 'Số điện thoại',
+                type: EContractAttributeType.CONTRACT_ATTRIBUTE,
+                statusAttribute: EStatusAttribute.CREATE
+            },
+            {
+                value: "",
+                property: 'Address Wallet',
+                type: EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET,
+                statusAttribute: EStatusAttribute.CREATE
+            }
+        ]
         if (!index) {
-            setContractAttribute([
-                ...contractAttribute,
-                newContractAttribute
-            ])
-            setInputValue('')
-            setTextArea('')
+            if (SelectType === EContractAttributeType.CONTRACT_PARTY_INFO) {
+                setContractAttribute([
+                    ...contractAttribute,
+                    ...partyAttributeArr,
+                ])
+                setInputValue('')
+                setTextArea('')
+            } else {
+                setContractAttribute([
+                    ...contractAttribute,
+                    newContractAttribute
+                ])
+                setInputValue('')
+                setTextArea('')
+            }
         }
         else {
-            const newContractAttributeArray = [...contractAttribute]
-            newContractAttributeArray.splice(index, 0, newContractAttribute)
-            newContractAttributeArray.splice(index + 1, 1)
-            setContractAttribute(newContractAttributeArray)
-            setInputValue('')
-            setTextArea('')
+            if (SelectType === EContractAttributeType.CONTRACT_PARTY_INFO) {
+                const newContractAttributeArray = [...contractAttribute]
+                newContractAttributeArray.splice(index, 0, ...partyAttributeArr)
+                newContractAttributeArray.splice(index + 6, 1)
+                setContractAttribute(newContractAttributeArray)
+                setInputValue('')
+                setTextArea('')
+            } else {
+                const newContractAttributeArray = [...contractAttribute]
+                newContractAttributeArray.splice(index, 0, newContractAttribute)
+                newContractAttributeArray.splice(index + 1, 1)
+                setContractAttribute(newContractAttributeArray)
+                setInputValue('')
+                setTextArea('')
+            }
         }
         setInputValue('')
         setTextArea('')
@@ -81,10 +136,12 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
     return (
         <div className='flex flex-col'>
             <div className='flex mt-2 w-full'>
-                <Input className='w-[32%]'
-                    onChange={(e) => {
-                        setInputValue(e.target.value)
-                    }} value={inputValue} />
+                {SelectType !== EContractAttributeType.CONTRACT_PARTY_INFO && (
+                    <Input className='w-[32%]'
+                        onChange={(e) => {
+                            setInputValue(e.target.value)
+                        }} value={inputValue} />
+                )}
                 <Select onValueChange={(e: EContractAttributeType) => {
                     setSelectType(e)
                 }}>

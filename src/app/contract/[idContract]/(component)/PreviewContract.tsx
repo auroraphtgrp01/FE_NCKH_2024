@@ -7,8 +7,8 @@ import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/s
 
 export default function PreviewContract({ contractAttribute, setContractAttribute }: { contractAttribute: IContractAttribute[], setContractAttribute: (item: any) => void }) {
   return (
-    <div className="h-[100%]">
-      <ScrollArea className="min-h-[750px] h-[755px] rounded-xl  w-[100%] flex-1">
+    <div className="h-[100%] min-h-[100%]">
+      <ScrollArea className="h-full min-h-[100%] rounded-xl  w-[100%] flex-1">
         <form className="max-w-[100%]  p-10 text-sm w-[100%]">
           <div id="main">
             <div id="application">

@@ -211,16 +211,25 @@ export default function DialogEditContract() {
                                                                 <span className="text-wrap ms-2 w-[80%]">
                                                                     <Textarea onBlur={(e) => {
                                                                         handleValueOfTextarea(e, index)
-                                                                    }} className="mr-auto " defaultValue={item.value} />
+                                                                    }} className="mr-auto " defaultValue={item.value} />asdasd
                                                                 </span>
                                                             </h2>
                                                         </div>
                                                     )}
+                                                    {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_USER && (
+                                                        <div>
+
+                                                        </div>
+                                                    )}
+
+
                                                     {item.statusAttribute === EStatusAttribute.PREPARE && (
                                                         <div>
                                                             <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} />
                                                         </div>
                                                     )}
+
+
                                                 </div>
                                             ))}
                                         </div>

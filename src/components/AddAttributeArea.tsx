@@ -149,7 +149,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                 <Select onValueChange={(e: EContractAttributeType) => {
                     setSelectType(e)
                 }}>
-                    <SelectTrigger className="w-[180px] ms-2">
+                    <SelectTrigger className="w-[45%] ms-2">
                         <SelectValue placeholder="Select Attribute Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -161,7 +161,7 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                <Button className='ms-2 w-[34%]' type='button' onClick={handleAddAttribute}>
+                <Button className='ms-2 w-[25%]' type='button' onClick={handleAddAttribute}>
                     Add New Attribute
                 </Button>
             </div>

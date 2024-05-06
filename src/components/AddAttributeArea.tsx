@@ -53,8 +53,18 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
             return
         }
         const newContractAttribute: IContractAttribute = {
-            value: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? textArea : inputValue,
-            property: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE) ? inputValue : undefined,
+            value: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE
+                || SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED
+                || SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
+                || SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
+                || SelectType === EContractAttributeType.TOTAL_AMOUNT
+            ) ? textArea : inputValue,
+            property: (SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE
+                || SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED
+                || SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
+                || SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
+                || SelectType === EContractAttributeType.TOTAL_AMOUNT
+            ) ? inputValue : undefined,
             type: SelectType as EContractAttributeType,
             statusAttribute: EStatusAttribute.CREATE
         }
@@ -89,12 +99,6 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                 type: EContractAttributeType.CONTRACT_ATTRIBUTE,
                 statusAttribute: EStatusAttribute.CREATE
             },
-            {
-                value: "",
-                property: 'Address Wallet',
-                type: EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET,
-                statusAttribute: EStatusAttribute.CREATE
-            }
         ]
         if (!index) {
             if (SelectType === EContractAttributeType.CONTRACT_PARTY_INFO) {
@@ -163,7 +167,10 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
             </div>
             {(
                 SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE ||
-                SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET
+                SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
+                SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+                SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
+                SelectType === EContractAttributeType.TOTAL_AMOUNT
             )
                 && (
                     <div>

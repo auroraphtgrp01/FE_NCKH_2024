@@ -200,22 +200,28 @@ export default function DialogEditContract() {
                                                             </h1>
                                                         </div>
                                                     )}
-                                                    {(item.type === EContractAttributeType.CONTRACT_ATTRIBUTE || item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET) && (
-                                                        <div>
-                                                            <h2 className="mt-2 text-[14px] flex w-full">
-                                                                <b className="">
-                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
-                                                                        handleChangeAttributeInput(e, index)
-                                                                    }} />
-                                                                </b>
-                                                                <span className="text-wrap ms-2 w-[80%]">
-                                                                    <Textarea onBlur={(e) => {
-                                                                        handleValueOfTextarea(e, index)
-                                                                    }} className="mr-auto " defaultValue={item.value} />
-                                                                </span>
-                                                            </h2>
-                                                        </div>
-                                                    )}
+                                                    {(
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE ||
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
+                                                        item.type === EContractAttributeType.TOTAL_AMOUNT
+                                                    ) && (
+                                                            <div>
+                                                                <h2 className="mt-2 text-[14px] flex w-full">
+                                                                    <b className="">
+                                                                        <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
+                                                                            handleChangeAttributeInput(e, index)
+                                                                        }} />
+                                                                    </b>
+                                                                    <span className="text-wrap ms-2 w-[80%]">
+                                                                        <Textarea onBlur={(e) => {
+                                                                            handleValueOfTextarea(e, index)
+                                                                        }} className="mr-auto " defaultValue={item.value} />
+                                                                    </span>
+                                                                </h2>
+                                                            </div>
+                                                        )}
                                                     {item.statusAttribute === EStatusAttribute.PREPARE && (
                                                         <div>
                                                             <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} />

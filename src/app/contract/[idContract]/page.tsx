@@ -42,7 +42,7 @@ import {
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState(initContractAttribute);
   const [contractData, setContractData] = useState<any>();
-  const [individual, setIndividual] = useState<any[]>([])
+  const [individual, setIndividual] = useState<any>({})
   const [isOpenAlert, setIsOpenAlert] = useState(false)
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>(
     [{
@@ -63,9 +63,23 @@ export default function Dashboard() {
         setContractAttribute(response.data.contractAttributes);
         setContractData(response.data.contract)
         setContractParticipants(response.data.participants)
-        const dataIndividual = response.data.contractAttributes.filter((item: IContractAttribute) => {
-          return item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET;
-        });
+        const dataIndividual = response.data.contractAttributes.reduce((acc: any, item: any) => {
+          if (item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND) {
+            return { ...acc, senderInd: item.value };
+          }
+          if (item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE) {
+            return { ...acc, receiverInd: item.value };
+          }
+          if (item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED) {
+            return { ...acc, joined: item.value };
+          }
+          if (item.type === EContractAttributeType.TOTAL_AMOUNT) {
+            return { ...acc, totalAmount: item.value };
+          }
+          return acc;
+        }, {} as any);
+        console.log(">>", dataIndividual);
+        
         setIndividual(dataIndividual);
       }).catch((error) => {
         console.log(error)
@@ -222,66 +236,28 @@ export default function Dashboard() {
               <CardContent className="text-sm">
                 <div className="grid gap-3 mt-2">
                   <div className="flex align-middle">
-                    <div className="font-semibold">Party A's Representative:
+                    <div className="font-semibold">Sender Representative:
                     </div>
                     <div className="translate-y-[-7px] ms-2">
-                      <Select >
-                        <SelectTrigger className="w-[180px]" onClick={() => {
-                          console.log('dsds');
-                          setIsOpenAlert(true)
-                        }} >
-                          <SelectValue placeholder="Select Individual" />
-                        </SelectTrigger>
-                        <SelectContent >
-                          <SelectGroup>
-                            <SelectLabel>Individual</SelectLabel>
-                            {individual.map((item, index) => (
-                              <SelectItem value="apple">{item.value}</SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                      <Input readOnly className="w-[180px] ms-3" placeholder="Empty" defaultValue={individual?.senderInd} />
                     </div>
                   </div>
                 </div>
                 <div className="grid gap-3 mt-2">
                   <div className="flex align-middle">
-                    <div className="font-semibold">Party B's Representative:
+                    <div className="font-semibold">Receiver Representative:
                     </div>
                     <div className="translate-y-[-7px] ms-2">
-                      <Select>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select Individual" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Individual</SelectLabel>
-                            {individual.map((item, index) => (
-                              <SelectItem value="apple">{item.value}</SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                      <Input readOnly className="w-[180px]" placeholder="Empty" defaultValue={individual?.receiverInd} />
                     </div>
                   </div>
-
                 </div>
                 <div className="grid gap-3 mt-2">
                   <div className="flex align-middle">
-                    <div className="font-semibold">Receiving Party:
+                    <div className="font-semibold">Joined Party :
                     </div>
-                    <div className="translate-y-[-7px] translate-x-[67px]">
-                      <Select>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select Party" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Fruits</SelectLabel>
-                            <SelectItem value="apple">Apple</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                    <div className="translate-y-[-7px] translate-x-[67px] ms-4">
+                      <Input readOnly className="w-[180px]" placeholder="Empty" defaultValue={individual?.joined} />
                     </div>
                   </div>
                 </div>
@@ -290,7 +266,7 @@ export default function Dashboard() {
                     <div className="font-semibold">Total Amount of Money:
                     </div>
                     <div className="translate-y-[-7px] translate-x-[15px]">
-                      <Input readOnly className="w-[180px]" placeholder="Total Amount of Money" />
+                      <Input readOnly className="w-[180px]" placeholder="Total Amount of Money" defaultValue={individual?.totalAmount} />
                     </div>
                   </div>
                 </div>

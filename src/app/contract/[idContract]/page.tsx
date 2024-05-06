@@ -22,14 +22,28 @@ import ChatBox from "@/components/ChatBox"
 import { useParams } from "next/navigation"
 import BreadCrumbHeader from "@/components/BreadCrumbHeader"
 import { fetchAPI } from "@/utils/fetchAPI"
-import { IContractParticipant } from "@/interface/contract.i"
+import { EContractAttributeType, IContractParticipant } from "@/interface/contract.i"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { IContractAttribute } from '../../../interface/contract.i';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState(initContractAttribute);
   const [contractData, setContractData] = useState<any>();
+  const [individual, setIndividual] = useState<any[]>([])
+  const [isOpenAlert, setIsOpenAlert] = useState(false)
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>(
     [{
       id: "1",
@@ -42,12 +56,17 @@ export default function Dashboard() {
   const [showChat, setShowChat] = useState(false);
   const { idContract } = useParams();
   useEffect(() => {
+
     fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
       .then((response) => {
         console.log(response.data.participants);
         setContractAttribute(response.data.contractAttributes);
         setContractData(response.data.contract)
         setContractParticipants(response.data.participants)
+        const dataIndividual = response.data.contractAttributes.filter((item: IContractAttribute) => {
+          return item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET;
+        });
+        setIndividual(dataIndividual);
       }).catch((error) => {
         console.log(error)
       })
@@ -206,14 +225,19 @@ export default function Dashboard() {
                     <div className="font-semibold">Party A's Representative:
                     </div>
                     <div className="translate-y-[-7px] ms-2">
-                      <Select>
-                        <SelectTrigger className="w-[180px]">
+                      <Select >
+                        <SelectTrigger className="w-[180px]" onClick={() => {
+                          console.log('dsds');
+                          setIsOpenAlert(true)
+                        }} >
                           <SelectValue placeholder="Select Individual" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent >
                           <SelectGroup>
-                            <SelectLabel>Fruits</SelectLabel>
-                            <SelectItem value="apple">Apple</SelectItem>
+                            <SelectLabel>Individual</SelectLabel>
+                            {individual.map((item, index) => (
+                              <SelectItem value="apple">{item.value}</SelectItem>
+                            ))}
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -231,8 +255,10 @@ export default function Dashboard() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>Fruits</SelectLabel>
-                            <SelectItem value="apple">Apple</SelectItem>
+                            <SelectLabel>Individual</SelectLabel>
+                            {individual.map((item, index) => (
+                              <SelectItem value="apple">{item.value}</SelectItem>
+                            ))}
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -327,6 +353,21 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
+          <AlertDialog onOpenChange={setIsOpenAlert} open={isOpenAlert}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your
+                  account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </main>
       </div>
       <ChatBox showChat={showChat} setShowChat={setShowChat}></ChatBox>

@@ -161,13 +161,17 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
                     Add New Attribute
                 </Button>
             </div>
-            {SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE && (
-                <div>
-                    <Textarea onChange={(e) => {
-                        setTextArea(e.target.value)
-                    }} className='mt-2 w-[100%]' value={textArea} />
-                </div>
-            )}
+            {(
+                SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE ||
+                SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET
+            )
+                && (
+                    <div>
+                        <Textarea onChange={(e) => {
+                            setTextArea(e.target.value)
+                        }} className='mt-2 w-[100%]' value={textArea} />
+                    </div>
+                )}
         </div>
     )
 }

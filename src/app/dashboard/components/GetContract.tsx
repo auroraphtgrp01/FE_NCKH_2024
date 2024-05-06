@@ -72,8 +72,10 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
     const contract = new web3.eth.Contract(payload.abi, payload.addressContract)
     try {
       const methodCall = payload.methodCall
-      const result: string[][] = await contract.methods.getContractInformation().call();
-      console.log(">>", JSON.parse(refactorTest(result)))
+      const result: any = await contract.methods.getContractInformation().call();
+      // console.log(">>", JSON.parse(refactorTest(result)))
+      console.log(">>", JSON.parse(result[0] as string));
+
     } catch (error) {
       console.error("Error:", error);
       return [];

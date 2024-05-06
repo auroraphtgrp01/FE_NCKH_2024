@@ -10,15 +10,18 @@ export enum EContractAttributeType {
 		CONTRACT_SIGNATURE = "Contract Signature",
 		CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET = "Contract Attribute Party Address Wallet",
 		CONTRACT_ATTRIBUTE_ADDRESS_WALLET_RECEIVE = "Contract Attribute Address Wallet Receive",
+		CONTRACT_PARTY_INFO = "Contract Party Info",
 }
 
 export enum EContractAttributeTypeAdditional {
 	CONTRACT_NUMBER = "Contract Number",
 	CONTRACT_TEXT = "Contract Text",
+	CONTRACT_PARTY_INFO = "Contract Party Info",
 	CONTRACT_HEADING_1 = "Contract Heading 1",
 	CONTRACT_HEADING_2 = "Contract Heading 2",
 	CONTRACT_ATTRIBUTE = "Contract Attribute",
 	CONTRACT_SIGNATURE = "Contract Signature",
+	CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET = "Contract Attribute Party Address Wallet",
 }
 
 export enum EContractAttributeTypeAdditionalHeader {

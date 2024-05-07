@@ -357,6 +357,8 @@ export default function Page() {
                                                                             </h1>
                                                                         </div>
                                                                     )}
+          
+
                                                                     {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
                                                                         <div>
                                                                             <h2 className="mt-2 text-[14px] flex w-full">

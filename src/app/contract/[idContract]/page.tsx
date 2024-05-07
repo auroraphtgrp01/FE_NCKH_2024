@@ -24,9 +24,7 @@ import BreadCrumbHeader from "@/components/BreadCrumbHeader"
 import { fetchAPI } from "@/utils/fetchAPI"
 import { EContractAttributeType, IContractParticipant } from "@/interface/contract.i"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { IContractAttribute } from '../../../interface/contract.i';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,14 +34,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { ethers } from "ethers"
+import Web3 from "web3"
+import { useAppContext } from "@/components/ThemeProvider"
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState(initContractAttribute);
   const [contractData, setContractData] = useState<any>();
   const [individual, setIndividual] = useState<any>({})
   const [isOpenAlert, setIsOpenAlert] = useState(false)
+  const [isDeployContractAlert, setIsDeployContractAlert] = useState(false)
+  const [privateKey, setPrivateKey] = useState("")
+  const { userInfo, setUserInfo }: any = useAppContext()
+  const [addressContract, setAddressContract] = useState('')
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>(
     [{
       id: "1",
@@ -56,7 +60,6 @@ export default function Dashboard() {
   const [showChat, setShowChat] = useState(false);
   const { idContract } = useParams();
   useEffect(() => {
-
     fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
       .then((response) => {
         console.log(response.data.participants);
@@ -79,7 +82,7 @@ export default function Dashboard() {
           return acc;
         }, {} as any);
         console.log(">>", dataIndividual);
-        
+
         setIndividual(dataIndividual);
       }).catch((error) => {
         console.log(error)
@@ -95,6 +98,58 @@ export default function Dashboard() {
         return `destructive`
       default:
         return `blue`
+    }
+  }
+  function transferToByteCode(str: string | object) {
+    return ethers.hexlify(ethers.toUtf8Bytes(JSON.stringify(str)))
+  }
+  async function transferMoney() {
+    try {
+      const privateCode = await fetchAPI('/smart-contracts/abi', "GET")
+      const abi = privateCode.data.abi.abi
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(abi, "0xa474D3DB7EEbb15d306DCA451a8E2E6B72a010d3")
+      // const balance = await contract.methods.getBalance().call();
+      // console.log('Contract balance:', balance);
+      const x = await contract.methods.sendToSmartContract().send({
+        from: userInfo?.data?.addressWallet,
+        value: '20000000000000000',
+        gas: '1000000'
+      })
+      console.log(x);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async function handleOnDeployContract() {
+    if (privateKey == '') {
+      alert('Please fill your private key')
+      return
+    }
+    try {
+      const privateCode = await fetchAPI('/smart-contracts/abi', "GET")
+      const abi = privateCode.data.abi.abi
+      const byteCode = privateCode.data.abi.bytecode
+      setIsDeployContractAlert(false)
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(abi)
+      const _user = [individual.senderInd]
+      const _keys = ["contract", "contractAttributes"]
+      const _values = [transferToByteCode(contractData), transferToByteCode(contractAttribute)]
+      const _total = individual.totalAmount
+      const _privateKey = privateKey
+      const _supplier = individual.receiverInd
+      const _stages: any[] = []
+
+      const deployTransaction = await contract.deploy({
+        data: byteCode,
+        arguments: [_user, _supplier, _keys, _values, _total, _stages, _privateKey]
+      }).send({
+        from: userInfo?.data?.addressWallet,
+      })
+      setAddressContract(deployTransaction?.options?.address as string)
+    } catch (error) {
+      console.log(error);
     }
   }
   return (
@@ -125,7 +180,7 @@ export default function Dashboard() {
                   <div className="font-semibold">Created By:  <span>{contractData?.createdBy?.name}</span></div>
                   <div className="font-semibold">
                     Address Contract:
-                    <Input readOnly className="mt-2" value={'0x5e48660738e5f3bb2b4a8aa9f7488f85f2548235'} />
+                    <Input readOnly className="mt-2" value={addressContract} />
                   </div>
                   <div className="flex align-middle mt-1">
                     <div className="font-semibold">
@@ -137,7 +192,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <div className="font-semibold">Contract Progress </div>
-                    <Progress value={75} className="my-2" />
+                    <Progress value={25} className="my-2" />
                     <div className="flex">
                       <div className="text-center ms-1 font-semibold">
                         Participated
@@ -275,7 +330,9 @@ export default function Dashboard() {
                   <Button className="" variant={'blue'}>
                     Template
                   </Button>
-                  <Button variant={'orange'} className="w-full ms-2">
+                  <Button variant={'orange'} className="w-full ms-2" onClick={() => {
+                    setIsDeployContractAlert(true)
+                  }}>
                     Deploy Contract
                   </Button>
                   <Button className="ms-2">
@@ -286,7 +343,7 @@ export default function Dashboard() {
                   <Button variant={'indigo'} className="w-full">
                     Confirmation completed
                   </Button>
-                  <Button variant={'destructive'} className="ms-2 w-full">
+                  <Button variant={'destructive'} className="ms-2 w-full" onClick={transferMoney}>
                     Transfer Money
                   </Button>
                 </div>
@@ -342,6 +399,31 @@ export default function Dashboard() {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction>Continue</AlertDialogAction>
               </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <AlertDialog open={isDeployContractAlert} onOpenChange={setIsDeployContractAlert}>
+            <AlertDialogContent>
+              <AlertDialogTitle className="text-center">Deploy Contract</AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                <b className="text-red-500">If you forget the private key, you will not be able to recover it and will lose access to the contract</b>
+              </AlertDialogDescription>
+              <Input placeholder="Fill your private key" className="w-full" onChange={
+                (e) => {
+                  setPrivateKey(e.target.value)
+                }
+              } />
+              <div className="w-full flex">
+                <Button className="ml-auto me-2 w-full " variant={'destructive'} onClick={() => {
+                  setIsDeployContractAlert(false)
+                }}>
+                  Cancel
+                </Button>
+                <Button className="ml-auto mr-auto w-full" variant={'violet'} onClick={() => {
+                  handleOnDeployContract()
+                }}>
+                  Deploy Contract
+                </Button>
+              </div>
             </AlertDialogContent>
           </AlertDialog>
         </main>

@@ -30,18 +30,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import GrantPermission, { IPermission } from "@/components/GrantPermission";
 import { useAppContext } from "@/components/ThemeProvider";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
+import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
+import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 export const initPermission: IPermission = {
   READ_CONTRACT: false,
   EDIT_CONTRACT: false,
@@ -61,37 +55,9 @@ export interface ContractTemplate {
   img: string;
 }
 
-const initContractTemplate = [
-  {
-    id: "1",
-    name: "Template 1",
-    img: "/avatar/profile-img.png",
-  },
-  {
-    id: "2",
-    name: "Template 2",
-    img: "/avatar/profile-img.png",
-  },
-  {
-    id: "3",
-    name: "Template 3",
-    img: "/avatar/profile-img.png",
-  },
-  {
-    id: "4",
-    name: "Template 4",
-    img: "/avatar/profile-img.png",
-  },
-  {
-    id: "5",
-    name: "Template 5",
-    img: "/avatar/profile-img.png",
-  },
-];
-
 export default function page() {
   const [template, setTemplate] =
-    useState<ContractTemplate[]>(initContractTemplate);
+    useState<ContractTemplate[]>([]);
   const [isOpen, setOpen] = useState(false);
   const { userInfo, setUserInfo }: any = useAppContext();
   const [invitationInput, setInvitationInput] = useState("");
@@ -101,8 +67,19 @@ export default function page() {
   const [templateSelect, setTemplateSelect] = useState<any>(undefined);
   const [contract, setContract] = useState<any>({});
   const [messages, setMessages] = useState("");
+  const [contractAttribute, setContractAttribute] = useState<any[]>([]);
   const Router = useRouter();
   const { toast } = useToast();
+  useEffect(() => {
+    fetchAPI("/template-contracts", "GET").then((res) => {
+      if (res.status === 200) {
+        setTemplate([
+          { id: "", name: "Empty Contract", img: "" },
+          ...res.data
+        ]);
+      }
+    })
+  }, []);
   function onAddInvitation(): void {
     const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/);
     if (!isEmail.test(invitationInput)) {
@@ -129,6 +106,19 @@ export default function page() {
       setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
+  useEffect(() => {
+    if (current !== 0) {
+      fetchAPI(`/template-contracts/${template[current]?.id}/attributes`, "GET").then((res) => {
+        if (res.status === 200) {
+          console.log(res.data);
+          setContractAttribute(res.data.contractAttributes);
+        }
+      }
+      )
+    } else {
+      setContractAttribute([])
+    }
+  }, [current]);
   function onClickCreateContractButton() {
     const payload = {
       addressWallet: userInfo?.data?.addressWallet,
@@ -201,18 +191,28 @@ export default function page() {
                   className="w-full max-w-xs"
                   setApi={setApi}
                 >
-                  <CarouselContent className="-mt-1 h-[280px]">
+                  <CarouselContent className="-mt-1 h-[300px]">
                     {template.map((item, index) => (
                       <CarouselItem key={index} className="pt-1 md:basis-1/2">
                         <div className="p-1">
                           <Card>
                             <CardContent className="flex justify-center p-6">
-                              <Image
+                              {/* <Image
                                 alt=""
                                 src={item.img}
                                 width={"200"}
                                 height={"300"}
-                              ></Image>
+                              ></Image> */}
+                              {index === 0 && (
+                                <div className="h-[150px] mt-auto">
+                                  Empty Contract
+                                </div>
+                              )}
+                              {index === 1 && (
+                                <div className="h-[150px] mt-auto">
+                                  {item.name}
+                                </div>
+                              )}
                             </CardContent>
                           </Card>
                         </div>
@@ -333,7 +333,11 @@ export default function page() {
                 Preview the contract here - Please choose a template
               </CardDescription>
             </CardHeader>
-            <CardContent></CardContent>
+            <ScrollArea className="h-[600px] ">
+              <CardContent>
+                <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
+              </CardContent>
+            </ScrollArea>
           </Card>
         </div>
         <GrantPermission

@@ -7,33 +7,70 @@ import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAppContext } from "@/components/ThemeProvider";
 import { fetchAPI } from "@/utils/fetchAPI";
+import { toast, useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const contractId = window.location.href.split("/")[4];
 
 export default function page() {
+  const Router = useRouter();
+  const { toast } = useToast();
   const [participantInfo, setParticipantInfo] = useState<any>({});
   const { userInfo, setUserInfo }: any = useAppContext();
   useEffect(() => {
     fetchAPI(
       `/participants/find-one/${userInfo?.data?.email}/${contractId}`,
       "GET"
-    ).then((res) => {
-      setParticipantInfo(res.data);
-      console.log(participantInfo);
-    });
+    )
+      .then((res) => {
+        setParticipantInfo(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
   async function handleJoinContract() {
     const participant = await fetchAPI("/participants", "PATCH", {
       id: participantInfo?.id,
       status: "ACCEPTED",
-    });
+    })
+      .then((res) => {
+        setParticipantInfo(res.data);
+        toast({
+          title: "Accept Invitation Success",
+          variant: "default",
+        });
+        Router.push(`/contract/${contractId}`);
+      })
+      .catch((err) => {
+        toast({
+          title: "Accept Invitation Failed",
+          description: err.response.data.message,
+          variant: "destructive",
+        });
+      });
   }
 
   async function handleRefuseContract() {
     const participant = await fetchAPI("/participants", "PATCH", {
       id: participantInfo?.id,
       status: "REFUSED",
-    });
+    })
+      .then((res) => {
+        setParticipantInfo(res.data);
+        toast({
+          title: "Refuse Invitation Success",
+          variant: "default",
+        });
+        Router.push(`/`);
+      })
+      .catch((err) => {
+        toast({
+          title: "Refuse Invitation Failed",
+          description: err.response.data.message,
+          variant: "destructive",
+        });
+      });
   }
 
   return (

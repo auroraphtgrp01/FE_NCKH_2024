@@ -643,8 +643,8 @@ export default function Dashboard() {
                     <ScrollArea className="max-h-[300px] h-56">
                       <CardContent className="grid gap-8">
                         {contractParticipants.map((participant, index) => (
-                          <div className="flex items-center gap-4" key={index}>
-                            <div className="grid gap-1">
+                          <div className="flex items-center" key={index}>
+                            <div className="grid">
                               <p className="text-sm font-medium leading-none">
                                 {participant.name
                                   ? participant.name
@@ -659,7 +659,7 @@ export default function Dashboard() {
                                 variant={
                                   handleBadgeColor(participant.status) as any
                                 }
-                                className="me-2 mb-2"
+                                className="me-1 translate-y-[-5px]"
                               >
                                 {participant.status}
                               </Badge>

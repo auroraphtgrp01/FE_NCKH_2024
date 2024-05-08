@@ -23,10 +23,24 @@ export default function page() {
       "GET"
     )
       .then((res) => {
-        setParticipantInfo(res.data);
+        if (res.data === null) {
+          toast({
+            title: "Account not found",
+            description: "Please register to create an account",
+            variant: "destructive",
+            duration: 2000,
+          });
+          Router.push("/register");
+        }
       })
       .catch((err) => {
-        console.log(err);
+        toast({
+          title: "Not logged in yet",
+          description: err.response.data.message,
+          variant: "destructive",
+          duration: 2000,
+        });
+        Router.push("/");
       });
   }, []);
   async function handleJoinContract() {

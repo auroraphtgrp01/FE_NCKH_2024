@@ -68,6 +68,8 @@ export default function AddAttributeArea({ contractAttribute, setContractAttribu
             type: SelectType as EContractAttributeType,
             statusAttribute: EStatusAttribute.CREATE
         }
+        console.log(newContractAttribute);
+        
         const partyAttributeArr = [
             {
                 value: "BÊN A",

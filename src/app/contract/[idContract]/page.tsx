@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import parse from "html-react-parser";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
 import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 import { useEffect, useState } from "react";
@@ -41,8 +40,8 @@ import {
 import { ethers } from "ethers";
 import Web3 from "web3";
 import { useAppContext } from "@/components/ThemeProvider";
-import { toast } from "sonner";
 import { set } from "react-hook-form";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Dashboard() {
   interface IStage {
@@ -63,6 +62,17 @@ export default function Dashboard() {
   const [privateKey, setPrivateKey] = useState("");
   const { userInfo, setUserInfo }: any = useAppContext();
   const [addressContract, setAddressContract] = useState("");
+  const { toast } = useToast();
+  const [isDisableButton, setIsDisableButton] = useState({
+    isDeployButton: true,
+    isWithdrawButton: true,
+    isConfirmButton: true,
+    isButtonConfirmCustomer: true,
+    isButtonConfirmSupplier: true
+  });
+  const [isVisible, setIsVisible] = useState({
+    confirmButton: 0,
+  });
   const [stages, setStages] = useState([
     {
       percent: 40,
@@ -91,7 +101,6 @@ export default function Dashboard() {
   useEffect(() => {
     fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
       .then((response) => {
-        console.log(response.data.participants);
         setContractAttribute(response.data.contractAttributes);
         setContractData(response.data.contract);
         setAddressContract(response.data.contract.contractAddress);
@@ -123,9 +132,43 @@ export default function Dashboard() {
           },
           {} as any
         );
-        console.log(">>", dataIndividual);
+        if (userInfo?.data?.addressWallet.trim().toLowerCase() == dataIndividual.senderInd.trim().toLowerCase()) {
+          setIsVisible({
+            ...isVisible,
+            confirmButton: 1
+          })
+        } else {
+          setIsVisible({
+            ...isVisible,
+            confirmButton: 2
+          })
+        }
+        
+        if ((dataIndividual.senderInd && dataIndividual.receiverInd && dataIndividual.joined && dataIndividual.totalAmount)) {
+          console.log(dataIndividual.totalAmount);
 
-        setIndividual(dataIndividual);
+          setIndividual(dataIndividual.totalAmount);
+          if (response.data.contract.status == 'PARTICIPATED') {
+            setIsDisableButton({
+              ...isDisableButton,
+              isDeployButton: false
+            })
+          }
+          if (response.data.contract.status == 'SIGNED') {
+            if (userInfo?.data?.addressWallet == dataIndividual.senderInd) {
+              setIsDisableButton({
+                ...isDisableButton,
+                isButtonConfirmCustomer: false
+              })
+            }
+            if (userInfo?.data?.addressWallet == dataIndividual.receiverInd) {
+              setIsDisableButton({
+                ...isDisableButton,
+                isButtonConfirmSupplier: false
+              })
+            }
+          }
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -171,11 +214,21 @@ export default function Dashboard() {
   }
 
   async function handleOnDeployContract() {
-    if (stages.length === 0) toast.error("Please fill stages of contract");
+    if (stages.length === 0) toast({
+      title: "Please add at least 1 stage",
+      variant: "destructive",
+    })
     if (!individual.totalAmount || individual.totalAmount === 0)
-      toast.error("Please fill total amount of money");
+      toast({
+        title: "Total amount of money must be greater than 0",
+        variant: "destructive",
+      })
     if (stages.reduce((acc, item) => acc + item.percent, 0) !== 100)
-      toast.error("Total percent of stages must be 100%");
+      toast({
+        title: "The total percentage of all stages must be 100%",
+        variant: "destructive",
+
+      })
     if (privateKey == "") {
       alert("Please fill your private key");
       return;
@@ -197,7 +250,6 @@ export default function Dashboard() {
       const _total = individual.totalAmount;
       const _privateKey = privateKey;
       const _supplier = individual.receiverInd;
-
       const _stages: IStage[] = await Promise.all(
         stages.map(async (stage) => {
           return {
@@ -245,13 +297,12 @@ export default function Dashboard() {
         .confirmStage()
         .send({ from: userInfo?.data?.addressWallet });
       if (confirm.events?.confirmedStage?.returnValues.isDone === true) {
-        const witdraw = await contract.methods
+        await contract.methods
           .withDrawByPercent(
             individual.receiverInd,
             confirm.events?.confirmedStage?.returnValues.percent
           )
           .send({ from: individual.receiverInd, gas: "100000000" });
-        console.log(witdraw);
       }
 
       // const stages = await contract.methods.getStages().call();
@@ -293,8 +344,15 @@ export default function Dashboard() {
       const contractAtbBC = JSON.parse(compare[1]);
 
       if (JSON.stringify(contractAtbBC) === JSON.stringify(contractAttribute)) {
-        toast.success("Contract is the same");
-      } else toast.error("Contract is not same");
+        toast({
+          title: "Contract is same",
+          variant: "success",
+        })
+      } else
+        toast({
+          title: "Contract is different",
+          variant: "destructive",
+        })
       setIsCompareContractAlert(false);
     } catch (error) {
       console.log(error);
@@ -516,35 +574,59 @@ export default function Dashboard() {
                 </div>
                 <Separator className="my-4" />
                 <div className="flex">
-                  <Button className="" variant={"blue"}>
-                    Template
-                  </Button>
-                  <Button
-                    variant={"orange"}
-                    className="w-full ms-2"
-                    onClick={() => {
-                      setIsDeployContractAlert(true);
-                    }}
-                  >
-                    Deploy Contract
-                  </Button>
-                  <Button className="ms-2">Detail</Button>
-                </div>
-                <div className="flex mt-2">
-                  <Button
-                    variant={"indigo"}
-                    className="w-full"
-                    onClick={() => handleConfirmStages()}
-                  >
-                    Confirmation completed
-                  </Button>
+                  {contractData?.status !== "ENFORCE" && (
+                    <Button
+                      disabled={isDisableButton?.isDeployButton}
+                      variant={"orange"}
+                      className="w-full"
+                      onClick={() => {
+                        setIsDeployContractAlert(true);
+                      }}
+                    >
+                      Deploy Contract
+                    </Button>
+                  )}
+                  {contractData?.status == "ENFORCE" && (
+                    <Button
+                      variant={"blue"}
+                      className="w-full"
+                      onClick={() => {
+
+                      }}
+                    >
+                      Sign Contract
+                    </Button>
+                  )}
                   <Button
                     variant={"destructive"}
                     className="ms-2 w-full"
                     onClick={transferMoney}
                   >
-                    Transfer Money
+                    Transfer
                   </Button>
+                  <Button disabled={isDisableButton.isWithdrawButton} className="ms-2 w-full">Withdraw</Button>
+                </div>
+                <div className="flex">
+                  {isVisible.confirmButton === 1 && (
+                    <Button
+                      disabled={isDisableButton.isButtonConfirmCustomer}
+                      variant={"indigo"}
+                      className="w-full mt-2"
+                      onClick={() => handleConfirmStages()}
+                    >
+                      Confirmation completed of Customer
+                    </Button>
+                  )}
+                  {isVisible.confirmButton === 2 && (
+                    <Button
+                      disabled={isDisableButton.isButtonConfirmCustomer}
+                      variant={"indigo"}
+                      className="w-full mt-2"
+                      onClick={() => handleConfirmStages()}
+                    >
+                      Confirmation completed of Supplier
+                    </Button>
+                  )}
                 </div>
                 <Separator className="my-4" />
                 <div>

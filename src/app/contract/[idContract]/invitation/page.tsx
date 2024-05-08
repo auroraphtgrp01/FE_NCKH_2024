@@ -11,7 +11,7 @@ import { fetchAPI } from "@/utils/fetchAPI";
 const contractId = window.location.href.split("/")[4];
 
 export default function page() {
-  const [participantInfo, setParticipantInfo] = useState({});
+  const [participantInfo, setParticipantInfo] = useState<any>({});
   const { userInfo, setUserInfo }: any = useAppContext();
   useEffect(() => {
     fetchAPI(
@@ -21,11 +21,18 @@ export default function page() {
       setParticipantInfo(res.data);
       console.log(participantInfo);
     });
-  });
+  }, []);
   async function handleJoinContract() {
     const participant = await fetchAPI("/participants", "PATCH", {
       id: participantInfo?.id,
       status: "ACCEPTED",
+    });
+  }
+
+  async function handleRefuseContract() {
+    const participant = await fetchAPI("/participants", "PATCH", {
+      id: participantInfo?.id,
+      status: "REFUSED",
     });
   }
 
@@ -60,7 +67,11 @@ export default function page() {
               <Button className="w-[50%] me-2" onClick={handleJoinContract}>
                 Join
               </Button>
-              <Button variant={"destructive"} className="w-[50%] ">
+              <Button
+                variant={"destructive"}
+                className="w-[50%] "
+                onClick={handleRefuseContract}
+              >
                 Refuse
               </Button>
             </div>

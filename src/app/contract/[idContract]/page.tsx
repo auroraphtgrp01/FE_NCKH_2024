@@ -132,6 +132,7 @@ export default function Dashboard() {
           },
           {} as any
         );
+        setIndividual(dataIndividual);
         if (userInfo?.data?.addressWallet.trim().toLowerCase() == dataIndividual.senderInd.trim().toLowerCase()) {
           setIsVisible({
             ...isVisible,
@@ -143,11 +144,10 @@ export default function Dashboard() {
             confirmButton: 2
           })
         }
-        
+
         if ((dataIndividual.senderInd && dataIndividual.receiverInd && dataIndividual.joined && dataIndividual.totalAmount)) {
           console.log(dataIndividual.totalAmount);
-
-          setIndividual(dataIndividual.totalAmount);
+          setIndividual(dataIndividual);
           if (response.data.contract.status == 'PARTICIPATED') {
             setIsDisableButton({
               ...isDisableButton,

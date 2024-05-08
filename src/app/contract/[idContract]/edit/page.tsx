@@ -47,7 +47,12 @@ export default function DialogEditContract() {
         const updatedAttributes = [...contractAttribute];
         const attributeToUpdate = updatedAttributes[index];
 
-        if (attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE) {
+        if (attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE ||
+            attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
+            attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+            attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
+            attributeToUpdate.type === EContractAttributeType.TOTAL_AMOUNT
+        ) {
             updatedAttributes[index] = {
                 ...attributeToUpdate,
                 property: e.target.value,

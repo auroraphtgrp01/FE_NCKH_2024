@@ -83,6 +83,8 @@ export default function Header() {
     let accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
+    console.log(accounts);
+
     setWallet({ accounts });
     const checkAccount = await fetchAPI(`/auth/${accounts[0]}`, "GET");
     console.log(checkAccount.data?.isExits);

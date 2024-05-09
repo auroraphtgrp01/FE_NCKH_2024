@@ -8,18 +8,19 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAppContext } from "@/components/ThemeProvider";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { toast, useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
-
-const contractId = window.location.href.split("/")[4];
+import { useParams, useRouter } from "next/navigation";
 
 export default function page() {
+  const { idContract } = useParams();
   const Router = useRouter();
   const { toast } = useToast();
   const [participantInfo, setParticipantInfo] = useState<any>({});
   const { userInfo, setUserInfo }: any = useAppContext();
   useEffect(() => {
+    console.log(userInfo?.data, idContract);
+
     fetchAPI(
-      `/participants/find-one/${userInfo?.data?.email}/${contractId}`,
+      `/participants/find-one/${userInfo?.data?.email}/${idContract}`,
       "GET"
     )
       .then((res) => {
@@ -32,6 +33,7 @@ export default function page() {
           });
           Router.push("/register");
         }
+        setParticipantInfo(res.data);
       })
       .catch((err) => {
         toast({
@@ -54,7 +56,7 @@ export default function page() {
           title: "Accept Invitation Success",
           variant: "default",
         });
-        Router.push(`/contract/${contractId}`);
+        Router.push(`/contract/${idContract}`);
       })
       .catch((err) => {
         toast({

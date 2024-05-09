@@ -53,6 +53,8 @@ export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState(
     initContractAttribute
   );
+  const [contractParticipants, setContractParticipants] = useState<any[]>([]);
+  const [contractUsers, setContractUsers] = useState<any[]>([]);
   const [contractData, setContractData] = useState<any>();
   const [individual, setIndividual] = useState<any>({});
   const [isOpenAlert, setIsOpenAlert] = useState(false);
@@ -68,7 +70,7 @@ export default function Dashboard() {
     isWithdrawButton: true,
     isConfirmButton: true,
     isButtonConfirmCustomer: true,
-    isButtonConfirmSupplier: true
+    isButtonConfirmSupplier: true,
   });
   const [isVisible, setIsVisible] = useState({
     confirmButton: 0,
@@ -85,26 +87,36 @@ export default function Dashboard() {
       description: "This is the second stage of the contract",
     },
   ]);
-  const [contractParticipants, setContractParticipants] = useState<
-    IContractParticipant[]
-  >([
-    {
-      id: "1",
-      address: "0x1234567890",
-      name: "Minh Tuan",
-      email: "",
-      status: "Active",
-    },
-  ]);
   const [showChat, setShowChat] = useState(false);
   const { idContract } = useParams();
   useEffect(() => {
+    // xxxxx
     fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
       .then((response) => {
+        const addressParties = response.data.contractAttributes.filter(
+          (item: any) =>
+            item.type == "Contract Attribute Address Wallet Send" ||
+            item.type == "Contract Attribute Address Wallet Receive"
+        );
+
+        const detailParties: any[] = [];
+        addressParties.forEach(async (address: any) => {
+          await fetchAPI(`/users/${address.value.toLowerCase()}`, "GET").then(
+            (response) => {
+              detailParties.push(response.data.user);
+            }
+          );
+        });
+        console.log(detailParties);
+
+        setContractUsers(detailParties);
+        console.log(contractUsers);
+
         setContractAttribute(response.data.contractAttributes);
         setContractData(response.data.contract);
         setAddressContract(response.data.contract.contractAddress);
         setContractParticipants(response.data.participants);
+
         const dataIndividual = response.data.contractAttributes.reduce(
           (acc: any, item: any) => {
             if (
@@ -133,39 +145,46 @@ export default function Dashboard() {
           {} as any
         );
         setIndividual(dataIndividual);
-        if (userInfo?.data?.addressWallet.trim().toLowerCase() == dataIndividual.senderInd.trim().toLowerCase()) {
+        if (
+          userInfo?.data?.addressWallet.trim().toLowerCase() ==
+          dataIndividual.senderInd.trim().toLowerCase()
+        ) {
           setIsVisible({
             ...isVisible,
-            confirmButton: 1
-          })
+            confirmButton: 1,
+          });
         } else {
           setIsVisible({
             ...isVisible,
-            confirmButton: 2
-          })
+            confirmButton: 2,
+          });
         }
 
-        if ((dataIndividual.senderInd && dataIndividual.receiverInd && dataIndividual.joined && dataIndividual.totalAmount)) {
-          console.log(dataIndividual.totalAmount);
+        if (
+          dataIndividual.senderInd &&
+          dataIndividual.receiverInd &&
+          dataIndividual.joined &&
+          dataIndividual.totalAmount
+        ) {
           setIndividual(dataIndividual);
-          if (response.data.contract.status == 'PARTICIPATED') {
+          if (response.data.contract.status == "PARTICIPATED") {
             setIsDisableButton({
               ...isDisableButton,
-              isDeployButton: false
-            })
+              isDeployButton: false,
+            });
           }
-          if (response.data.contract.status == 'SIGNED') {
+          if (response.data.contract.status == "SIGNED") {
             if (userInfo?.data?.addressWallet == dataIndividual.senderInd) {
               setIsDisableButton({
                 ...isDisableButton,
-                isButtonConfirmCustomer: false
-              })
+                isButtonConfirmCustomer: false,
+              });
             }
             if (userInfo?.data?.addressWallet == dataIndividual.receiverInd) {
               setIsDisableButton({
                 ...isDisableButton,
-                isButtonConfirmSupplier: false
-              })
+                isButtonConfirmSupplier: false,
+              });
             }
           }
         }
@@ -202,8 +221,8 @@ export default function Dashboard() {
         gas: "1000000",
       });
       console.log(x);
-      const balance = await contract.methods.getBalance().call();
-      console.log("Contract balance:", balance);
+      // const balance = await contract.methods.getBalance().call();
+      // console.log("Contract balance:", balance);
     } catch (error) {
       console.log(error);
     }
@@ -214,21 +233,21 @@ export default function Dashboard() {
   }
 
   async function handleOnDeployContract() {
-    if (stages.length === 0) toast({
-      title: "Please add at least 1 stage",
-      variant: "destructive",
-    })
+    if (stages.length === 0)
+      toast({
+        title: "Please add at least 1 stage",
+        variant: "destructive",
+      });
     if (!individual.totalAmount || individual.totalAmount === 0)
       toast({
         title: "Total amount of money must be greater than 0",
         variant: "destructive",
-      })
+      });
     if (stages.reduce((acc, item) => acc + item.percent, 0) !== 100)
       toast({
         title: "The total percentage of all stages must be 100%",
         variant: "destructive",
-
-      })
+      });
     if (privateKey == "") {
       alert("Please fill your private key");
       return;
@@ -324,7 +343,6 @@ export default function Dashboard() {
       const cancel = await contract.methods
         .setStatus(1)
         .send({ from: userInfo?.data?.addressWallet });
-      console.log(cancel);
 
       setIsCancelContractAlert(false);
     } catch (error) {
@@ -347,12 +365,12 @@ export default function Dashboard() {
         toast({
           title: "Contract is same",
           variant: "success",
-        })
+        });
       } else
         toast({
           title: "Contract is different",
           variant: "destructive",
-        })
+        });
       setIsCompareContractAlert(false);
     } catch (error) {
       console.log(error);
@@ -462,36 +480,23 @@ export default function Dashboard() {
                     </CardHeader>
                     <ScrollArea className="max-h-[300px] h-[120px]">
                       <CardContent className="grid gap-8">
-                        <div className="flex items-center gap-4">
-                          <div className="grid gap-1">
-                            <p className="text-sm font-medium leading-none">
-                              FPT TELECOM
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Party A
-                            </p>
+                        {contractUsers.map((user: any, index) => (
+                          <div className="flex items-center gap-4" key={index}>
+                            <div className="grid gap-1">
+                              <p className="text-sm font-medium leading-none">
+                                {user.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.email}
+                              </p>
+                            </div>
+                            <div className="ml-auto font-medium">
+                              <Badge variant={"default"} className="me-2 mb-2">
+                                Signed
+                              </Badge>
+                            </div>
                           </div>
-                          <div className="ml-auto font-medium">
-                            <Badge variant={"default"} className="me-2 mb-2">
-                              Signed
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="grid gap-1">
-                            <p className="text-sm font-medium leading-none">
-                              DUY TAN UNIVERSITY
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Party B
-                            </p>
-                          </div>
-                          <div className="ml-auto font-medium">
-                            <Badge variant={"default"} className="me-2 mb-2">
-                              Signed
-                            </Badge>
-                          </div>
-                        </div>
+                        ))}
                       </CardContent>
                     </ScrollArea>
                   </Card>
@@ -590,9 +595,7 @@ export default function Dashboard() {
                     <Button
                       variant={"blue"}
                       className="w-full"
-                      onClick={() => {
-
-                      }}
+                      onClick={() => {}}
                     >
                       Sign Contract
                     </Button>
@@ -604,7 +607,12 @@ export default function Dashboard() {
                   >
                     Transfer
                   </Button>
-                  <Button disabled={isDisableButton.isWithdrawButton} className="ms-2 w-full">Withdraw</Button>
+                  <Button
+                    disabled={isDisableButton.isWithdrawButton}
+                    className="ms-2 w-full"
+                  >
+                    Withdraw
+                  </Button>
                 </div>
                 <div className="flex">
                   {isVisible.confirmButton === 1 && (
@@ -646,8 +654,8 @@ export default function Dashboard() {
                           <div className="flex items-center" key={index}>
                             <div className="grid">
                               <p className="text-sm font-medium leading-none">
-                                {participant.name
-                                  ? participant.name
+                                {participant?.User
+                                  ? participant?.User?.name
                                   : "No Name"}
                               </p>
                               <p className="text-sm text-muted-foreground">

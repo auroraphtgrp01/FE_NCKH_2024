@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState(
     initContractAttribute
   );
+  const [nonWithdrarStage, setNonWithdrarStage] = useState<any>({});
   const [contractParticipants, setContractParticipants] = useState<any[]>([]);
   const [contractUsers, setContractUsers] = useState<any[]>([]);
   const [contractData, setContractData] = useState<any>();
@@ -71,20 +72,23 @@ export default function Dashboard() {
     isConfirmButton: true,
     isButtonConfirmCustomer: true,
     isButtonConfirmSupplier: true,
+    isTransferButton: true,
+    isButtonSignContractCustomer: false,
+    isButtonSignContractSupplier: false,
+  });
+
+  const [isHideButton, setIsHideButton] = useState({
+    isDeployButton: false,
+    isSignButton: true,
   });
   const [isVisible, setIsVisible] = useState({
     confirmButton: 0,
   });
   const [stages, setStages] = useState([
     {
-      percent: 40,
+      percent: 100,
       deliveryAt: "2024-07-16T00:00:00Z",
-      description: "This is the first stage of the contract",
-    },
-    {
-      percent: 60,
-      deliveryAt: "2024-07-16T00:00:00Z",
-      description: "This is the second stage of the contract",
+      description: "This is the stage of the contract",
     },
   ]);
   const [showChat, setShowChat] = useState(false);
@@ -98,19 +102,7 @@ export default function Dashboard() {
             item.type == "Contract Attribute Address Wallet Send" ||
             item.type == "Contract Attribute Address Wallet Receive"
         );
-
-        const detailParties: any[] = [];
-        addressParties.forEach(async (address: any) => {
-          await fetchAPI(`/users/${address.value.toLowerCase()}`, "GET").then(
-            (response) => {
-              detailParties.push(response.data.user);
-            }
-          );
-        });
-        console.log(detailParties);
-
-        setContractUsers(detailParties);
-        console.log(contractUsers);
+        setContractUsers(addressParties);
 
         setContractAttribute(response.data.contractAttributes);
         setContractData(response.data.contract);
@@ -167,27 +159,37 @@ export default function Dashboard() {
           dataIndividual.totalAmount
         ) {
           setIndividual(dataIndividual);
+
           if (response.data.contract.status == "PARTICIPATED") {
             setIsDisableButton({
               ...isDisableButton,
               isDeployButton: false,
             });
           }
-          if (response.data.contract.status == "SIGNED") {
-            if (userInfo?.data?.addressWallet == dataIndividual.senderInd) {
-              setIsDisableButton({
-                ...isDisableButton,
-                isButtonConfirmCustomer: false,
-              });
-            }
-            if (userInfo?.data?.addressWallet == dataIndividual.receiverInd) {
-              setIsDisableButton({
-                ...isDisableButton,
-                isButtonConfirmSupplier: false,
-              });
-            }
-          }
         }
+        if (response.data.contract.status == "ENFORCE") {
+          setIsDisableButton({
+            ...isDisableButton,
+            isTransferButton: false,
+          });
+          setIsHideButton({
+            ...isHideButton,
+            isDeployButton: true,
+            isSignButton: false,
+          });
+        }
+        if (response.data.contract.status == "SIGNED") {
+          setIsDisableButton({
+            ...isDisableButton,
+            isButtonConfirmCustomer: false,
+            isButtonSignContractCustomer: true,
+            isButtonConfirmSupplier: false,
+          });
+        }
+        console.log(
+          isDisableButton.isButtonSignContractCustomer,
+          isDisableButton.isButtonSignContractSupplier
+        );
       })
       .catch((error) => {
         console.log(error);
@@ -221,8 +223,8 @@ export default function Dashboard() {
         gas: "1000000",
       });
       console.log(x);
-      // const balance = await contract.methods.getBalance().call();
-      // console.log("Contract balance:", balance);
+      const balance = await contract.methods.getBalance().call();
+      console.log("Contract balance:", balance);
     } catch (error) {
       console.log(error);
     }
@@ -295,12 +297,19 @@ export default function Dashboard() {
         .send({
           from: userInfo?.data?.addressWallet,
         });
-
+      setAddressContract(deployTransaction?.options?.address as string);
+      setIsDisableButton({ ...isDisableButton, isTransferButton: false });
+      setIsHideButton({
+        ...isHideButton,
+        isDeployButton: true,
+        isSignButton: false,
+      });
       fetchAPI("/contracts", "PATCH", {
         id: idContract,
         contractAddress: deployTransaction?.options?.address as string,
+        status: "ENFORCE",
+        stages: stages,
       });
-      setAddressContract(deployTransaction?.options?.address as string);
     } catch (error) {
       console.log(error);
     }
@@ -312,23 +321,13 @@ export default function Dashboard() {
       const abi = privateCode.data.abi.abi;
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(abi, addressContract as string);
-      const confirm = await contract.methods
-        .confirmStage()
-        .send({ from: userInfo?.data?.addressWallet });
-      if (confirm.events?.confirmedStage?.returnValues.isDone === true) {
-        await contract.methods
-          .withDrawByPercent(
-            individual.receiverInd,
-            confirm.events?.confirmedStage?.returnValues.percent
-          )
-          .send({ from: individual.receiverInd, gas: "100000000" });
-      }
+      const confirm = await contract.methods.confirmStage().send({
+        from: userInfo?.data?.addressWallet,
+        gas: "1000000",
+      });
 
-      // const stages = await contract.methods.getStages().call();
-      // console.log("Stages:", stages);
-
-      // const balance = await contract.methods.getBalance().call();
-      // console.log("Contract balance:", balance);
+      const stages = await contract.methods.getStages().call();
+      console.log("Stages:", stages);
     } catch (error) {
       console.log(error);
     }
@@ -372,6 +371,49 @@ export default function Dashboard() {
           variant: "destructive",
         });
       setIsCompareContractAlert(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleSignContract() {
+    try {
+      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+      const abi = privateCode.data.abi.abi;
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(abi, addressContract as string);
+      await contract.methods
+        .sign(userInfo?.data?.addressWallet.toString())
+        .send({ from: userInfo?.data?.addressWallet });
+      const signature1: string = await contract.methods
+        .getSignature(individual.senderInd)
+        .call();
+      const signature2: string = await contract.methods
+        .getSignature(individual.receiverInd)
+        .call();
+      console.log(">>>>", signature1, signature2);
+
+      if (userInfo?.data?.addressWallet == individual.senderInd)
+        setIsDisableButton({
+          ...isDisableButton,
+          isButtonSignContractCustomer: true,
+        });
+      else
+        setIsDisableButton({
+          ...isDisableButton,
+          isButtonSignContractSupplier: true,
+        });
+      if (signature1 !== "" && signature2 !== "") {
+        await fetchAPI("/contracts", "PATCH", {
+          id: idContract,
+          status: "SIGNED",
+        });
+        setIsDisableButton({
+          ...isDisableButton,
+          isButtonConfirmCustomer: false,
+          isButtonConfirmSupplier: false,
+        });
+      }
     } catch (error) {
       console.log(error);
     }
@@ -484,10 +526,10 @@ export default function Dashboard() {
                           <div className="flex items-center gap-4" key={index}>
                             <div className="grid gap-1">
                               <p className="text-sm font-medium leading-none">
-                                {user.name}
+                                {user.property}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {user.email}
+                                ************************{user.value.slice(-5)}
                               </p>
                             </div>
                             <div className="ml-auto font-medium">
@@ -581,7 +623,8 @@ export default function Dashboard() {
                 <div className="flex">
                   {contractData?.status !== "ENFORCE" && (
                     <Button
-                      disabled={isDisableButton?.isDeployButton}
+                      hidden={isHideButton.isDeployButton}
+                      disabled={isDisableButton.isDeployButton}
                       variant={"orange"}
                       className="w-full"
                       onClick={() => {
@@ -593,14 +636,21 @@ export default function Dashboard() {
                   )}
                   {contractData?.status == "ENFORCE" && (
                     <Button
+                      hidden={isHideButton.isSignButton}
+                      disabled={
+                        userInfo?.data?.addressWallet == individual.senderInd
+                          ? isDisableButton.isButtonSignContractCustomer
+                          : isDisableButton.isButtonSignContractSupplier
+                      }
                       variant={"blue"}
                       className="w-full"
-                      onClick={() => {}}
+                      onClick={handleSignContract}
                     >
                       Sign Contract
                     </Button>
                   )}
                   <Button
+                    disabled={isDisableButton.isTransferButton}
                     variant={"destructive"}
                     className="ms-2 w-full"
                     onClick={transferMoney}
@@ -620,17 +670,17 @@ export default function Dashboard() {
                       disabled={isDisableButton.isButtonConfirmCustomer}
                       variant={"indigo"}
                       className="w-full mt-2"
-                      onClick={() => handleConfirmStages()}
+                      onClick={handleConfirmStages}
                     >
                       Confirmation completed of Customer
                     </Button>
                   )}
                   {isVisible.confirmButton === 2 && (
                     <Button
-                      disabled={isDisableButton.isButtonConfirmCustomer}
+                      disabled={isDisableButton.isButtonConfirmSupplier}
                       variant={"indigo"}
                       className="w-full mt-2"
-                      onClick={() => handleConfirmStages()}
+                      onClick={handleConfirmStages}
                     >
                       Confirmation completed of Supplier
                     </Button>
@@ -731,11 +781,10 @@ export default function Dashboard() {
                   Close
                 </Button>
                 <Button
+                  hidden={isHideButton.isDeployButton}
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
-                  onClick={() => {
-                    handleOnDeployContract();
-                  }}
+                  onClick={handleOnDeployContract}
                 >
                   Deploy Contract
                 </Button>

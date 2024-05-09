@@ -498,7 +498,7 @@ export default function Dashboard() {
       </header>
       <div className="flex justify-center">
         <main className="flex items-start py-4">
-          <div className="min-w-[300px] px-3 flex-1">
+          <div className="min-w-[300px] px-3 flex-1 flex justify-end">
             <Card className="overflow-hidden w-[430px]">
               <CardHeader className="flex flex-row items-start">
                 <div className="w-full">

@@ -40,8 +40,9 @@ import {
 import { ethers } from "ethers";
 import Web3 from "web3";
 import { useAppContext } from "@/components/ThemeProvider";
-import { set } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
+
+import { fromWei } from "web3-utils";
 
 export default function Dashboard() {
   interface IStage {
@@ -53,7 +54,8 @@ export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState(
     initContractAttribute
   );
-  const [nonWithdrarStage, setNonWithdrarStage] = useState<any>({});
+  const [currentBalance, setCurrentBalance] = useState<number>(0);
+  const [nonWithdrawStage, setNonWithdrawStage] = useState<any>({});
   const [contractParticipants, setContractParticipants] = useState<any[]>([]);
   const [contractUsers, setContractUsers] = useState<any[]>([]);
   const [contractData, setContractData] = useState<any>();
@@ -84,7 +86,7 @@ export default function Dashboard() {
   const [isVisible, setIsVisible] = useState({
     confirmButton: 0,
   });
-  const [stages, setStages] = useState([
+  const [stages, setStages] = useState<any[]>([
     {
       percent: 100,
       deliveryAt: "2024-07-16T00:00:00Z",
@@ -93,8 +95,10 @@ export default function Dashboard() {
   ]);
   const [showChat, setShowChat] = useState(false);
   const { idContract } = useParams();
+
   useEffect(() => {
     // xxxxx
+    let dataIndividual: any = {};
     fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
       .then((response) => {
         const addressParties = response.data.contractAttributes.filter(
@@ -103,13 +107,34 @@ export default function Dashboard() {
             item.type == "Contract Attribute Address Wallet Receive"
         );
         setContractUsers(addressParties);
-
+        setNonWithdrawStage(response.data.contract.stages[0]);
         setContractAttribute(response.data.contractAttributes);
         setContractData(response.data.contract);
-        setAddressContract(response.data.contract.contractAddress);
+
+        if (response.data.contract.contractAddress !== "") {
+          setAddressContract(response.data.contract.contractAddress);
+          (async () => {
+            try {
+              const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+              const abi = privateCode.data.abi.abi;
+              const web3 = new Web3(window.ethereum);
+
+              const contract = new web3.eth.Contract(
+                abi,
+                response.data.contract.contractAddress
+              );
+              const balance: string = await contract.methods
+                .getBalance()
+                .call();
+              setCurrentBalance(parseFloat(fromWei(balance, "ether")));
+            } catch (error) {
+              console.log(error);
+            }
+          })();
+        }
         setContractParticipants(response.data.participants);
 
-        const dataIndividual = response.data.contractAttributes.reduce(
+        dataIndividual = response.data.contractAttributes.reduce(
           (acc: any, item: any) => {
             if (
               item.type ===
@@ -136,7 +161,9 @@ export default function Dashboard() {
           },
           {} as any
         );
+
         setIndividual(dataIndividual);
+
         if (
           userInfo?.data?.addressWallet.trim().toLowerCase() ==
           dataIndividual.senderInd.trim().toLowerCase()
@@ -155,11 +182,8 @@ export default function Dashboard() {
         if (
           dataIndividual.senderInd &&
           dataIndividual.receiverInd &&
-          dataIndividual.joined &&
           dataIndividual.totalAmount
         ) {
-          setIndividual(dataIndividual);
-
           if (response.data.contract.status == "PARTICIPATED") {
             setIsDisableButton({
               ...isDisableButton,
@@ -184,17 +208,28 @@ export default function Dashboard() {
             isButtonConfirmCustomer: false,
             isButtonSignContractCustomer: true,
             isButtonConfirmSupplier: false,
+            isTransferButton: false,
           });
+          console.log(
+            userInfo?.data?.addressWallet,
+            dataIndividual.receiverInd
+          );
+
+          if (
+            userInfo?.data?.addressWallet ==
+            dataIndividual.receiverInd.toLowerCase()
+          ) {
+            setIsDisableButton({
+              ...isDisableButton,
+              isWithdrawButton: false,
+            });
+          }
         }
-        console.log(
-          isDisableButton.isButtonSignContractCustomer,
-          isDisableButton.isButtonSignContractSupplier
-        );
       })
       .catch((error) => {
         console.log(error);
       });
-  }, [idContract]);
+  }, []);
   function handleBadgeColor(status: string) {
     switch (status) {
       case "JOINED":
@@ -207,6 +242,30 @@ export default function Dashboard() {
         return `blue`;
     }
   }
+
+  async function withdrawMoney() {
+    try {
+      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+      const abi = privateCode.data.abi.abi;
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(abi, addressContract as string);
+      console.log(individual.receiverInd, nonWithdrawStage.percent);
+
+      await contract.methods
+        .withDrawByPercent(individual.receiverInd, nonWithdrawStage.percent)
+        .send({
+          from: userInfo?.data?.addressWallet,
+          gas: "1000000",
+          gasPrice: "1000000000",
+        });
+
+      const balance: string = await contract.methods.getBalance().call();
+      setCurrentBalance(parseFloat(fromWei(balance, "ether")));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   function transferToByteCode(str: string | object) {
     return ethers.hexlify(ethers.toUtf8Bytes(JSON.stringify(str)));
   }
@@ -223,8 +282,8 @@ export default function Dashboard() {
         gas: "1000000",
       });
       console.log(x);
-      const balance = await contract.methods.getBalance().call();
-      console.log("Contract balance:", balance);
+      const balance: string = await contract.methods.getBalance().call();
+      setCurrentBalance(parseFloat(fromWei(balance, "ether")));
     } catch (error) {
       console.log(error);
     }
@@ -326,8 +385,20 @@ export default function Dashboard() {
         gas: "1000000",
       });
 
-      const stages = await contract.methods.getStages().call();
-      console.log("Stages:", stages);
+      const nonWithdrawStage = await contract.methods
+        .getNonWithdrawStage()
+        .call();
+
+      if (userInfo?.data.addressWallet == individual.senderInd)
+        setIsDisableButton({
+          ...isDisableButton,
+          isButtonConfirmCustomer: true,
+        });
+      else
+        setIsDisableButton({
+          ...isDisableButton,
+          isButtonConfirmSupplier: true,
+        });
     } catch (error) {
       console.log(error);
     }
@@ -359,6 +430,7 @@ export default function Dashboard() {
         .getContractInformation(privateKey)
         .call({ from: userInfo?.data?.addressWallet });
       const contractAtbBC = JSON.parse(compare[1]);
+      console.log(contractAtbBC);
 
       if (JSON.stringify(contractAtbBC) === JSON.stringify(contractAttribute)) {
         toast({
@@ -384,25 +456,21 @@ export default function Dashboard() {
       const contract = new web3.eth.Contract(abi, addressContract as string);
       await contract.methods
         .sign(userInfo?.data?.addressWallet.toString())
-        .send({ from: userInfo?.data?.addressWallet });
+        .send({ from: userInfo?.data?.addressWallet, gas: "1000000" });
+
       const signature1: string = await contract.methods
         .getSignature(individual.senderInd)
         .call();
+
       const signature2: string = await contract.methods
         .getSignature(individual.receiverInd)
         .call();
-      console.log(">>>>", signature1, signature2);
 
-      if (userInfo?.data?.addressWallet == individual.senderInd)
-        setIsDisableButton({
-          ...isDisableButton,
-          isButtonSignContractCustomer: true,
-        });
-      else
-        setIsDisableButton({
-          ...isDisableButton,
-          isButtonSignContractSupplier: true,
-        });
+      setIsDisableButton({
+        ...isDisableButton,
+        isButtonSignContractCustomer: true,
+        isButtonSignContractSupplier: true,
+      });
       if (signature1 !== "" && signature2 !== "") {
         await fetchAPI("/contracts", "PATCH", {
           id: idContract,
@@ -461,7 +529,7 @@ export default function Dashboard() {
                       <Input
                         readOnly
                         className="mt-2 w-[155px]"
-                        value={"100 ETH"}
+                        value={currentBalance + " ETH"}
                       />
                     </div>
                   </div>
@@ -638,7 +706,7 @@ export default function Dashboard() {
                     <Button
                       hidden={isHideButton.isSignButton}
                       disabled={
-                        userInfo?.data?.addressWallet == individual.senderInd
+                        userInfo?.data?.addressWallet === individual.senderInd
                           ? isDisableButton.isButtonSignContractCustomer
                           : isDisableButton.isButtonSignContractSupplier
                       }
@@ -660,6 +728,7 @@ export default function Dashboard() {
                   <Button
                     disabled={isDisableButton.isWithdrawButton}
                     className="ms-2 w-full"
+                    onClick={withdrawMoney}
                   >
                     Withdraw
                   </Button>
@@ -826,9 +895,7 @@ export default function Dashboard() {
                 <Button
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
-                  onClick={() => {
-                    handleCompareContractInfomation();
-                  }}
+                  onClick={handleCompareContractInfomation}
                 >
                   Compare Contract
                 </Button>

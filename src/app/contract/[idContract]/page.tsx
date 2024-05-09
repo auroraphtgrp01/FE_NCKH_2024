@@ -621,8 +621,8 @@ export default function Dashboard() {
               />
             </Card>
           </div>
-          <div className="min-w-[300px] px-3 flex-1">
-            <Card className="overflow-hidden w-[420px]">
+          <div className="min-w-[300px] px-3 flex-1 h-[642px]">
+            <Card className="overflow-hidden w-[420px] h-[755px]">
               <CardHeader className="flex flex-row items-start">
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">

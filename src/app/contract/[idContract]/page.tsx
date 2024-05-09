@@ -249,7 +249,6 @@ export default function Dashboard() {
       const abi = privateCode.data.abi.abi;
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(abi, addressContract as string);
-      console.log(individual.receiverInd, nonWithdrawStage.percent);
 
       await contract.methods
         .withDrawByPercent(individual.receiverInd, nonWithdrawStage.percent)
@@ -410,7 +409,7 @@ export default function Dashboard() {
       const abi = privateCode.data.abi.abi;
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(abi, addressContract as string);
-      const cancel = await contract.methods
+      await contract.methods
         .setStatus(1)
         .send({ from: userInfo?.data?.addressWallet });
 

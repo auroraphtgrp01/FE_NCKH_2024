@@ -11,14 +11,21 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Heart, Info } from "lucide-react";
+import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 
 export default function page() {
   return (
     <div className="mb-14">
+      <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
+        <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
+          <div className='flex'>
+            <BreadCrumbHeader />
+          </div>
+        </div>
+      </header>
       <div className="flex justify-between mt-4 drop-shadow-2xl">
         <div>
-          <Label className="font-bold text-xl text-[#1e293b]">Supplier</Label>
+      
         </div>
         <div className="flex">
           <Input

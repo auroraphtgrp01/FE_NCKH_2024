@@ -1,5 +1,5 @@
 "use client";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -17,36 +17,20 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import Image from "next/image";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import GrantPermission, { IPermission } from "@/components/GrantPermission";
+import { IPermission } from "@/components/GrantPermission";
 import { useAppContext } from "@/components/ThemeProvider";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
-import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
-export const initPermission: IPermission = {
-  READ_CONTRACT: false,
-  EDIT_CONTRACT: false,
-  INVITE_PARTICIPANT: false,
-  CHANGE_STATUS_CONTRACT: false,
-  SET_OWNER_PARTY: false,
-};
+import InvitationArea from "@/components/InvitationArea";
 
 export interface InvitationItem {
   email: string;
   permission: IPermission;
+  messages?: string;
 }
 
 export interface ContractTemplate {
@@ -58,14 +42,10 @@ export interface ContractTemplate {
 export default function page() {
   const [template, setTemplate] =
     useState<ContractTemplate[]>([]);
-  const [isOpen, setOpen] = useState(false);
   const { userInfo, setUserInfo }: any = useAppContext();
-  const [invitationInput, setInvitationInput] = useState("");
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
-  const [indexPerson, setIndexPerson] = useState<number>(-1);
   const [nameOfContractInput, setNameOfContractInput] = useState("");
   const [templateSelect, setTemplateSelect] = useState<any>(undefined);
-  const [contract, setContract] = useState<any>({});
   const [messages, setMessages] = useState("");
   const [contractAttribute, setContractAttribute] = useState<any[]>([]);
   const Router = useRouter();
@@ -80,22 +60,7 @@ export default function page() {
       }
     })
   }, []);
-  function onAddInvitation(): void {
-    const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/);
-    if (!isEmail.test(invitationInput)) {
-      alert("Email is invalid !");
-      return;
-    }
-    setInvitation([
-      ...invitation,
-      { email: invitationInput, permission: initPermission },
-    ]);
-    setInvitationInput("");
-  }
-  function updatePermission(data: IPermission): void {
-    invitation[indexPerson].permission = data;
-    setInvitation([...invitation]);
-  }
+
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   useEffect(() => {
@@ -242,73 +207,7 @@ export default function page() {
               <CardDescription>Please fill in all to continue</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col space-y-2 mt-2">
-                <Label>Invitation Participants:</Label>
-                <div className="flex">
-                  <Input
-                    className="me-2"
-                    onChange={(e) => {
-                      setInvitationInput(e.target.value);
-                    }}
-                    value={invitationInput}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        onAddInvitation();
-                      }
-                    }}
-                  ></Input>
-                  <Button onClick={onAddInvitation}>Invite</Button>
-                </div>
-              </div>
-              <div className="flex flex-col space-y-2 mt-2 ">
-                <ScrollArea className="h-72 rounded-md border px-2">
-                  <Table className="">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="">#</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead className="text-center">
-                          Permission
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {invitation.map((inv, index) => (
-                        <TableRow key={inv.email}>
-                          <TableCell>{index}</TableCell>
-                          <TableCell>{inv.email}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex">
-                              <Button
-                                variant={"default"}
-                                className="me-2"
-                                onClick={() => {
-                                  setIndexPerson(index);
-                                  setOpen(true);
-                                }}
-                              >
-                                Grant
-                              </Button>
-                              <Button variant={"destructive"}>Delete</Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </ScrollArea>
-              </div>
-              <div className="flex flex-col space-y-2 mt-2">
-                <Label>Message for Invitation: </Label>
-                <Textarea
-                  placeholder="Message"
-                  className="resize-none w-full min-h-[150px]"
-                  defaultValue={messages}
-                  onChange={(e) => {
-                    setMessages(e.target.value);
-                  }}
-                />
-              </div>
+              <InvitationArea invitation={invitation} setInvitation={setInvitation} messages={messages} setMessages={setMessages} />
             </CardContent>
             <CardFooter>
               <Button
@@ -340,12 +239,6 @@ export default function page() {
             </ScrollArea>
           </Card>
         </div>
-        <GrantPermission
-          isOpen={isOpen}
-          setOpen={setOpen}
-          permission={invitation[indexPerson]?.permission}
-          callback={updatePermission}
-        ></GrantPermission>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export const fetchAPI = async (path: string, method: string, body?: any) => {
     }
     return await axios({
         method,
-        url: `http://localhost:3000${path}`,
+        url: `http://localhost:4000${path}`,
         data: body,
         headers,
     })

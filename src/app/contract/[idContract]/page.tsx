@@ -14,7 +14,6 @@ import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewCont
 import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Icons } from "@/components/ui/icons";
 import ChatBox from "@/components/ChatBox";
@@ -22,8 +21,7 @@ import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
 import {
-  EContractAttributeType,
-  IContractParticipant,
+  EContractAttributeType
 } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -41,8 +39,17 @@ import { ethers } from "ethers";
 import Web3 from "web3";
 import { useAppContext } from "@/components/ThemeProvider";
 import { useToast } from "@/components/ui/use-toast";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { fromWei } from "web3-utils";
+import InvitationArea from "@/components/InvitationArea";
+import { InvitationItem } from "@/app/contract/create/page";
 
 export default function Dashboard() {
   interface IStage {
@@ -61,11 +68,13 @@ export default function Dashboard() {
   const [contractData, setContractData] = useState<any>();
   const [individual, setIndividual] = useState<any>({});
   const [isOpenAlert, setIsOpenAlert] = useState(false);
+  const [messages, setMessages] = useState("");
   const [isDeployContractAlert, setIsDeployContractAlert] = useState(false);
   const [isCompareContractAlert, setIsCompareContractAlert] = useState(false);
   const [isCancelContractAlert, setIsCancelContractAlert] = useState(false);
   const [privateKey, setPrivateKey] = useState("");
   const { userInfo, setUserInfo }: any = useAppContext();
+  const [invitation, setInvitation] = useState<InvitationItem[]>([]);
   const [addressContract, setAddressContract] = useState("");
   const { toast } = useToast();
   const [isDisableButton, setIsDisableButton] = useState({
@@ -78,7 +87,11 @@ export default function Dashboard() {
     isButtonSignContractCustomer: false,
     isButtonSignContractSupplier: false,
   });
+  const [dialogInvite, setDialogInvite] = useState(false);
+  useEffect(() => {
+    console.log(contractParticipants);
 
+  }, [contractParticipants])
   const [isHideButton, setIsHideButton] = useState({
     isDeployButton: false,
     isSignButton: true,
@@ -97,7 +110,6 @@ export default function Dashboard() {
   const { idContract } = useParams();
 
   useEffect(() => {
-    // xxxxx
     let dataIndividual: any = {};
     fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
       .then((response) => {
@@ -243,6 +255,36 @@ export default function Dashboard() {
     }
   }
 
+  function inviteParticipant() {
+    const payload = {
+      contractId: idContract,
+      invitation: invitation.map((item) => {
+        return {
+          ...item,
+          messages
+        }
+      })
+    }
+
+    fetchAPI("/participants/send-invitation", "POST", payload).then((res) => {
+      toast({
+        title: "Invitation has been sent",
+        variant: "success",
+      })
+      const newParticipants = invitation.map((item) => {
+        return {
+          status: "PENDING",
+          email: item.email
+        }
+      })
+      setContractParticipants([...contractParticipants, ...newParticipants])
+    })
+      .catch((err) => {
+
+      });
+    setDialogInvite(false)
+  }
+
   async function withdrawMoney() {
     try {
       const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
@@ -379,7 +421,7 @@ export default function Dashboard() {
       const abi = privateCode.data.abi.abi;
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(abi, addressContract as string);
-      const confirm = await contract.methods.confirmStage().send({
+      await contract.methods.confirmStage().send({
         from: userInfo?.data?.addressWallet,
         gas: "1000000",
       });
@@ -540,10 +582,10 @@ export default function Dashboard() {
                         Participated
                       </div>
                       <div className="ms-8 text-center font-semibold">
-                        Signed <br /> Contract
+                        Deployed
                       </div>
                       <div className="ms-8 text-center font-semibold">
-                        Enforce <br /> Contract
+                        Signed <br /> Contract
                       </div>
                       <div className="ms-10 text-center font-semibold">
                         Completed
@@ -559,9 +601,9 @@ export default function Dashboard() {
                     </Link>
                     <Button
                       onClick={() => setShowChat(!showChat)}
-                      className=" ms-2 text-white text-sm bg-blue-500 hover:bg-blue-500/90 dark:text-white outline-none border-none py-2 px-2 border rounded-md shadow"
+                      className=" ms-2 text-white text-sm bg-blue-500 hover:bg-blue-500/90 dark:text-white outline-none border-none py-2 px-2 border rounded-md shadow w-full"
                     >
-                      Discussion
+                      Chat
                     </Button>
                     <Button
                       variant={"destructive"}
@@ -571,12 +613,16 @@ export default function Dashboard() {
                       Cancel The Contract
                     </Button>
                   </div>
-                  <Button onClick={() => setIsCompareContractAlert(true)}>
-                    Fetch Blockchain to Compare Database
-                  </Button>
+                  <div className="flex">
+                    <Button onClick={() => setIsCompareContractAlert(true)}>
+                      Fetch Blockchain to Compare Database
+                    </Button>
+                    <Button variant={"orange"} className="ms-2 w-full" onClick={() => {
+                      setDialogInvite(true);
+                    }}>Invite</Button>
+                  </div>
                 </div>
                 <Separator className="my-4" />
-
                 <div>
                   <Card x-chunk="dashboard-01-chunk-5">
                     <CardHeader>
@@ -766,7 +812,7 @@ export default function Dashboard() {
                       </div>
                       <Separator className="mb-2" />
                     </CardHeader>
-                    <ScrollArea className="max-h-[300px] h-56">
+                    <ScrollArea className="max-h-[300px] h-full">
                       <CardContent className="grid gap-8">
                         {contractParticipants.map((participant, index) => (
                           <div className="flex items-center" key={index}>
@@ -939,6 +985,26 @@ export default function Dashboard() {
         </main>
       </div>
       <ChatBox showChat={showChat} setShowChat={setShowChat}></ChatBox>
+      <Dialog onOpenChange={setDialogInvite} open={dialogInvite}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Invitation Participant</DialogTitle>
+            <DialogDescription>
+              Invite your partner to join the contract
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <Card className="min-w-[450px]">
+              <CardContent>
+                <InvitationArea invitation={invitation} setInvitation={setInvitation} messages={messages} setMessages={setMessages} participant={contractParticipants} />
+              </CardContent>
+            </Card>
+          </div>
+          <DialogFooter className="sm:justify-end">
+            <Button onClick={inviteParticipant}>Invite Participant</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -20,9 +20,7 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import {
-  EContractAttributeType
-} from "@/interface/contract.i";
+import { EContractAttributeType } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -46,7 +44,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import { fromWei } from "web3-utils";
 import InvitationArea from "@/components/InvitationArea";
 import { InvitationItem } from "@/app/contract/create/page";
@@ -90,8 +88,7 @@ export default function Dashboard() {
   const [dialogInvite, setDialogInvite] = useState(false);
   useEffect(() => {
     console.log(contractParticipants);
-
-  }, [contractParticipants])
+  }, [contractParticipants]);
   const [isHideButton, setIsHideButton] = useState({
     isDeployButton: false,
     isSignButton: true,
@@ -261,28 +258,27 @@ export default function Dashboard() {
       invitation: invitation.map((item) => {
         return {
           ...item,
-          messages
-        }
-      })
-    }
+          messages,
+        };
+      }),
+    };
 
-    fetchAPI("/participants/send-invitation", "POST", payload).then((res) => {
-      toast({
-        title: "Invitation has been sent",
-        variant: "success",
+    fetchAPI("/participants/send-invitation", "POST", payload)
+      .then((res) => {
+        toast({
+          title: "Invitation has been sent",
+          variant: "success",
+        });
+        const newParticipants = invitation.map((item) => {
+          return {
+            status: "PENDING",
+            email: item.email,
+          };
+        });
+        setContractParticipants([...contractParticipants, ...newParticipants]);
       })
-      const newParticipants = invitation.map((item) => {
-        return {
-          status: "PENDING",
-          email: item.email
-        }
-      })
-      setContractParticipants([...contractParticipants, ...newParticipants])
-    })
-      .catch((err) => {
-
-      });
-    setDialogInvite(false)
+      .catch((err) => {});
+    setDialogInvite(false);
   }
 
   async function withdrawMoney() {
@@ -384,19 +380,30 @@ export default function Dashboard() {
       const deployTransaction = await contract
         .deploy({
           data: byteCode,
-          arguments: [
-            _user,
-            _supplier,
-            _keys,
-            _values,
-            _total,
-            _stages,
-            _privateKey,
-          ],
+          arguments: [_user, _supplier, "", _total, _stages, _privateKey],
         })
         .send({
           from: userInfo?.data?.addressWallet,
         });
+
+      const contractCreatedEvent = contract.events
+        .contractCreated({
+          fromBlock: deployTransaction.options.address,
+        })
+        .on("data", (event: any) => {
+          toast({
+            title: "Deploy Successfuly",
+            description: `You have been deploy successfully!\nAddress wallet customer: ${JSON.stringify(
+              event.returnValues.owner
+            )}\nAddress wallet supplier: ${JSON.stringify(
+              event.returnValues.supplier
+            )}\nTotal balance: ${JSON.stringify(
+              event.returnValues.totalBalance
+            )}`,
+            variant: "success",
+          });
+        });
+
       setAddressContract(deployTransaction?.options?.address as string);
       setIsDisableButton({ ...isDisableButton, isTransferButton: false });
       setIsHideButton({
@@ -617,9 +624,15 @@ export default function Dashboard() {
                     <Button onClick={() => setIsCompareContractAlert(true)}>
                       Fetch Blockchain to Compare Database
                     </Button>
-                    <Button variant={"orange"} className="ms-2 w-full" onClick={() => {
-                      setDialogInvite(true);
-                    }}>Invite</Button>
+                    <Button
+                      variant={"orange"}
+                      className="ms-2 w-full"
+                      onClick={() => {
+                        setDialogInvite(true);
+                      }}
+                    >
+                      Invite
+                    </Button>
                   </div>
                 </div>
                 <Separator className="my-4" />
@@ -996,7 +1009,13 @@ export default function Dashboard() {
           <div className="flex items-center space-x-2">
             <Card className="min-w-[450px]">
               <CardContent>
-                <InvitationArea invitation={invitation} setInvitation={setInvitation} messages={messages} setMessages={setMessages} participant={contractParticipants} />
+                <InvitationArea
+                  invitation={invitation}
+                  setInvitation={setInvitation}
+                  messages={messages}
+                  setMessages={setMessages}
+                  participant={contractParticipants}
+                />
               </CardContent>
             </Card>
           </div>

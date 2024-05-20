@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
 import InvitationArea from "@/components/InvitationArea";
+import Image from "next/image";
 
 export interface InvitationItem {
   email: string;
@@ -36,12 +37,19 @@ export interface InvitationItem {
 export interface ContractTemplate {
   id: string;
   name: string;
-  img: string;
+  path: string;
+  contractAttributes: any[];
 }
 
 export default function page() {
-  const [template, setTemplate] =
-    useState<ContractTemplate[]>([]);
+  const [template, setTemplate] = useState<ContractTemplate[]>([
+    {
+      id: "",
+      name: "Empty Contract",
+      path: "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg",
+      contractAttributes: [],
+    },
+  ]);
   const { userInfo, setUserInfo }: any = useAppContext();
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
   const [nameOfContractInput, setNameOfContractInput] = useState("");
@@ -52,13 +60,10 @@ export default function page() {
   const { toast } = useToast();
   useEffect(() => {
     fetchAPI("/template-contracts", "GET").then((res) => {
-      if (res.status === 200) {
-        setTemplate([
-          { id: "", name: "Empty Contract", img: "" },
-          ...res.data
-        ]);
+      if (res.status === 200 || res.status === 201) {
+        setTemplate([...res.data]);
       }
-    })
+    });
   }, []);
 
   const [api, setApi] = useState<CarouselApi>();
@@ -73,33 +78,37 @@ export default function page() {
   }, [api]);
   useEffect(() => {
     if (current !== 0) {
-      fetchAPI(`/template-contracts/${template[current]?.id}/attributes`, "GET").then((res) => {
+      fetchAPI(
+        `/template-contracts/${template[current]?.id}/attributes`,
+        "GET"
+      ).then((res) => {
         if (res.status === 200) {
           console.log(res.data);
           setContractAttribute(res.data.contractAttributes);
         }
-      }
-      )
+      });
     } else {
-      setContractAttribute([])
+      setContractAttribute([]);
     }
   }, [current]);
-  function onClickCreateContractButton() {
+  async function onClickCreateContractButton() {
+    console.log(nameOfContractInput, templateSelect, invitation, messages);
+
     const payload = {
       addressWallet: userInfo?.data?.addressWallet,
       name: nameOfContractInput,
-      template: templateSelect?.id || null,
+      templateId: templateSelect?.id || undefined,
       invitation: invitation,
       messagesForInvitation: messages,
     };
-    fetchAPI("/contracts", "POST", payload)
+    await fetchAPI("/contracts", "POST", payload)
       .then((res) => {
         if (res.status === 201) {
           toast({
             title: "Create contract success",
             description: "You have successfully created a contract",
             variant: "success",
-            duration: 2000,
+            duration: 1000,
           });
           Router.push(`/contract/${res.data.contract.id}`);
         }
@@ -145,7 +154,6 @@ export default function page() {
                   onChange={(e) => setNameOfContractInput(e.target.value)}
                 />
               </div>
-
               <div className="flex flex-col space-y-2 mt-2">
                 <Label>Template Contract: </Label>
                 <Carousel
@@ -158,26 +166,41 @@ export default function page() {
                 >
                   <CarouselContent className="-mt-1 h-[300px]">
                     {template.map((item, index) => (
+                      // <CarouselItem key={index} className="pt-1 md:basis-1/2">
+                      //   <div className="p-1">
+                      //     <Card>
+                      //       <CardContent className="flex justify-center p-6">
+                      //         {
+                      //           <div className="h-[150px] mt-auto">
+                      //             <Image
+                      //               alt={item.name}
+                      //               src={item.path}
+                      //               width={"220"}
+                      //               height={"120"}
+                      //             ></Image>
+                      //             {item.name}
+                      //           </div>
+                      //         }
+                      //       </CardContent>
+                      //     </Card>
+                      //   </div>
+                      // </CarouselItem>
                       <CarouselItem key={index} className="pt-1 md:basis-1/2">
                         <div className="p-1">
                           <Card>
-                            <CardContent className="flex justify-center p-6">
-                              {/* <Image
-                                alt=""
-                                src={item.img}
-                                width={"200"}
-                                height={"300"}
-                              ></Image> */}
-                              {index === 0 && (
-                                <div className="h-[150px] mt-auto">
-                                  Empty Contract
-                                </div>
-                              )}
-                              {index === 1 && (
-                                <div className="h-[150px] mt-auto">
-                                  {item.name}
-                                </div>
-                              )}
+                            <CardContent className="flex flex-col items-center p-6">
+                              <div className="h-[150px] w-[220px] relative">
+                                <Image
+                                  alt={item.name}
+                                  src={item.path}
+                                  layout="fill"
+                                  objectFit="contain"
+                                  className="rounded"
+                                />
+                              </div>
+                              <div className="text-center mt-2">
+                                {item.name}
+                              </div>
                             </CardContent>
                           </Card>
                         </div>
@@ -207,7 +230,12 @@ export default function page() {
               <CardDescription>Please fill in all to continue</CardDescription>
             </CardHeader>
             <CardContent>
-              <InvitationArea invitation={invitation} setInvitation={setInvitation} messages={messages} setMessages={setMessages} />
+              <InvitationArea
+                invitation={invitation}
+                setInvitation={setInvitation}
+                messages={messages}
+                setMessages={setMessages}
+              />
             </CardContent>
             <CardFooter>
               <Button
@@ -234,7 +262,10 @@ export default function page() {
             </CardHeader>
             <ScrollArea className="h-[600px] ">
               <CardContent>
-                <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
+                <PreviewContract
+                  contractAttribute={contractAttribute}
+                  setContractAttribute={setContractAttribute}
+                />
               </CardContent>
             </ScrollArea>
           </Card>

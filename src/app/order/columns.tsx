@@ -1,9 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "postcss";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type TOrderDetail = {
@@ -72,7 +73,7 @@ export const columns: ColumnDef<TOrderDetail>[] = [
     cell: ({ row }) => (
       <img
         className="w-14 hover:scale-[2] hover:delay-250 duration-300"
-        src={getFirstPathImage(row.getValue("image"))}
+        src={row.getValue("image")}
         alt="Product Image"
       />
     ),
@@ -92,16 +93,25 @@ export const columns: ColumnDef<TOrderDetail>[] = [
       return <div className="font-semibold ">Discount</div>;
     },
     cell: ({ row }) => (
-      <div className="text-start">{row.getValue("discount")}</div>
+      <div className="text-start"><Input className="w-16" type="text" defaultValue={row.getValue("discount")} /></div>
     ),
   },
   {
-    accessorKey: "taxExclude",
+    accessorKey: "priceWithoutTax",
     header: ({ column }) => {
       return <div className="font-semibold ">Price without tax</div>;
     },
     cell: ({ row }) => (
-      <div className="text-start">{row.getValue("taxExclude")}</div>
+      <div className="text-start">{row.getValue("priceWithoutTax")}</div>
+    ),
+  },
+  {
+    accessorKey: "unit",
+    header: ({ column }) => {
+      return <div className="font-semibold ">Unit</div>;
+    },
+    cell: ({ row }) => (
+      <div className="text-start">{row.getValue("unit")}</div>
     ),
   },
 ];

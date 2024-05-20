@@ -53,6 +53,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { ScrollArea } from '@radix-ui/react-scroll-area';
+import { fetchAPI } from '@/utils/fetchAPI';
 const data: Payment[] = [
     {
         id: "1",
@@ -63,43 +64,6 @@ const data: Payment[] = [
         totalPrice: 1000,
         status: 'To Send'
     },
-    {
-        id: "2",
-        orderCode: "123456",
-        buyer: "John Doe",
-        supplier: "Supplier Inc.",
-        numberOfProducts: 5,
-        totalPrice: 1000,
-        status: "To Send"
-    },
-    {
-        id: "3",
-        orderCode: "789012",
-        buyer: "Jane Smith",
-        supplier: "ABC Company",
-        numberOfProducts: 3,
-        totalPrice: 750,
-        status: "Waiting"
-    },
-    {
-        id: "4",
-        orderCode: "345678",
-        buyer: "Alice Johnson",
-        supplier: "XYZ Corporation",
-        numberOfProducts: 8,
-        totalPrice: 2000,
-        status: "Replied"
-    },
-    {
-        id: "5",
-        orderCode: "123456",
-        buyer: "John Doe",
-        supplier: "Supplier Inc.",
-        numberOfProducts: 5,
-        totalPrice: 1000,
-        status: "To Send"
-    },
-
 ]
 
 export type Payment = {
@@ -180,6 +144,7 @@ export default function Page() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+    const [order, setOrder] = React.useState([])
 
     const table = useReactTable({
         data,
@@ -199,6 +164,31 @@ export default function Page() {
             rowSelection,
         },
     })
+    useEffect(() => {
+        fetchAPI('/orders/find-all-by-user-id', 'GET')
+            .then(res => {
+                console.log(res.data);
+                const dataUserOrder = res.data.orders[0].map((order: any) => {
+
+                    const productOrder = order.products.map((product: any) => {
+                        return {
+                            id: product.id,
+                            buyer: order.updatedBy.name,
+                            // supplier :
+                        }
+
+                    })
+                    console.log(productOrder);
+                })
+
+
+                // console.log(parsedOrders);
+                // setOrder(parsedOrders); // Lưu đối tượng đơn hàng đã được biến đổi vào state
+            })
+    }, []);
+
+
+
 
     return (
         <div className='w-full'>
@@ -238,20 +228,7 @@ export default function Page() {
                             </div>
                         </div>
                     </div>
-                    <div className='flex items-center my-2'>
-                        <span className='mr-3 w-20'>All RFQs</span>
-                        <div className='flex items-center gap-4'>
-                            <div className='px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
-                            </div>
-                            <div className='px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
-                            </div>
-                            <div className='px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             {/* table */}

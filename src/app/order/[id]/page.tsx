@@ -1,4 +1,6 @@
-import React from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+'use client'
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +12,8 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { TOrderDetail, columns } from "./columns";
-import { DataTable } from "./data-table";
+import { columns } from "../columns";
+import { DataTable } from "../data-table";
 import {
   Table,
   TableBody,
@@ -32,7 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Contract } from "../contract/page";
+import { fetchAPI } from "@/utils/fetchAPI";
+import { useParams } from "next/navigation";
 
 export interface OrderDetail {
   id: string;
@@ -40,44 +43,43 @@ export interface OrderDetail {
   description?: string;
   quantity?: number;
   price: number;
-  image: string[];
+  image: string;
   taxPrice?: number;
   discount?: number;
   taxExclude?: number;
+  unit: string
 }
 
-async function getData(): Promise<OrderDetail[]> {
-  return [
-    {
-      id: "e96460db-119d-4d06-af48-5397649cf796",
-      name: "Laptop",
-      description: "Macbook Pro 14 inch 2021 [Apple M1 Pro 8-core CPU]",
-      price: 50,
-      image: [],
-      taxPrice: 10,
-      discount: 2,
-      taxExclude: 888,
-    },
-    {
-      id: "ce41bebd-fc4d-4d33-bfa4-725176086add",
-      name: "Điện thoại",
-      description: "ip 13",
-      image: [],
-      price: 70,
-      taxPrice: 5,
-      discount: 2,
-      taxExclude: 999,
-    },
-  ];
-}
+export default function Page() {
+  const [data, setData] = useState<OrderDetail[]>([]);
+  const params = useParams<{ id: string }>();
 
-export default async function page() {
-  const data = await getData();
+  useEffect(() => {
+    fetchAPI(`/orders/${params.id}`, 'GET')
+      .then(res => {
+        console.log(res.data);
+        const productOrder = res.data.products.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          image: product.image,
+          taxPrice: product.taxPrice,
+          discount: product.discount,
+          priceWithoutTax: (product.price - product.discount),
+          unit: 'cái',
+        }));
+        console.log(productOrder);
+        setData(productOrder);
+      })
+      .catch(error => console.error("Lỗi khi lấy dữ liệu sản phẩm:", error));
+  }, [params.id]);
+
   return (
     <div>
       <div className="flex justify-between">
         <h2 className="font-semibold tracking-tight text-lg mb-5">
-          Request for Quotation
+          Yêu cầu Báo giá
         </h2>
         <Breadcrumb className="mt-2">
           <BreadcrumbList>
@@ -100,24 +102,24 @@ export default async function page() {
 
       <div className="grid grid-cols-2 mb-5">
         <div className="flex">
-          <div className="text-sm font-semibold w-28 mt-2">Supplier?</div>
+          <div className="text-sm font-semibold w-28 mt-2">Supplier</div>
           <Input
             className="w-[50%] ml-4"
-            placeholder="Name, Email, or Reference"
+            placeholder="Tên, Email, hoặc Tham chiếu"
           ></Input>
         </div>
         <div className="flex">
-          <div className="text-sm font-semibold w-32 mt-2">Order Deadline?</div>
+          <div className="text-sm font-semibold w-32 mt-2">End date</div>
           <Input
             className="w-[50%] ml-4"
             type="date"
-            placeholder="Name, Email, or Reference"
+            placeholder="Tên, Email, hoặc Tham chiếu"
           ></Input>
         </div>
       </div>
       <div className="grid grid-cols-2">
         <div className="flex">
-          <div className="text-sm font-semibold w-28 mt-2">Supplier code?</div>
+          <div className="text-sm font-semibold w-28 mt-2">Supplier code</div>
           <Input
             className="w-[50.5%] ml-4"
             placeholder="xxxx-xxxx-xxxx"
@@ -125,12 +127,12 @@ export default async function page() {
         </div>
         <div className="flex">
           <div className="text-sm font-semibold w-32">
-            Estimated delivery date?
+            Delivery date
           </div>
           <Input
             className="w-[50.5%] ml-4"
             type="date"
-            placeholder="Name, Email, or Reference"
+            placeholder="Tên, Email, hoặc Tham chiếu"
           ></Input>
         </div>
       </div>
@@ -141,13 +143,13 @@ export default async function page() {
       </Tabs>
       <div className="flex justify-end">
         <Button className="px-2 py-2 mr-1" variant={"default"}>
-          Send Request
+          Gửi Yêu Cầu
         </Button>
         <Button className="px-2 py-2 mr-1" variant={"destructive"}>
-          Confirm Order
+          Xác Nhận Đơn Hàng
         </Button>
         <Button className="px-2 py-2" variant={"secondary"}>
-          Cancel
+          Hủy
         </Button>
       </div>
     </div>

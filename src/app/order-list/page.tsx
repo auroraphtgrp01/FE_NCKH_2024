@@ -2,6 +2,7 @@
 "use client"
 import { ReceiptText, Trash2, X } from 'lucide-react';
 import React, { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     CaretSortIcon,
     ChevronDownIcon,
@@ -19,7 +20,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-
+import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -137,6 +138,7 @@ export const columns: ColumnDef<Payment>[] = [
 ]
 
 export default function Page() {
+    const router = useRouter();
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -145,9 +147,9 @@ export default function Page() {
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
     const [order, setOrder] = React.useState([])
-
+    const [click, setClick] = React.useState(0)
     const table = useReactTable({
-        data,
+        data: order,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -164,28 +166,31 @@ export default function Page() {
             rowSelection,
         },
     })
+    function changePage(index: number) {
+        setClick(index);
+        router.push(`/order/${order[index].id}`)
+    }
     useEffect(() => {
         fetchAPI('/orders/find-all-by-user-id', 'GET')
             .then(res => {
-                console.log(res.data);
+                console.log(res.data.orders[0]);
                 const dataUserOrder = res.data.orders[0].map((order: any) => {
-
-                    const productOrder = order.products.map((product: any) => {
-                        return {
-                            id: product.id,
-                            buyer: order.updatedBy.name,
-                            // supplier :
-                        }
-
-                    })
-                    console.log(productOrder);
+                    return {
+                        orderCode: order.orderCode,
+                        buyer: order.customer,
+                        supplier: order.supplier,
+                        numberOfProducts: order.products.length,
+                        totalPrice: order.total,
+                        status: order.status,
+                        id: order.id
+                        // supplier :
+                    }
                 })
-
-
-                // console.log(parsedOrders);
-                // setOrder(parsedOrders); // Lưu đối tượng đơn hàng đã được biến đổi vào state
+                console.log(dataUserOrder);
+                setOrder(dataUserOrder); // Lưu đối tượng đơn hàng đã được biến đổi vào state
             })
     }, []);
+
 
 
 
@@ -255,11 +260,13 @@ export default function Page() {
                         </TableHeader>
                         <TableBody>
                             {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow className='w-[150px]'
+                                table.getRowModel().rows.map((row, index) => (
+
+                                    <TableRow className='w-[150px] cursor-pointer' onClick={() => { changePage(index) }}
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}
                                     >
+
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
                                                 {flexRender(
@@ -268,6 +275,7 @@ export default function Page() {
                                                 )}
                                             </TableCell>
                                         ))}
+
                                     </TableRow>
                                 ))
                             ) : (

@@ -134,14 +134,14 @@ export default function page() {
     }
 
     // addToCart
-    function addToCart() {
+    async function addToCart() {
         const payload = {
             supplierId: params.id,
             productId: productDetail.id
         }
         console.log(payload);
 
-        fetchAPI("/orders", "POST", payload)
+        await fetchAPI("/orders", "POST", payload)
             .then((res) => {
                 if (res.status === 201) {
                     toast({

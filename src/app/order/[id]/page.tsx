@@ -53,12 +53,16 @@ export interface OrderDetail {
 export default function Page() {
   const [data, setData] = useState<OrderDetail[]>([]);
   const params = useParams<{ id: string }>();
+  const [supplier, setsupplier] = useState('')
+  const [endDate, setEndate] = useState('')
+  const [supplierCode, setSupplierCode] = useState('')
+  const [delivery, setDelivery] = useState('')
 
   useEffect(() => {
     fetchAPI(`/orders/${params.id}`, 'GET')
       .then(res => {
         console.log(res.data);
-        const productOrder = res.data.products.map((product: any) => ({
+        const productOrder = res.data.order.products.map((product: any) => ({
           id: product.id,
           name: product.name,
           description: product.description,
@@ -67,7 +71,7 @@ export default function Page() {
           taxPrice: product.taxPrice,
           discount: product.discount,
           priceWithoutTax: (product.price - product.discount),
-          unit: 'cái',
+          unit: product.unit,
         }));
         console.log(productOrder);
         setData(productOrder);
@@ -105,7 +109,7 @@ export default function Page() {
           <div className="text-sm font-semibold w-28 mt-2">Supplier</div>
           <Input
             className="w-[50%] ml-4"
-            placeholder="Tên, Email, hoặc Tham chiếu"
+            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => setsupplier(e.target.value)}
           ></Input>
         </div>
         <div className="flex">
@@ -113,7 +117,7 @@ export default function Page() {
           <Input
             className="w-[50%] ml-4"
             type="date"
-            placeholder="Tên, Email, hoặc Tham chiếu"
+            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => setEndate(e.target.value)}
           ></Input>
         </div>
       </div>
@@ -123,6 +127,7 @@ export default function Page() {
           <Input
             className="w-[50.5%] ml-4"
             placeholder="xxxx-xxxx-xxxx"
+            onBlur={(e) => setSupplierCode(e.target.value)}
           ></Input>
         </div>
         <div className="flex">
@@ -132,7 +137,7 @@ export default function Page() {
           <Input
             className="w-[50.5%] ml-4"
             type="date"
-            placeholder="Tên, Email, hoặc Tham chiếu"
+            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => setDelivery(e.target.value)}
           ></Input>
         </div>
       </div>
@@ -152,6 +157,6 @@ export default function Page() {
           Hủy
         </Button>
       </div>
-    </div>
+    </div >
   );
 }

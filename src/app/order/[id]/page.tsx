@@ -50,9 +50,13 @@ export interface OrderDetail {
   unit: string
 }
 
+
+
 export default function Page() {
+
   const [data, setData] = useState<OrderDetail[]>([]);
   const params = useParams<{ id: string }>();
+  const [dataOrder, setDataOrder] = useState<any>([]);
   const [supplier, setsupplier] = useState('')
   const [endDate, setEndate] = useState('')
   const [supplierCode, setSupplierCode] = useState('')
@@ -61,7 +65,9 @@ export default function Page() {
   useEffect(() => {
     fetchAPI(`/orders/${params.id}`, 'GET')
       .then(res => {
+        setDataOrder(res.data.supplier)
         console.log(res.data);
+
         const productOrder = res.data.order.products.map((product: any) => ({
           id: product.id,
           name: product.name,
@@ -72,13 +78,13 @@ export default function Page() {
           discount: product.discount,
           priceWithoutTax: (product.price - product.discount),
           unit: product.unit,
+          idSupplier: res.data.supplier.id,
+          quantity: product.quantity
         }));
-        console.log(productOrder);
         setData(productOrder);
       })
       .catch(error => console.error("Lỗi khi lấy dữ liệu sản phẩm:", error));
   }, [params.id]);
-
   return (
     <div>
       <div className="flex justify-between">
@@ -109,7 +115,7 @@ export default function Page() {
           <div className="text-sm font-semibold w-28 mt-2">Supplier</div>
           <Input
             className="w-[50%] ml-4"
-            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => setsupplier(e.target.value)}
+            placeholder="Tên, Email, hoặc Tham chiếu" value={dataOrder.name} disabled onBlur={(e) => setsupplier(e.target.value)}
           ></Input>
         </div>
         <div className="flex">
@@ -127,7 +133,7 @@ export default function Page() {
           <Input
             className="w-[50.5%] ml-4"
             placeholder="xxxx-xxxx-xxxx"
-            onBlur={(e) => setSupplierCode(e.target.value)}
+            onBlur={(e) => setSupplierCode(e.target.value)} value={dataOrder.taxCode} disabled
           ></Input>
         </div>
         <div className="flex">

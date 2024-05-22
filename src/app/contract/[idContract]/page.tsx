@@ -32,6 +32,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ethers } from "ethers";
 import Web3 from "web3";
@@ -315,10 +316,9 @@ export default function Dashboard() {
 
       const x = await contract.methods.sendToSmartContract().send({
         from: userInfo?.data?.addressWallet,
-        value: "5000000000000000000",
+        value: web3.utils.toWei(individual?.totalAmount, "ether"),
         gas: "1000000",
       });
-      console.log(x);
       const balance: string = await contract.methods.getBalance().call();
       setCurrentBalance(parseFloat(fromWei(balance, "ether")));
     } catch (error) {
@@ -385,6 +385,8 @@ export default function Dashboard() {
         .send({
           from: userInfo?.data?.addressWallet,
         });
+
+      console.log(deployTransaction?.options);
 
       const contractCreatedEvent = contract.events
         .contractCreated({
@@ -791,7 +793,7 @@ export default function Dashboard() {
                     Withdraw
                   </Button>
                 </div>
-                <div className="flex">
+                <div className="flex gap-2">
                   {isVisible.confirmButton === 1 && (
                     <Button
                       disabled={isDisableButton.isButtonConfirmCustomer}
@@ -799,7 +801,7 @@ export default function Dashboard() {
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
                     >
-                      Confirmation completed of Customer
+                      Customer confirmation completed
                     </Button>
                   )}
                   {isVisible.confirmButton === 2 && (
@@ -809,10 +811,63 @@ export default function Dashboard() {
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
                     >
-                      Confirmation completed of Supplier
+                      Supplier confirmation completed
                     </Button>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        disabled={false}
+                        variant={"destructive"}
+                        className="w-full mt-2"
+                      >
+                        Dispute
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure to create dispute contract?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          <div className="max-w-md mx-auto">
+                            <div className="flex flex-col space-y-2">
+                              <div className="flex">
+                                <div className="w-40">Stage:</div>
+                                <div className="flex-1">
+                                  <b>...</b>
+                                </div>
+                              </div>
+                              <div className="flex">
+                                <div className="w-40">Customer confirmed:</div>
+                                <div className="flex-1">
+                                  <b>...</b>
+                                </div>
+                              </div>
+                              <div className="flex">
+                                <div className="w-40">Supplier confirmed:</div>
+                                <div className="flex-1">
+                                  <b>...</b>
+                                </div>
+                              </div>
+                              <div className="flex">
+                                <div className="w-40">Total amount:</div>
+                                <div className="flex-1">
+                                  <b>...</b>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Close</AlertDialogCancel>
+                        <AlertDialogAction>Dispute</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
+
                 <Separator className="my-4" />
                 <div>
                   <Card x-chunk="dashboard-01-chunk-5">

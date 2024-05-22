@@ -62,6 +62,16 @@ export default function page() {
     fetchAPI("/template-contracts", "GET").then((res) => {
       if (res.status === 200 || res.status === 201) {
         setTemplate([...res.data]);
+        if (res.data.length !== 0)
+          fetchAPI(
+            `/template-contracts/${res.data[0]?.id}/attributes`,
+            "GET"
+          ).then((res) => {
+            if (res.status === 200) {
+              setContractAttribute(res.data.contractAttributes);
+            }
+          });
+        else setContractAttribute([]);
       }
     });
   }, []);

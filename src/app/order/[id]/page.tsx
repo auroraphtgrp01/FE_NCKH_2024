@@ -12,7 +12,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { columns } from "../columns";
+// import { columns } from "../columns";
 import { DataTable } from "../data-table";
 import {
   Table,
@@ -66,8 +66,6 @@ export default function Page() {
     fetchAPI(`/orders/${params.id}`, 'GET')
       .then(res => {
         setDataOrder(res.data.supplier)
-        console.log(res.data);
-
         const productOrder = res.data.order.products.map((product: any) => ({
           id: product.id,
           name: product.name,
@@ -79,7 +77,8 @@ export default function Page() {
           priceWithoutTax: (product.price - product.discount),
           unit: product.unit,
           idSupplier: res.data.supplier.id,
-          quantity: product.quantity
+          quantity: product.quantity,
+          idOrder: params.id
         }));
         setData(productOrder);
       })
@@ -149,7 +148,8 @@ export default function Page() {
       </div>
       <Tabs defaultValue="products" className="w-full mb-5">
         <TabsContent value="products">
-          <DataTable columns={columns} data={data} />
+          {/* columns={columns} */}
+          <DataTable data={data} />
         </TabsContent>
       </Tabs>
       <div className="flex justify-end">

@@ -42,15 +42,26 @@ import { Settings2 } from "lucide-react";
 import { useState } from "react";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+import { getColumns, TOrderDetail } from './columns'; // Import hàm getColumns
+interface DataWithName {
+  id: string;
+  name: string;
+  unit: string;
+  image: string;
+  price: number;
+  discount: number;
+  quantity: number;
+  taxPrice: number;
+  description: string;
+  idSupplier: string;
+}
+interface DataTableProps<TData extends DataWithName, TValue> {
   data: TData[];
 }
-
-export function DataTable<TData, TValue>({
-  columns,
-  data,
+export function DataTable<TData extends DataWithName, TValue>({
+  data
 }: DataTableProps<TData, TValue>) {
+  const columns = getColumns(data); // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -72,7 +83,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
     },
   });
-  console.log(data);
+  // console.log(data);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { toast } = useToast()
   const handleSelect = (index: number) => {
@@ -81,8 +92,6 @@ export function DataTable<TData, TValue>({
       productId: data[selectedIndex].id
     }
     console.log(payload);
-    console.log('>>>>>>>>>>>>>>>>>');
-
     fetchAPI("/orders", "POST", payload)
       .then((res) => {
         if (res.status === 201) {
@@ -202,17 +211,9 @@ export function DataTable<TData, TValue>({
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-
-                  {/* start */}
-
-
-
-
-                  {/* end */}
                   <Button className="ml-2" variant="default" onClick={() => handleSelect(selectedIndex)}>
                     Chọn ngay
                   </Button>
-
                 </div>
               </TableCell>
             </TableRow>

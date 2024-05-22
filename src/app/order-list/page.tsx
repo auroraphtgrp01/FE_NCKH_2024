@@ -55,17 +55,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { fetchAPI } from '@/utils/fetchAPI';
-const data: Payment[] = [
-    {
-        id: "1",
-        orderCode: "123456",
-        buyer: "John Doe",
-        supplier: "Supplier Inc.",
-        numberOfProducts: 5,
-        totalPrice: 1000,
-        status: 'To Send'
-    },
-]
+const data: Payment[] = []
 
 export type Payment = {
     id: string;
@@ -74,7 +64,11 @@ export type Payment = {
     supplier: string;
     numberOfProducts: number;
     totalPrice: number;
-    status: "To Send" | "Waiting" | "Replied" | "Accept" | "Refuse"
+    status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED"
+}
+
+type status = {
+    PENDING: number; PROCESSING: number; COMPLETED: number
 }
 
 
@@ -147,6 +141,7 @@ export default function Page() {
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
     const [order, setOrder] = React.useState([])
+    const [status, setStatus] = React.useState<status>({})
     const [click, setClick] = React.useState(0)
     const table = useReactTable({
         data: order,
@@ -183,17 +178,24 @@ export default function Page() {
                         totalPrice: order.total,
                         status: order.status,
                         id: order.id
-                        // supplier :
                     }
                 })
-                console.log(dataUserOrder);
-                setOrder(dataUserOrder); // Lưu đối tượng đơn hàng đã được biến đổi vào state
+                const objStatus: status = {
+                    PENDING: 0, PROCESSING: 0, COMPLETED: 0
+                }
+
+                if (dataUserOrder) {
+                    dataUserOrder.forEach((element: any) => {
+                        if (element.status == 'Pending') objStatus.PENDING = objStatus.PENDING + 1
+                        else if (element.status == 'Processing') objStatus.PROCESSING = objStatus.PROCESSING + 1
+                        else objStatus.COMPLETED = objStatus.COMPLETED + 1
+                    });
+                    setStatus(objStatus)
+                    setOrder(dataUserOrder); // Lưu đối tượng đơn hàng đã được biến đổi vào state
+                }
+
             })
     }, []);
-
-
-
-
 
     return (
         <div className='w-full'>
@@ -220,15 +222,15 @@ export default function Page() {
                         <span className='mr-3 w-20'>All RFQs</span>
                         <div className='flex items-center gap-4'>
                             <div className=' bg-violet-500  px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
+                                <div className='text-center'>{status.PENDING}</div>
                                 <div className='text-center'>Cần gửi</div>
                             </div>
                             <div className=' bg-violet-500  px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
+                                <div className='text-center'>{status.PROCESSING}</div>
                                 <div className='text-center'>Đang chờ</div>
                             </div>
                             <div className=' bg-violet-500  px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
+                                <div className='text-center'>{status.COMPLETED}</div>
                                 <div className='text-center'>Đã trả lời</div>
                             </div>
                         </div>

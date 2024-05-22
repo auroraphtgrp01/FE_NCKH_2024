@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-export interface TOrderDetail {
+import { TData } from "./[id]/page";
+export interface DataWithName {
   id: string;
   name: string;
   unit: string;
@@ -17,11 +18,12 @@ export interface TOrderDetail {
   taxPrice: number;
   description: string;
   idSupplier: string;
+  idOrder: string;
 }
 
 
-export function getColumns(data: any): ColumnDef<TOrderDetail>[] {
-  // console.log('>>>>>>Data gốc : ', data);
+
+export function getColumns(data: DataWithName[], setData: React.Dispatch<React.SetStateAction<DataWithName[]>>, getDataOrders: () => void): ColumnDef<DataWithName>[] {
   const { toast } = useToast()
   const userInfoString = localStorage.getItem("user-info");
   const user_info = userInfoString ? JSON.parse(userInfoString) : null;
@@ -55,15 +57,11 @@ export function getColumns(data: any): ColumnDef<TOrderDetail>[] {
     console.log('>>>>>Payload PATCH lên : ', payload);
     await fetchAPI("/orders", "PATCH", payload)
       .then((res) => {
-        // console.log(res);
-        // console.log(data);
-        // data[index].quantity = res.data.products[0].quantity
-        // data[index].discount = res.data.products[0].discount
-        // console.log(data);
         toast({
           title: `Update thành công`,
           variant: "success",
         })
+        getDataOrders()
       })
       .catch((err) => {
         toast({

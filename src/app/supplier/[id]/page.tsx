@@ -86,20 +86,22 @@ export default function page() {
     const [dataProduct, setDataProduct] = useState<any>([])
     const { toast } = useToast()
     const { id } = useParams();
-    const params = useParams<{
-        id: any; tag: string; item: string
-    }>()
 
     useEffect(() => {
-        fetchAPI(`/suppliers/${id}`, 'GET').then(res => {
-            setDataSupplier(res.data)
-        })
-        fetchAPI(`/products/find-all-by-supplier/${params.id}`, 'GET').then((res) => {
-            setDataProduct(res.data)
-            console.log(res.data);
+        const fetchData = async () => {
+            try {
+                const supplierResponse = await fetchAPI(`/suppliers/${id}`, 'GET');
+                setDataSupplier(supplierResponse.data);
 
-        })
-    }, [id])
+                const productResponse = await fetchAPI(`/products/find-all-by-supplier/${id}`, 'GET');
+                setDataProduct(productResponse.data);
+                console.log(productResponse.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [id]);
     function StarIcon(props: any) {
         return (
             <svg
@@ -136,7 +138,7 @@ export default function page() {
     // addToCart
     async function addToCart() {
         const payload = {
-            supplierId: params.id,
+            supplierId: id,
             productId: productDetail.id
         }
         console.log(payload);
@@ -282,7 +284,7 @@ export default function page() {
                                 alt="Product Image"
                                 className="aspect-square object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800"
                                 height={600}
-                                src={productDetail ? productDetail.images[0].path : ''}
+                                src={productDetail?.images?.[0]?.path ?? ''}
                                 width={600}
                             />
                         </div>

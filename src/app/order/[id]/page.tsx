@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 import React, { useEffect, useState } from "react";
-
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,6 +37,43 @@ import {
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useParams } from "next/navigation";
 
+export type TData = {
+  id: string;
+  name: string;
+  unit: string;
+  image: string;
+  price: number;
+  discount: number;
+  quantity: number;
+  taxPrice: number;
+  description: string;
+  idSupplier: string;
+  idOrder: string; // Thuộc tính idOrder cần phải có
+};
+export interface DataWithName {
+  id: string;
+  name: string;
+  unit: string;
+  image: string;
+  price: number;
+  discount: number;
+  quantity: number;
+  taxPrice: number;
+  description: string;
+  idSupplier: string;
+}
+export interface DataTableProps<TData extends DataWithName, TValue> {
+  data: TData[];
+  getDataOrders: () => void;
+  setData: React.Dispatch<React.SetStateAction<TData[]>>;
+}
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  idSupplier: number;
+}
+
 export interface OrderDetail {
   id: string;
   name: string;
@@ -47,24 +84,63 @@ export interface OrderDetail {
   taxPrice?: number;
   discount?: number;
   taxExclude?: number;
-  unit: string
+  unit: string;
+  idOrder: string;
+  idSupplier: string;
 }
 
-
-
 export default function Page() {
-
+  const { toast } = useToast()
   const [data, setData] = useState<OrderDetail[]>([]);
-  const params = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
   const [dataOrder, setDataOrder] = useState<any>([]);
   const [supplier, setsupplier] = useState('')
-  const [endDate, setEndate] = useState('')
+  const [endDate, setEndate] = useState('0000-00-00')
   const [supplierCode, setSupplierCode] = useState('')
   const [delivery, setDelivery] = useState('')
+  const updateOrder = async (e: any, type: string) => {
+    var payload = {}
+    const dateValue = new Date(e.target.value);
+    if (!isNaN(dateValue.getTime())) {
+      const isoDate = dateValue.toISOString();
+      let payload;
 
-  useEffect(() => {
-    fetchAPI(`/orders/${params.id}`, 'GET')
+      if (type === 'endDate') {
+        payload = {
+          id: id,
+          endDate: isoDate,
+        };
+      } else if (type === 'delivery') {
+        payload = {
+          id: id,
+          executeDate: isoDate,
+        };
+      }
+
+      if (payload) {
+        console.log('>>>>>Payload PATCH lên : ', payload);
+        try {
+          const res = await fetchAPI("/orders", "PATCH", payload);
+          toast({
+            title: `Update thành công`,
+            variant: "success",
+          });
+        } catch (err) {
+          toast({
+            title: `Update không thành công`,
+            variant: "destructive",
+          });
+        }
+      }
+    } else {
+      console.log('Chưa nhập xong');
+    }
+
+  };
+  const getDataOrders = () => {
+    fetchAPI(`/orders/${id}`, 'GET')
       .then(res => {
+        console.log('>>>>>>');
         setDataOrder(res.data.supplier)
         const productOrder = res.data.order.products.map((product: any) => ({
           id: product.id,
@@ -74,21 +150,24 @@ export default function Page() {
           image: product.image,
           taxPrice: product.taxPrice,
           discount: product.discount,
-          priceWithoutTax: (product.price - product.discount),
+          priceWithoutTax: ((product.price - product.discount) * product.quantity),
           unit: product.unit,
           idSupplier: res.data.supplier.id,
           quantity: product.quantity,
-          idOrder: params.id
+          idOrder: id
         }));
         setData(productOrder);
       })
       .catch(error => console.error("Lỗi khi lấy dữ liệu sản phẩm:", error));
-  }, [params.id]);
+  }
+  useEffect(() => {
+    getDataOrders()
+  }, []);
   return (
     <div>
       <div className="flex justify-between">
         <h2 className="font-semibold tracking-tight text-lg mb-5">
-          Yêu cầu Báo giá
+          Request a quote
         </h2>
         <Breadcrumb className="mt-2">
           <BreadcrumbList>
@@ -114,7 +193,7 @@ export default function Page() {
           <div className="text-sm font-semibold w-28 mt-2">Supplier</div>
           <Input
             className="w-[50%] ml-4"
-            placeholder="Tên, Email, hoặc Tham chiếu" value={dataOrder.name} disabled onBlur={(e) => setsupplier(e.target.value)}
+            placeholder="Tên, Email, hoặc Tham chiếu" value={dataOrder.name} disabled
           ></Input>
         </div>
         <div className="flex">
@@ -122,7 +201,9 @@ export default function Page() {
           <Input
             className="w-[50%] ml-4"
             type="date"
-            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => setEndate(e.target.value)}
+            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => {
+              ; updateOrder(e, 'endDate')
+            }}
           ></Input>
         </div>
       </div>
@@ -142,14 +223,14 @@ export default function Page() {
           <Input
             className="w-[50.5%] ml-4"
             type="date"
-            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => setDelivery(e.target.value)}
+            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => { updateOrder(e, 'delivery') }}
           ></Input>
         </div>
       </div>
       <Tabs defaultValue="products" className="w-full mb-5">
         <TabsContent value="products">
           {/* columns={columns} */}
-          <DataTable data={data} />
+          <DataTable data={data} setData={setData} getDataOrders={getDataOrders} />
         </TabsContent>
       </Tabs>
       <div className="flex justify-end">

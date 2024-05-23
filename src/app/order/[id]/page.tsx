@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-'use client'
+"use client";
 import React, { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -90,27 +90,27 @@ export interface OrderDetail {
 }
 
 export default function Page() {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const [data, setData] = useState<OrderDetail[]>([]);
   const { id } = useParams<{ id: string }>();
   const [dataOrder, setDataOrder] = useState<any>([]);
-  const [supplier, setsupplier] = useState('')
-  const [endDate, setEndate] = useState('0000-00-00')
-  const [supplierCode, setSupplierCode] = useState('')
-  const [delivery, setDelivery] = useState('')
+  const [supplier, setsupplier] = useState("");
+  const [endDate, setEndate] = useState("");
+  const [supplierCode, setSupplierCode] = useState("");
+  const [delivery, setDelivery] = useState("");
   const updateOrder = async (e: any, type: string) => {
-    var payload = {}
+    var payload = {};
     const dateValue = new Date(e.target.value);
     if (!isNaN(dateValue.getTime())) {
       const isoDate = dateValue.toISOString();
       let payload;
 
-      if (type === 'endDate') {
+      if (type === "endDate") {
         payload = {
           id: id,
           endDate: isoDate,
         };
-      } else if (type === 'delivery') {
+      } else if (type === "delivery") {
         payload = {
           id: id,
           executeDate: isoDate,
@@ -118,7 +118,7 @@ export default function Page() {
       }
 
       if (payload) {
-        console.log('>>>>>Payload PATCH lên : ', payload);
+        console.log(">>>>>Payload PATCH lên : ", payload);
         try {
           const res = await fetchAPI("/orders", "PATCH", payload);
           toast({
@@ -133,15 +133,16 @@ export default function Page() {
         }
       }
     } else {
-      console.log('Chưa nhập xong');
+      console.log("Chưa nhập xong");
     }
-
   };
   const getDataOrders = () => {
-    fetchAPI(`/orders/${id}`, 'GET')
-      .then(res => {
-        console.log('>>>>>>');
-        setDataOrder(res.data.supplier)
+    fetchAPI(`/orders/${id}`, "GET")
+      .then((res) => {
+        setEndate(res.data.order.endDate.split("T")[0]);
+        setDelivery(res.data.order.executeDate.split("T")[0]);
+
+        setDataOrder(res.data.supplier);
         const productOrder = res.data.order.products.map((product: any) => ({
           id: product.id,
           name: product.name,
@@ -150,18 +151,19 @@ export default function Page() {
           image: product.image,
           taxPrice: product.taxPrice,
           discount: product.discount,
-          priceWithoutTax: ((product.price - product.discount) * product.quantity),
+          priceWithoutTax:
+            (product.price - product.discount) * product.quantity,
           unit: product.unit,
           idSupplier: res.data.supplier.id,
           quantity: product.quantity,
-          idOrder: id
+          idOrder: id,
         }));
         setData(productOrder);
       })
-      .catch(error => console.error("Lỗi khi lấy dữ liệu sản phẩm:", error));
-  }
+      .catch((error) => console.error("Lỗi khi lấy dữ liệu sản phẩm:", error));
+  };
   useEffect(() => {
-    getDataOrders()
+    getDataOrders();
   }, []);
   return (
     <div>
@@ -193,7 +195,9 @@ export default function Page() {
           <div className="text-sm font-semibold w-28 mt-2">Supplier</div>
           <Input
             className="w-[50%] ml-4"
-            placeholder="Tên, Email, hoặc Tham chiếu" value={dataOrder.name} disabled
+            placeholder="Tên, Email, hoặc Tham chiếu"
+            value={dataOrder.name}
+            disabled
           ></Input>
         </div>
         <div className="flex">
@@ -201,8 +205,10 @@ export default function Page() {
           <Input
             className="w-[50%] ml-4"
             type="date"
-            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => {
-              ; updateOrder(e, 'endDate')
+            placeholder="Tên, Email, hoặc Tham chiếu"
+            value={endDate}
+            onBlur={(e) => {
+              updateOrder(e, "endDate");
             }}
           ></Input>
         </div>
@@ -213,24 +219,32 @@ export default function Page() {
           <Input
             className="w-[50.5%] ml-4"
             placeholder="xxxx-xxxx-xxxx"
-            onBlur={(e) => setSupplierCode(e.target.value)} value={dataOrder.taxCode} disabled
+            onBlur={(e) => setSupplierCode(e.target.value)}
+            value={dataOrder.taxCode}
+            disabled
           ></Input>
         </div>
         <div className="flex">
-          <div className="text-sm font-semibold w-32">
-            Delivery date
-          </div>
+          <div className="text-sm font-semibold w-32">Delivery date</div>
           <Input
             className="w-[50.5%] ml-4"
             type="date"
-            placeholder="Tên, Email, hoặc Tham chiếu" onBlur={(e) => { updateOrder(e, 'delivery') }}
+            placeholder="Tên, Email, hoặc Tham chiếu"
+            value={delivery}
+            onBlur={(e) => {
+              updateOrder(e, "delivery");
+            }}
           ></Input>
         </div>
       </div>
       <Tabs defaultValue="products" className="w-full mb-5">
         <TabsContent value="products">
           {/* columns={columns} */}
-          <DataTable data={data} setData={setData} getDataOrders={getDataOrders} />
+          <DataTable
+            data={data}
+            setData={setData}
+            getDataOrders={getDataOrders}
+          />
         </TabsContent>
       </Tabs>
       <div className="flex justify-end">
@@ -244,6 +258,6 @@ export default function Page() {
           Hủy
         </Button>
       </div>
-    </div >
+    </div>
   );
 }

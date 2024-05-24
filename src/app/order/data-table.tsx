@@ -12,7 +12,15 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -31,20 +39,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings2 } from "lucide-react";
+import { useState } from "react";
+import { fetchAPI } from "@/utils/fetchAPI";
+import { useToast } from "@/components/ui/use-toast";
+import { getColumns } from './columns'; // Import hàm getColumns
+import { TData } from "./[id]/page";
+import { DataWithName } from "./[id]/page";
+import { DataTableProps } from "./[id]/page";
+import { Product } from "./[id]/page";
+import { OrderDetail } from "./[id]/page";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
-export function DataTable<TData, TValue>({
-  columns,
+export function DataTable<TData extends DataWithName, TValue>({
   data,
+  getDataOrders,
+  setData
 }: DataTableProps<TData, TValue>) {
+  const columns = getColumns(data, setData, getDataOrders) as ColumnDef<TData, any>[]; // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [ListSelectProduct, setListSelectProduct] = React.useState<Product[]>([])
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const table = useReactTable({
@@ -63,6 +78,66 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const { toast } = useToast()
+
+
+  const handleSelect = (index: number) => {
+    if (ListSelectProduct.length > 0) {
+      const payload = {
+        supplierId: ListSelectProduct?.[index]?.idSupplier ?? '',
+        productId: ListSelectProduct?.[index]?.id ?? ''
+      };
+      fetchAPI("/orders", "POST", payload)
+        .then((res) => {
+          if (res.status === 201) {
+            toast({
+              title: `${res.data.message}`,
+              variant: "success",
+            })
+            getDataOrders()
+          }
+        })
+        .catch((err) => {
+          toast({
+            title: `${err.message}`,
+            variant: "destructive",
+          })
+        });
+    }
+  };
+
+  const getProduct = () => {
+    if (data.length > 0) {
+      const idSupplier = data?.[0]?.idSupplier ?? '';
+      console.log(idSupplier);
+      fetchAPI(`/products/find-all-by-supplier/${idSupplier}`, 'GET')
+        .then((res) => {
+          const mappedProducts = res.data.map((value: any, index: number) => {
+            return {
+              "id": value.id,
+              "name": value.name,
+              "description": value.description,
+              "price": value.price,
+              "image": value?.images?.[0]?.path ?? '',
+              "taxPrice": value.taxPrice,
+              "discount": value.discount,
+              "priceWithoutTax": (value.price - value.discount),
+              "unit": value.unit,
+              "idSupplier": value.supplierId,
+              "quantity": 1,
+              "idOrder": value.idOrder,
+            }
+          })
+          console.log(mappedProducts);
+          setListSelectProduct(mappedProducts)
+        })
+        .catch((errors) => console.log('Error : ' + errors))
+    }
+  }
+  React.useEffect(() => {
+    getProduct()
+  }, [data]);
   return (
     <div>
       <div className="flex items-center py-4">
@@ -95,96 +170,19 @@ export function DataTable<TData, TValue>({
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
-        {/* <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead className="" key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="h-14">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-            <TableRow className="justify-start">
-              <TableCell colSpan={2}>
-                <Input
-                  className="text-center mx-5"
-                  placeholder="Add a product"
-                ></Input>
-              </TableCell>
-              <TableCell>
-                <Input
-                  className="text-center w-[50%] mx-5"
-                  placeholder="Add a section"
-                ></Input>
-              </TableCell>
-              <TableCell>
-                <Input
-                  className="text-center w-[50%] mx-5"
-                  placeholder="Add a note"
-                ></Input>
-              </TableCell>
-              <TableCell>
-                <Input
-                  className="text-center w-[50%] mx-5"
-                  placeholder="Catalog"
-                ></Input>
-              </TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableBody>
-        </Table> */}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -193,7 +191,7 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
@@ -221,28 +219,35 @@ export function DataTable<TData, TValue>({
             <TableRow className="justify-start hover:bg-transparent">
               <TableCell colSpan={7}>
                 <div className="flex">
-                  <Input
-                    className="mx-1 w-[15%]"
-                    placeholder="Add a product"
-                  ></Input>
-                  <Input
-                    className="w-[30%] mx-1"
-                    placeholder="Add a note"
-                  ></Input>
-                  <Input
-                    className="w-[15%] mx-1"
-                    placeholder="Add a tax price"
-                  ></Input>
-                  <Input
-                    className="w-[15%] mx-1"
-                    placeholder="Add a discount"
-                  ></Input>
+                  <Select onValueChange={(value) => {
+                    const index = ListSelectProduct.findIndex(item => item.name === value);
+                    setSelectedIndex(index);
+                  }}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a fruit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {ListSelectProduct.map((value, index) => (
+                          <SelectItem
+                            value={value.name}
+                            key={index}
+                          >
+                            {value.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <Button className="ml-2" variant="default" onClick={() => handleSelect(selectedIndex)}>
+                    Chọn ngay
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
-    </div>
+    </div >
   );
 }

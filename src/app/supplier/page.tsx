@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-key */
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import React, { useEffect, useState } from "react";
@@ -19,9 +21,12 @@ import Link from "next/link";
 export default function page() {
   const [supplierList, setSupplierList] = useState<any>([])
   useEffect(() => {
-    fetchAPI('/suppliers', 'GET').then(res => {
-      setSupplierList([...res.data])
-    })
+    fetchAPI('/suppliers', 'GET')
+      .then(res => {
+        setSupplierList([...res.data])
+        console.log(res.data);
+
+      })
   }, [])
 
   return (
@@ -49,7 +54,7 @@ export default function page() {
         <div className="grid pl-4 grid-cols-5">
           {
             supplierList.map((item: any, index: any) => (
-              <Link href={`/supplier/${item.supplier.id}`}>
+              <Link href={`/supplier/${item.id}`} key={index}>
                 <div className=" rounded-lg shadow-md overflow-hidden dark:bg-zinc-800 hover:scale-105 hover:delay-250 duration-300">
                   <img
                     alt="Product 1"
@@ -63,15 +68,17 @@ export default function page() {
                     width="400"
                   />
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold select-none mb-2">{item.supplier.name}</h3>
+                    <h3 className="text-lg font-semibold select-none mb-2">
+                      {item.name}
+                    </h3>
                     <p className="text-gray-500 select-none dark:text-gray-400 line-clamp-2">
                       {item.description}
                     </p>
                     <p className="text-gray-500 select-none dark:text-gray-400 line-clamp-2">
-                      Address:  {item.supplier.address}
+                      Address:  {item.address}
                     </p>
                     <p className="text-gray-500 select-none dark:text-gray-400 line-clamp-2">
-                      TaxCode: {item.supplier.taxCode}
+                      TaxCode: {item.taxCode}
                     </p>
                   </div>
                 </div>

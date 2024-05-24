@@ -1,3 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable react/jsx-key */
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import React, { useEffect, useState } from 'react'
@@ -31,6 +34,7 @@ import {
 } from "@/components/ui/table"
 import { useParams } from "next/navigation";
 import { fetchAPI } from "@/utils/fetchAPI";
+import Link from "next/link";
 const image = [
     "https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720TPB/cong-ty-cp-xi-mang-ha-tien-1-651515.jpg",
     "https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720Ymu/cong-ty-co-phan-go-an-cuong-651470.jpg",
@@ -82,14 +86,22 @@ export default function page() {
     const [dataProduct, setDataProduct] = useState<any>([])
     const { toast } = useToast()
     const { id } = useParams();
+
     useEffect(() => {
-        fetchAPI(`/suppliers/${id}`, 'GET').then(res => {
-            setDataSupplier(res.data)
-        })
-        fetchAPI(`/products/find-all-by-supplier/${id}`, 'GET').then((res) => {
-            setDataProduct(res.data)
-        })
-    }, [id])
+        const fetchData = async () => {
+            try {
+                const supplierResponse = await fetchAPI(`/suppliers/${id}`, 'GET');
+                setDataSupplier(supplierResponse.data);
+
+                const productResponse = await fetchAPI(`/products/find-all-by-supplier/${id}`, 'GET');
+                setDataProduct(productResponse.data);
+                console.log(productResponse.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [id]);
     function StarIcon(props: any) {
         return (
             <svg
@@ -111,6 +123,7 @@ export default function page() {
     function openDetailProduct(index: number) {
         setProductDetail(dataProduct[index])
         setIsDetail(true)
+        console.log(dataProduct[index]);
     }
     function isAddToCart() {
         setCart([...cart, productDetail])
@@ -121,13 +134,40 @@ export default function page() {
         })
         setIsDetail(false)
     }
+
+    // addToCart
+    async function addToCart() {
+        const payload = {
+            supplierId: id,
+            productId: productDetail.id
+        }
+        console.log(payload);
+
+        await fetchAPI("/orders", "POST", payload)
+            .then((res) => {
+                if (res.status === 201) {
+                    toast({
+                        title: `${res.data.message}`,
+                        variant: "success",
+                    })
+                    setIsDetail(false)
+                    console.log(res);
+
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
     return (
         <div>
             <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
                 <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
                     <div className='flex'>
                         <BreadCrumbHeader />
-                        <Button onClick={() => { setIsOrderOpen(true) }} variant={"outline"} className={cart.length !== 0 ? 'ms-2 text-red-600 font-bold' : 'ms-2 font-bold'}><Icons.shoppingCart className="h-5 w-5 me-2" />Carts  </Button>
+                        <Link href='/order-list'>
+                            <Button variant={"outline"} className={cart.length !== 0 ? 'ms-2 text-red-600 font-bold' : 'ms-2 font-bold'}><Icons.shoppingCart className="h-5 w-5 me-2" />Carts  </Button>
+                        </Link>
                     </div>
                 </div>
             </header>
@@ -136,7 +176,7 @@ export default function page() {
                     <div className="grid md:grid-cols-5 gap-3 items-start">
                         <div className="hidden md:flex flex-col gap-3 items-start">
                             {dataSupplier?.images?.map((item: any, index: number) => (
-                                <button onClick={() => {
+                                <button key={index} onClick={() => {
                                     setIsSelectImg(index)
                                 }}
                                     className="border hover:border-gray-900 rounded-lg overflow-hidden transition-colors dark:hover:border-gray-50">
@@ -201,7 +241,9 @@ export default function page() {
                 <Carousel className="w-full">
                     <CarouselContent>
                         {dataProduct.map((item: any, index: number) => (
-                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4 " onClick={() => { openDetailProduct(index) }}>
+                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4 " onClick={(e) => {
+                                openDetailProduct(index);
+                            }}>
                                 <div className="p-1">
                                     <Card className="cursor-pointer ">
                                         <CardContent className="flex aspect-square items-center justify-center p-6">
@@ -210,7 +252,7 @@ export default function page() {
                                                     alt="Product 1"
                                                     className="w-full h-40 object-cover select-none"
                                                     height="300"
-                                                    src={item.image}
+                                                    src={item.images[0] ? item.images[0].path : ''}
                                                     style={{
                                                         aspectRatio: "400/300",
                                                         objectFit: "cover",
@@ -242,7 +284,7 @@ export default function page() {
                                 alt="Product Image"
                                 className="aspect-square object-cover border border-gray-200 w-full rounded-lg overflow-hidden dark:border-gray-800"
                                 height={600}
-                                src={productDetail?.path}
+                                src={productDetail?.images?.[0]?.path ?? ''}
                                 width={600}
                             />
                         </div>
@@ -255,7 +297,7 @@ export default function page() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-2xl font-bold">Estimate Price: {productDetail?.price} ETH / Unit</span>
-                                <Button className="w-[80%] items-center text-center mr-auto ml-12 mt-5" onClick={isAddToCart}>Add to Order</Button>
+                                <Button className="w-[80%] items-center text-center mr-auto ml-12 mt-5" onClick={(e) => { isAddToCart; addToCart() }}>Add to Order</Button>
                             </div>
                         </div>
                     </div>

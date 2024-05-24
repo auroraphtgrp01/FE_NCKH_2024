@@ -2,6 +2,7 @@
 "use client"
 import { ReceiptText, Trash2, X } from 'lucide-react';
 import React, { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     CaretSortIcon,
     ChevronDownIcon,
@@ -19,7 +20,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-
+import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -53,54 +54,8 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { ScrollArea } from '@radix-ui/react-scroll-area';
-const data: Payment[] = [
-    {
-        id: "1",
-        orderCode: "123456",
-        buyer: "John Doe",
-        supplier: "Supplier Inc.",
-        numberOfProducts: 5,
-        totalPrice: 1000,
-        status: 'To Send'
-    },
-    {
-        id: "2",
-        orderCode: "123456",
-        buyer: "John Doe",
-        supplier: "Supplier Inc.",
-        numberOfProducts: 5,
-        totalPrice: 1000,
-        status: "To Send"
-    },
-    {
-        id: "3",
-        orderCode: "789012",
-        buyer: "Jane Smith",
-        supplier: "ABC Company",
-        numberOfProducts: 3,
-        totalPrice: 750,
-        status: "Waiting"
-    },
-    {
-        id: "4",
-        orderCode: "345678",
-        buyer: "Alice Johnson",
-        supplier: "XYZ Corporation",
-        numberOfProducts: 8,
-        totalPrice: 2000,
-        status: "Replied"
-    },
-    {
-        id: "5",
-        orderCode: "123456",
-        buyer: "John Doe",
-        supplier: "Supplier Inc.",
-        numberOfProducts: 5,
-        totalPrice: 1000,
-        status: "To Send"
-    },
-
-]
+import { fetchAPI } from '@/utils/fetchAPI';
+const data: Payment[] = []
 
 export type Payment = {
     id: string;
@@ -109,7 +64,11 @@ export type Payment = {
     supplier: string;
     numberOfProducts: number;
     totalPrice: number;
-    status: "To Send" | "Waiting" | "Replied" | "Accept" | "Refuse"
+    status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED"
+}
+
+type status = {
+    PENDING: number; PROCESSING: number; COMPLETED: number
 }
 
 
@@ -173,6 +132,7 @@ export const columns: ColumnDef<Payment>[] = [
 ]
 
 export default function Page() {
+    const router = useRouter();
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -180,9 +140,11 @@ export default function Page() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
-
+    const [order, setOrder] = React.useState([])
+    const [status, setStatus] = React.useState<status>({})
+    const [click, setClick] = React.useState(0)
     const table = useReactTable({
-        data,
+        data: order,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -199,6 +161,41 @@ export default function Page() {
             rowSelection,
         },
     })
+    function changePage(index: number) {
+        setClick(index);
+        router.push(`/order/${order[index].id}`)
+    }
+    useEffect(() => {
+        fetchAPI('/orders/find-all-by-user-id', 'GET')
+            .then(res => {
+                console.log(res.data.orders[0]);
+                const dataUserOrder = res.data.orders[0].map((order: any) => {
+                    return {
+                        orderCode: order.orderCode,
+                        buyer: order.customer,
+                        supplier: order.supplier,
+                        numberOfProducts: order.products.length,
+                        totalPrice: order.total,
+                        status: order.status,
+                        id: order.id
+                    }
+                })
+                const objStatus: status = {
+                    PENDING: 0, PROCESSING: 0, COMPLETED: 0
+                }
+
+                if (dataUserOrder) {
+                    dataUserOrder.forEach((element: any) => {
+                        if (element.status == 'Pending') objStatus.PENDING = objStatus.PENDING + 1
+                        else if (element.status == 'Processing') objStatus.PROCESSING = objStatus.PROCESSING + 1
+                        else objStatus.COMPLETED = objStatus.COMPLETED + 1
+                    });
+                    setStatus(objStatus)
+                    setOrder(dataUserOrder); // Lưu đối tượng đơn hàng đã được biến đổi vào state
+                }
+
+            })
+    }, []);
 
     return (
         <div className='w-full'>
@@ -225,33 +222,20 @@ export default function Page() {
                         <span className='mr-3 w-20'>All RFQs</span>
                         <div className='flex items-center gap-4'>
                             <div className=' bg-violet-500  px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
+                                <div className='text-center'>{status.PENDING}</div>
                                 <div className='text-center'>Cần gửi</div>
                             </div>
                             <div className=' bg-violet-500  px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
+                                <div className='text-center'>{status.PROCESSING}</div>
                                 <div className='text-center'>Đang chờ</div>
                             </div>
                             <div className=' bg-violet-500  px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
+                                <div className='text-center'>{status.COMPLETED}</div>
                                 <div className='text-center'>Đã trả lời</div>
                             </div>
                         </div>
                     </div>
-                    <div className='flex items-center my-2'>
-                        <span className='mr-3 w-20'>All RFQs</span>
-                        <div className='flex items-center gap-4'>
-                            <div className='px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
-                            </div>
-                            <div className='px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
-                            </div>
-                            <div className='px-6 py-2 w-[130px]'>
-                                <div className='text-center'>0</div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             {/* table */}
@@ -278,11 +262,13 @@ export default function Page() {
                         </TableHeader>
                         <TableBody>
                             {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow className='w-[150px]'
+                                table.getRowModel().rows.map((row, index) => (
+
+                                    <TableRow className='w-[150px] cursor-pointer' onClick={() => { changePage(index) }}
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}
                                     >
+
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
                                                 {flexRender(
@@ -291,6 +277,7 @@ export default function Page() {
                                                 )}
                                             </TableCell>
                                         ))}
+
                                     </TableRow>
                                 ))
                             ) : (

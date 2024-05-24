@@ -121,6 +121,7 @@ export default function Page() {
         console.log(">>>>>Payload PATCH lên : ", payload);
         try {
           const res = await fetchAPI("/orders", "PATCH", payload);
+          getDataOrders();
           toast({
             title: `Update thành công`,
             variant: "success",

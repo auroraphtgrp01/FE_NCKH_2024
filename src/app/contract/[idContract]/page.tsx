@@ -20,7 +20,7 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { EContractAttributeType } from "@/interface/contract.i";
+import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,7 +34,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ethers } from "ethers";
 import Web3 from "web3";
 import { useAppContext } from "@/components/ThemeProvider";
 import { useToast } from "@/components/ui/use-toast";
@@ -46,9 +45,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { fromWei } from "web3-utils";
 import InvitationArea from "@/components/InvitationArea";
 import { InvitationItem } from "@/app/contract/create/page";
+import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleSignContractFunc, inviteNewParticipant, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 
 export default function Dashboard() {
   interface IStage {
@@ -57,15 +56,12 @@ export default function Dashboard() {
     description?: string;
   }
 
-  const [contractAttribute, setContractAttribute] = useState(
-    initContractAttribute
-  );
+  const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
-  const [nonWithdrawStage, setNonWithdrawStage] = useState<any>({});
-  const [contractParticipants, setContractParticipants] = useState<any[]>([]);
+  const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([]);
   const [contractUsers, setContractUsers] = useState<any[]>([]);
-  const [contractData, setContractData] = useState<any>();
-  const [individual, setIndividual] = useState<any>({});
+  const [contractData, setContractData] = useState<ContractData>();
+  const [individual, setIndividual] = useState<IIndividual>({ receiverInd: "", senderInd: "", totalAmount: "" });
   const [isOpenAlert, setIsOpenAlert] = useState(false);
   const [messages, setMessages] = useState("");
   const [isDeployContractAlert, setIsDeployContractAlert] = useState(false);
@@ -74,28 +70,31 @@ export default function Dashboard() {
   const [privateKey, setPrivateKey] = useState("");
   const { userInfo, setUserInfo }: any = useAppContext();
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
-  const [addressContract, setAddressContract] = useState("");
+  const [addressContract, setAddressContract] = useState<string>("");
   const { toast } = useToast();
-  const [isDisableButton, setIsDisableButton] = useState({
-    isDeployButton: true,
-    isWithdrawButton: true,
-    isConfirmButton: true,
-    isButtonConfirmCustomer: true,
-    isButtonConfirmSupplier: true,
-    isTransferButton: true,
-    isButtonSignContractCustomer: false,
-    isButtonSignContractSupplier: false,
+  const [isDisableButton, setIsDisableButton] = useState<IDisableButton>({
+    fetchCompareButton: true,
+    cancelButton: true,
+    withdrawButton: true,
+    transferButton: true,
+    deployButton: true,
+    editContractButton: true,
+    signButton: true
+  });
+  const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>({
+    deployButton: false,
+    withdrawButton: false,
+    confirmButton: false,
+    transferButton: false,
+    buttonDisputed: false,
+    signButton: false,
+    confirmButtonCustomer: false,
+    confirmButtonSupplier: false,
   });
   const [dialogInvite, setDialogInvite] = useState(false);
-  useEffect(() => {
-    console.log(contractParticipants);
-  }, [contractParticipants]);
   const [isHideButton, setIsHideButton] = useState({
-    isDeployButton: false,
-    isSignButton: true,
-  });
-  const [isVisible, setIsVisible] = useState({
-    confirmButton: 0,
+    deployButton: false,
+    signButton: false,
   });
   const [stages, setStages] = useState<any[]>([
     {
@@ -106,140 +105,41 @@ export default function Dashboard() {
   ]);
   const [showChat, setShowChat] = useState(false);
   const { idContract } = useParams();
-
+  // --------------------------------------------------------------------------------------------------------------------------------------------- //
+  // fetchDataWhenEntryPage
   useEffect(() => {
-    let dataIndividual: any = {};
-    fetchAPI(`/contracts/get-contract-details/${idContract}`, "GET")
-      .then((response) => {
-        const addressParties = response.data.contractAttributes.filter(
-          (item: any) =>
-            item.type == "Contract Attribute Address Wallet Send" ||
-            item.type == "Contract Attribute Address Wallet Receive"
-        );
-        setContractUsers(addressParties);
-        setNonWithdrawStage(response.data.contract.stages[0]);
-        setContractAttribute(response.data.contractAttributes);
-        setContractData(response.data.contract);
-
-        if (response.data.contract.contractAddress !== "") {
-          setAddressContract(response.data.contract.contractAddress);
-          (async () => {
-            try {
-              const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-              const abi = privateCode.data.abi.abi;
-              const web3 = new Web3(window.ethereum);
-
-              const contract = new web3.eth.Contract(
-                abi,
-                response.data.contract.contractAddress
-              );
-              const balance: string = await contract.methods
-                .getBalance()
-                .call();
-              setCurrentBalance(parseFloat(fromWei(balance, "ether")));
-            } catch (error) {
-              console.log(error);
-            }
-          })();
-        }
-        setContractParticipants(response.data.participants);
-
-        dataIndividual = response.data.contractAttributes.reduce(
-          (acc: any, item: any) => {
-            if (
-              item.type ===
-              EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
-            ) {
-              return { ...acc, senderInd: item.value as string };
-            }
-            if (
-              item.type ===
-              EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-            ) {
-              return { ...acc, receiverInd: item.value as string };
-            }
-            if (
-              item.type ===
-              EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED
-            ) {
-              return { ...acc, joined: item.value };
-            }
-            if (item.type === EContractAttributeType.TOTAL_AMOUNT) {
-              return { ...acc, totalAmount: item.value as number };
-            }
-            return acc;
-          },
-          {} as any
-        );
-
-        setIndividual(dataIndividual);
-
-        if (
-          userInfo?.data?.addressWallet.trim().toLowerCase() ==
-          dataIndividual.senderInd.trim().toLowerCase()
-        ) {
-          setIsVisible({
-            ...isVisible,
-            confirmButton: 1,
-          });
-        } else {
-          setIsVisible({
-            ...isVisible,
-            confirmButton: 2,
-          });
-        }
-
-        if (
-          dataIndividual.senderInd &&
-          dataIndividual.receiverInd &&
-          dataIndividual.totalAmount
-        ) {
-          if (response.data.contract.status == "PARTICIPATED") {
+    fetchDataWhenEntryPage(
+      idContract,
+      setContractAttribute,
+      setContractData,
+      setAddressContract,
+      setContractParticipants,
+      setIndividual
+    ).then((response) => {
+      updateStateButton(response?.data.contract.status, response?.data.contractAttributes, userInfo?.data?.addressWallet, setIsVisibleButton, setIsDisableButton, individual);
+      response?.data.participants.map((participant: any) => {
+        if (participant?.userId === userInfo?.data?.id) {
+          if (participant?.status === "SIGNED") {
             setIsDisableButton({
               ...isDisableButton,
-              isDeployButton: false,
-            });
-          }
-        }
-        if (response.data.contract.status == "ENFORCE") {
-          setIsDisableButton({
-            ...isDisableButton,
-            isTransferButton: false,
-          });
-          setIsHideButton({
-            ...isHideButton,
-            isDeployButton: true,
-            isSignButton: false,
-          });
-        }
-        if (response.data.contract.status == "SIGNED") {
-          setIsDisableButton({
-            ...isDisableButton,
-            isButtonConfirmCustomer: false,
-            isButtonSignContractCustomer: true,
-            isButtonConfirmSupplier: false,
-            isTransferButton: false,
-          });
-          console.log(
-            userInfo?.data?.addressWallet,
-            dataIndividual.receiverInd
-          );
-
-          if (
-            userInfo?.data?.addressWallet ==
-            dataIndividual.receiverInd.toLowerCase()
-          ) {
-            setIsDisableButton({
-              ...isDisableButton,
-              isWithdrawButton: false,
+              signButton: true
             });
           }
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    })
   }, []);
+  // --------------------------------------------------------------------------------------------------------------------------------------------- //
+  // onInviteParticipant
+  useEffect(() => {
+    if (individual.receiverInd !== "" && individual.senderInd !== "" && individual.totalAmount) {
+      setIsDisableButton({
+        ...isDisableButton,
+        deployButton: false
+      })
+    }
+  }, [individual])
+  // --------------------------------------------------------------------------------------------------------------------------------------------- //
   function handleBadgeColor(status: string) {
     switch (status) {
       case "JOINED":
@@ -254,103 +154,60 @@ export default function Dashboard() {
   }
 
   function inviteParticipant() {
-    const payload = {
-      contractId: idContract,
-      invitation: invitation.map((item) => {
-        return {
-          ...item,
-          messages,
-        };
-      }),
-    };
-
-    fetchAPI("/participants/send-invitation", "POST", payload)
-      .then((res) => {
-        toast({
-          title: "Invitation has been sent",
-          variant: "success",
-        });
-        const newParticipants = invitation.map((item) => {
-          return {
-            status: "PENDING",
-            email: item.email,
-          };
-        });
-        setContractParticipants([...contractParticipants, ...newParticipants]);
-      })
-      .catch((err) => {});
+    inviteNewParticipant(idContract, invitation, messages, setContractParticipants).then((response) => {
+      toast({
+        title: response.message,
+        variant: "success",
+      });
+    }).catch((error) => {
+      toast({
+        title: "Invitation failed to send",
+        description: error,
+        variant: "destructive",
+      });
+    })
     setDialogInvite(false);
   }
 
   async function withdrawMoney() {
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
-
-      await contract.methods
-        .withDrawByPercent(individual.receiverInd, nonWithdrawStage.percent)
-        .send({
-          from: userInfo?.data?.addressWallet,
-          gas: "1000000",
-          gasPrice: "1000000000",
-        });
-
-      const balance: string = await contract.methods.getBalance().call();
-      setCurrentBalance(parseFloat(fromWei(balance, "ether")));
-    } catch (error) {
-      console.log(error);
-    }
+    withdrawMoneyFunc(addressContract, userInfo, individual)
+      .then(() => { })
+      .catch((error) => {
+        toast({
+          title: "Error occurred while withdrawing money",
+          description: error,
+          variant: "destructive",
+        })
+      })
   }
 
-  function transferToByteCode(str: string | object) {
-    return ethers.hexlify(ethers.toUtf8Bytes(JSON.stringify(str)));
-  }
   async function transferMoney() {
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
-
-      const x = await contract.methods.sendToSmartContract().send({
-        from: userInfo?.data?.addressWallet,
-        value: web3.utils.toWei(individual?.totalAmount, "ether"),
-        gas: "1000000",
-      });
-      const balance: string = await contract.methods.getBalance().call();
-      setCurrentBalance(parseFloat(fromWei(balance, "ether")));
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  function handleDateStringToUint(date: string): number {
-    return new Date(date).getTime();
+    transferMoneyFunc(addressContract, userInfo, individual)
+      .then(() => {
+        toast({
+          title: "Transfer successfully",
+          variant: "success",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Error occurred while transferring money",
+          description: error,
+          variant: "destructive",
+        })
+      })
   }
 
   async function handleOnDeployContract() {
-    if (stages.length === 0)
-      toast({
-        title: "Please add at least 1 stage",
-        variant: "destructive",
-      });
-    if (!individual.totalAmount || individual.totalAmount === 0)
+    if (!individual.totalAmount || individual.totalAmount === '0')
       toast({
         title: "Total amount of money must be greater than 0",
-        variant: "destructive",
-      });
-    if (stages.reduce((acc, item) => acc + item.percent, 0) !== 100)
-      toast({
-        title: "The total percentage of all stages must be 100%",
         variant: "destructive",
       });
     if (privateKey == "") {
       alert("Please fill your private key");
       return;
     }
-
     try {
       const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
       const abi = privateCode.data.abi.abi;
@@ -359,11 +216,6 @@ export default function Dashboard() {
       const web3 = new Web3(window.ethereum);
       const contract = new web3.eth.Contract(abi);
       const _user = [individual.senderInd];
-      const _keys = ["contract", "contractAttributes"];
-      const _values = [
-        transferToByteCode(contractData),
-        transferToByteCode(contractAttribute),
-      ];
       const _total = individual.totalAmount;
       const _privateKey = privateKey;
       const _supplier = individual.receiverInd;
@@ -386,32 +238,28 @@ export default function Dashboard() {
           from: userInfo?.data?.addressWallet,
         });
 
-      console.log(deployTransaction?.options);
-
-      const contractCreatedEvent = contract.events
+      contract.events
         .contractCreated({
           fromBlock: deployTransaction.options.address,
         })
         .on("data", (event: any) => {
           toast({
-            title: "Deploy Successfuly",
-            description: `You have been deploy successfully!\nAddress wallet customer: ${JSON.stringify(
-              event.returnValues.owner
-            )}\nAddress wallet supplier: ${JSON.stringify(
-              event.returnValues.supplier
-            )}\nTotal balance: ${JSON.stringify(
-              event.returnValues.totalBalance
-            )}`,
+            title: "Deploy Successfully",
+            description: `Contract address: ${event.returnValues.contractAddress}`,
             variant: "success",
           });
         });
 
       setAddressContract(deployTransaction?.options?.address as string);
-      setIsDisableButton({ ...isDisableButton, isTransferButton: false });
-      setIsHideButton({
-        ...isHideButton,
-        isDeployButton: true,
-        isSignButton: false,
+      setIsVisibleButton({
+        ...isVisibleButton,
+        deployButton: false,
+        signButton: true
+      })
+      setIsDisableButton({
+        ...isDisableButton,
+        transferButton: true,
+        deployButton: true,
       });
       fetchAPI("/contracts", "PATCH", {
         id: idContract,
@@ -425,33 +273,21 @@ export default function Dashboard() {
   }
 
   async function handleConfirmStages() {
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
-      await contract.methods.confirmStage().send({
-        from: userInfo?.data?.addressWallet,
-        gas: "1000000",
-      });
-
-      const nonWithdrawStage = await contract.methods
-        .getNonWithdrawStage()
-        .call();
-
-      if (userInfo?.data.addressWallet == individual.senderInd)
-        setIsDisableButton({
-          ...isDisableButton,
-          isButtonConfirmCustomer: true,
+    handleConfirmStagesFunc(addressContract, userInfo, individual, setIsDisableButton, setIsVisibleButton)
+      .then(() => {
+        toast({
+          title: "Confirm successfully !",
+          description: "You have confirmed the stage",
+          variant: "success",
         });
-      else
-        setIsDisableButton({
-          ...isDisableButton,
-          isButtonConfirmSupplier: true,
+      })
+      .catch((error) => {
+        toast({
+          title: "Error occurred while confirming stage",
+          description: error,
+          variant: "destructive",
         });
-    } catch (error) {
-      console.log(error);
-    }
+      })
   }
 
   async function handleCancelContract() {
@@ -463,78 +299,30 @@ export default function Dashboard() {
       await contract.methods
         .setStatus(1)
         .send({ from: userInfo?.data?.addressWallet });
-
       setIsCancelContractAlert(false);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async function handleCompareContractInfomation() {
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
-      const compare: string[] = await contract.methods
-        .getContractInformation(privateKey)
-        .call({ from: userInfo?.data?.addressWallet });
-      const contractAtbBC = JSON.parse(compare[1]);
-      console.log(contractAtbBC);
-
-      if (JSON.stringify(contractAtbBC) === JSON.stringify(contractAttribute)) {
-        toast({
-          title: "Contract is same",
-          variant: "success",
-        });
-      } else
-        toast({
-          title: "Contract is different",
-          variant: "destructive",
-        });
-      setIsCompareContractAlert(false);
-    } catch (error) {
-      console.log(error);
-    }
+  async function handleCompareContractInformation() {
   }
 
   async function handleSignContract() {
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
-      await contract.methods
-        .sign(userInfo?.data?.addressWallet.toString())
-        .send({ from: userInfo?.data?.addressWallet, gas: "1000000" });
-
-      const signature1: string = await contract.methods
-        .getSignature(individual.senderInd)
-        .call();
-
-      const signature2: string = await contract.methods
-        .getSignature(individual.receiverInd)
-        .call();
-
-      setIsDisableButton({
-        ...isDisableButton,
-        isButtonSignContractCustomer: true,
-        isButtonSignContractSupplier: true,
+    handleSignContractFunc(addressContract, userInfo, individual, contractParticipants, idContract).then(() => {
+      toast({
+        title: "Sign successfully !",
+        description: "You have signed the contract",
+        variant: "success",
       });
-      if (signature1 !== "" && signature2 !== "") {
-        await fetchAPI("/contracts", "PATCH", {
-          id: idContract,
-          status: "SIGNED",
+    })
+      .catch((error) => {
+        toast({
+          title: "Error occurred while signing contract",
+          description: error,
+          variant: "destructive",
         });
-        setIsDisableButton({
-          ...isDisableButton,
-          isButtonConfirmCustomer: false,
-          isButtonConfirmSupplier: false,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
+      })
   }
 
   return (
@@ -553,7 +341,7 @@ export default function Dashboard() {
               <CardHeader className="flex flex-row items-start">
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">
-                    Contract Infomation
+                    Contract Information
                   </CardTitle>
                   <CardDescription>Date: November 23, 2023</CardDescription>
                   <Separator className="mt-4" />
@@ -573,7 +361,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex align-middle mt-1">
                     <div className="font-semibold">
-                      Funds locked in a smart contract:
+                      Funds locked in a Contract:
                     </div>
                     <div className="translate-y-[-15px] ms-3">
                       <Input
@@ -604,7 +392,7 @@ export default function Dashboard() {
                   <Separator className="" />
                   <div className="flex justify-center text-center items-center">
                     <Link href={`/contract/${idContract}/edit`}>
-                      <Button className="" variant={"violet"}>
+                      <Button className="" variant={"violet"} >
                         Edit contract
                       </Button>
                     </Link>
@@ -615,6 +403,7 @@ export default function Dashboard() {
                       Chat
                     </Button>
                     <Button
+                      disabled={isDisableButton.cancelButton}
                       variant={"destructive"}
                       className="ms-2"
                       onClick={() => setIsCancelContractAlert(true)}
@@ -623,7 +412,7 @@ export default function Dashboard() {
                     </Button>
                   </div>
                   <div className="flex">
-                    <Button onClick={() => setIsCompareContractAlert(true)}>
+                    <Button disabled={isDisableButton.fetchCompareButton} onClick={() => setIsCompareContractAlert(true)}>
                       Fetch Blockchain to Compare Database
                     </Button>
                     <Button
@@ -729,7 +518,6 @@ export default function Dashboard() {
                         readOnly
                         className="w-[180px]"
                         placeholder="Empty"
-                        defaultValue={individual?.joined}
                       />
                     </div>
                   </div>
@@ -749,10 +537,9 @@ export default function Dashboard() {
                 </div>
                 <Separator className="my-4" />
                 <div className="flex">
-                  {contractData?.status !== "ENFORCE" && (
+                  {isVisibleButton.deployButton && (
                     <Button
-                      hidden={isHideButton.isDeployButton}
-                      disabled={isDisableButton.isDeployButton}
+                      disabled={isDisableButton.deployButton}
                       variant={"orange"}
                       className="w-full"
                       onClick={() => {
@@ -762,14 +549,14 @@ export default function Dashboard() {
                       Deploy Contract
                     </Button>
                   )}
-                  {contractData?.status == "ENFORCE" && (
+                  {isVisibleButton.signButton && (
                     <Button
-                      hidden={isHideButton.isSignButton}
-                      disabled={
-                        userInfo?.data?.addressWallet === individual.senderInd
-                          ? isDisableButton.isButtonSignContractCustomer
-                          : isDisableButton.isButtonSignContractSupplier
-                      }
+                      // disabled={
+                      //   isDisableButton.isButtonSignContractCustomer && isDisableButton.isButtonSignContractSupplier ?
+                      // (userInfo?.data?.addressWallet === individual.senderInd
+                      //   ? isDisableButton.isButtonSignContractCustomer
+                      //   : isDisableButton.isButtonSignContractSupplier) : isDisableButton.isButtonSignContractCustomer
+                      // }
                       variant={"blue"}
                       className="w-full"
                       onClick={handleSignContract}
@@ -777,26 +564,29 @@ export default function Dashboard() {
                       Sign Contract
                     </Button>
                   )}
-                  <Button
-                    disabled={isDisableButton.isTransferButton}
-                    variant={"destructive"}
-                    className="ms-2 w-full"
-                    onClick={transferMoney}
-                  >
-                    Transfer
-                  </Button>
-                  <Button
-                    disabled={isDisableButton.isWithdrawButton}
-                    className="ms-2 w-full"
-                    onClick={withdrawMoney}
-                  >
-                    Withdraw
-                  </Button>
+                  {isVisibleButton.transferButton && (
+                    <Button
+                      disabled={isDisableButton.transferButton}
+                      variant={"destructive"}
+                      className="ms-2 w-full"
+                      onClick={transferMoney}
+                    >
+                      Transfer
+                    </Button>
+                  )}
+                  {isVisibleButton.withdrawButton && (
+                    <Button
+                      disabled={isDisableButton.withdrawButton}
+                      className="ms-2 w-full"
+                      onClick={withdrawMoney}
+                    >
+                      Withdraw
+                    </Button>
+                  )}
                 </div>
                 <div className="flex gap-2">
-                  {isVisible.confirmButton === 1 && (
+                  {isVisibleButton.confirmButtonCustomer && (
                     <Button
-                      disabled={isDisableButton.isButtonConfirmCustomer}
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
@@ -804,9 +594,8 @@ export default function Dashboard() {
                       Customer confirmation completed
                     </Button>
                   )}
-                  {isVisible.confirmButton === 2 && (
+                  {isVisibleButton.confirmButtonSupplier && (
                     <Button
-                      disabled={isDisableButton.isButtonConfirmSupplier}
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
@@ -816,13 +605,14 @@ export default function Dashboard() {
                   )}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        disabled={false}
-                        variant={"destructive"}
-                        className="w-full mt-2"
-                      >
-                        Dispute
-                      </Button>
+                      {isVisibleButton.confirmButton && (
+                        <Button
+                          variant={"destructive"}
+                          className="w-full mt-2"
+                        >
+                          Disputed
+                        </Button>
+                      )}
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
@@ -881,7 +671,7 @@ export default function Dashboard() {
                       <Separator className="mb-2" />
                     </CardHeader>
                     <ScrollArea className="max-h-[300px] h-full">
-                      <CardContent className="grid gap-8">
+                      <CardContent className="grid gap-8 p-5">
                         {contractParticipants.map((participant, index) => (
                           <div className="flex items-center" key={index}>
                             <div className="grid">
@@ -963,7 +753,7 @@ export default function Dashboard() {
                   Close
                 </Button>
                 <Button
-                  hidden={isHideButton.isDeployButton}
+                  hidden={isHideButton.deployButton}
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
                   onClick={handleOnDeployContract}
@@ -1008,7 +798,7 @@ export default function Dashboard() {
                 <Button
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
-                  onClick={handleCompareContractInfomation}
+                  onClick={handleCompareContractInformation}
                 >
                   Compare Contract
                 </Button>

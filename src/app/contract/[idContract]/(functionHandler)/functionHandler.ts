@@ -146,21 +146,21 @@ const withdrawMoneyFunc = async (addressContract: string, userInfo: any, individ
 
 const transferMoneyFunc = async (addressContract: string, individual: IIndividual, userInfo: any) => {
     try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
-      await contract.methods.sendToSmartContract().send({
-        from: userInfo?.data?.addressWallet,
-        value: web3.utils.toWei(individual?.totalAmount, "ether"),
-        gas: "1000000",
-      });
-    //   const balance: string = await contract.methods.getBalance().call();
-    //   setCurrentBalance(parseFloat(fromWei(balance, "ether")));
+        const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+        const abi = privateCode.data.abi.abi;
+        const web3 = new Web3(window.ethereum);
+        const contract = new web3.eth.Contract(abi, addressContract as string);
+        await contract.methods.sendToSmartContract().send({
+            from: userInfo?.data?.addressWallet,
+            value: web3.utils.toWei(individual?.totalAmount, "ether"),
+            gas: "1000000",
+        });
+        //   const balance: string = await contract.methods.getBalance().call();
+        //   setCurrentBalance(parseFloat(fromWei(balance, "ether")));
     } catch (error) {
-      throw error
+        throw error
     }
-  }
+}
 
 const handleDateStringToUint = (date: string): number => {
     return new Date(date).getTime();
@@ -168,9 +168,9 @@ const handleDateStringToUint = (date: string): number => {
 
 const handleConfirmStagesFunc = async (
     addressContract: string,
-    userInfo: any, 
-    individual: IIndividual, 
-    setIsDisableButton: any, 
+    userInfo: any,
+    individual: IIndividual,
+    setIsDisableButton: any,
     isDisableButton: any
 ) => {
     try {
@@ -217,10 +217,10 @@ async function handleCompareContractInformationFunc(setIsCompareContractAlert: a
 }
 
 const handleSignContractFunc = async (
-    addressContract: string, 
-    userInfo: any, 
-    individual: IIndividual, 
-    contractParticipants:IContractParticipant[], 
+    addressContract: string,
+    userInfo: any,
+    individual: IIndividual,
+    contractParticipants: IContractParticipant[],
     idContract: string | string[]
 ) => {
     try {
@@ -246,4 +246,14 @@ const handleSignContractFunc = async (
 }
 
 
-export { updateStateButton, fetchDataWhenEntryPage, inviteNewParticipant, withdrawMoneyFunc, transferMoneyFunc, handleDateStringToUint, handleConfirmStagesFunc, handleCompareContractInformationFunc, handleSignContractFunc }
+export {
+    updateStateButton,
+    fetchDataWhenEntryPage,
+    inviteNewParticipant,
+    withdrawMoneyFunc,
+    transferMoneyFunc,
+    handleDateStringToUint,
+    handleConfirmStagesFunc,
+    handleCompareContractInformationFunc,
+    handleSignContractFunc
+}

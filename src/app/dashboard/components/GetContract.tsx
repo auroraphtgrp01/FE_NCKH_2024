@@ -69,14 +69,13 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
   }
   async function getContract(): Promise<any> {
     const web3 = new Web3(window.ethereum);
-    const contract = new web3.eth.Contract(payload.abi, payload.addressContract)
+    const contract = new web3.eth.Contract(payload.abi, "0x26b5e6146C96239700156d3f466CB0a3476cF61c")
     try {
-      const methodCall = payload.methodCall
-      const result: string[][] = await contract.methods.getContractInformation().call();
-      console.log(">>", JSON.parse(refactorTest(result)))
+      const result: any = await contract.methods.getContractInformation().call();
+      // console.log(">>", JSON.parse(refactorTest(result)))
+      // console.log(">>");
     } catch (error) {
       console.error("Error:", error);
-      return [];
     }
   }
   function refactorTest(jsonData: any) {
@@ -94,7 +93,7 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
       })
     } else {
       fetchAPI('/smart-contracts/abi', "GET").then((res) => {
-        setABI(res.data.abi)
+        setABI(res.data.abi.abi)
       })
         .catch((error) => {
           toast({
@@ -204,7 +203,6 @@ export default function GetContract({ dataContract, setDataContract }: ContractD
             <Textarea
               placeholder="ABI of Contract"
               className="resize-none"
-              value={arrayObjectToJson(abi)}
               rows={10}
               readOnly
             />

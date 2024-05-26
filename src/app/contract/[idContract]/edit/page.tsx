@@ -47,7 +47,12 @@ export default function DialogEditContract() {
         const updatedAttributes = [...contractAttribute];
         const attributeToUpdate = updatedAttributes[index];
 
-        if (attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE) {
+        if (attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE ||
+            attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
+            attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+            attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
+            attributeToUpdate.type === EContractAttributeType.TOTAL_AMOUNT
+        ) {
             updatedAttributes[index] = {
                 ...attributeToUpdate,
                 property: e.target.value,
@@ -115,7 +120,6 @@ export default function DialogEditContract() {
             }
             )
     }
-
     const handleOnClickSaveChanges = () => {
         compareChangesOfContractAttribute()
     }
@@ -133,7 +137,7 @@ export default function DialogEditContract() {
                     </div>
                 </header>
                 <main className="flex mx-10 gap-2">
-                    <div className="px-1 w-[50%] h-[74%] border rounded-lg my-2">
+                    <div className="px-1 w-[50%] h-[760px] border rounded-lg my-2">
                         <ScrollArea className=" w-[100%]  h-[100%] ">
                             <form className="max-w-[100%] p-10 text-sm w-[100%]">
                                 <div id="main">
@@ -200,22 +204,28 @@ export default function DialogEditContract() {
                                                             </h1>
                                                         </div>
                                                     )}
-                                                    {item.type === EContractAttributeType.CONTRACT_ATTRIBUTE && (
-                                                        <div>
-                                                            <h2 className="mt-2 text-[14px] flex w-full">
-                                                                <b className="">
-                                                                    <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
-                                                                        handleChangeAttributeInput(e, index)
-                                                                    }} />
-                                                                </b>
-                                                                <span className="text-wrap ms-2 w-[80%]">
-                                                                    <Textarea onBlur={(e) => {
-                                                                        handleValueOfTextarea(e, index)
-                                                                    }} className="mr-auto " defaultValue={item.value} />
-                                                                </span>
-                                                            </h2>
-                                                        </div>
-                                                    )}
+                                                    {(
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE ||
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+                                                        item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
+                                                        item.type === EContractAttributeType.TOTAL_AMOUNT
+                                                    ) && (
+                                                            <div>
+                                                                <h2 className="mt-2 text-[14px] flex w-full">
+                                                                    <b className="">
+                                                                        <InputWithTooltip deleteArray={deleteArray} setDeleteArray={setDeleteArray} setInfoOfContractAttribute={setInfoOfContractAttribute} setIsDetailOpen={setIsDetailAttributeDialog} setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} defaultValue={item.property} description={''} onBlur={(e) => {
+                                                                            handleChangeAttributeInput(e, index)
+                                                                        }} />
+                                                                    </b>
+                                                                    <span className="text-wrap ms-2 w-[80%]">
+                                                                        <Textarea onBlur={(e) => {
+                                                                            handleValueOfTextarea(e, index)
+                                                                        }} className="mr-auto " defaultValue={item.value} />
+                                                                    </span>
+                                                                </h2>
+                                                            </div>
+                                                        )}
                                                     {item.statusAttribute === EStatusAttribute.PREPARE && (
                                                         <div>
                                                             <AddAttributeArea setContractAttribute={setContractAttribute} contractAttribute={contractAttribute} index={index} />
@@ -230,7 +240,7 @@ export default function DialogEditContract() {
                             </form>
                         </ScrollArea>
                     </div>
-                    <div className="px-1 w-[50%] h-[74%] border rounded-lg my-2">
+                    <div className="px-1 w-[50%] h-[760px] border rounded-lg my-2">
                         <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
                     </div>
                 </main>

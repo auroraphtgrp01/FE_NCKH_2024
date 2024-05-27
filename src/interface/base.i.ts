@@ -1,4 +1,4 @@
-interface User {
+export interface User {
     id: string;
     email: string;
     name: string;
@@ -21,20 +21,21 @@ interface User {
     deletedAt: string | null;
     deletedBy: string | null;
 }
-
-interface UserPermission {
+export interface UserPermission {
     EDIT_CONTRACT: boolean;
     READ_CONTRACT: boolean;
     SET_OWNER_PARTY: boolean;
     INVITE_PARTICIPANT: boolean;
     CHANGE_STATUS_CONTRACT: boolean;
 }
-
-interface Executor {
+export interface Executor {
     id: string | null;
     name: string | null;
     role: string | null;
     email: string | null;
 }
-
-
+export interface DatePicker {
+    selectedDate: Date | undefined
+    onDateChange: (newDate: any) => void
+  }
+  

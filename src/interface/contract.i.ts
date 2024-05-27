@@ -1,3 +1,5 @@
+import { Executor, User, UserPermission } from "@/interface/base.i"
+
 export enum EContractAttributeType {
 	CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = "Contract Attribute Party Address Wallet Joined",
 	CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE = "Contract Attribute Address Wallet Receive",
@@ -14,7 +16,6 @@ export enum EContractAttributeType {
 	CONTRACT_ATTRIBUTE = "Contract Attribute",
 	CONTRACT_SIGNATURE = "Contract Signature",
 }
-
 export enum EContractAttributeTypeAdditional {
 	CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = "Contract Attribute Party Address Wallet Joined",
 	CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE = "Contract Attribute Address Wallet Receive",
@@ -28,13 +29,11 @@ export enum EContractAttributeTypeAdditional {
 	CONTRACT_ATTRIBUTE = "Contract Attribute",
 	CONTRACT_SIGNATURE = "Contract Signature",
 }
-
 export enum EContractAttributeTypeAdditionalHeader {
 	CONTRACT_HEADER = "Contract Header",
 	CONTRACT_HEADER_DATE = "Contract Header Date",
 	CONTRACT_TITLE = "Contract Title",
 }
-
 export interface IContractAttribute {
 	id?: string
 	index?: number
@@ -46,16 +45,13 @@ export interface IContractAttribute {
 	createdBy: Executor
 	updatedBy: Executor | null;
 }
-
 export enum EStatusAttribute {
 	CREATE = "Create",
 	UPDATE = "Update",
 	PREPARE = "Prepare",
 	NOT_CHANGE = "Not Change",
 }
-
 export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {}
-
 export interface IContractParticipant {
 	id: string
 	userId: string
@@ -65,7 +61,6 @@ export interface IContractParticipant {
 	status: string
 	User: User
 }
-
 export enum EContractStatus {
 	PENDING = "PENDING",
 	PARTICIPATED = "PARTICIPATED",
@@ -98,13 +93,11 @@ export interface ContractData {
 	deletedBy: string | null;
 	User: User;
 }
-
 export interface IIndividual {
 	receiverInd: string
 	senderInd: string
 	totalAmount: string
 }
-
 export interface IVisibleButton extends DynamicType {
 	deployButton: boolean,
     withdrawButton: boolean,
@@ -115,7 +108,6 @@ export interface IVisibleButton extends DynamicType {
 	confirmButtonSender: boolean,
     confirmButtonReceiver: boolean
 }
-
 export interface IDisableButton extends DynamicType {
 	fetchCompareButton: boolean,
     cancelButton: boolean,
@@ -127,19 +119,16 @@ export interface IDisableButton extends DynamicType {
 	confirmButtonSender: boolean,
     confirmButtonReceiver: boolean
 }
-
 export interface IStage {
     percent: number;
     deliveryAt: number;
     description?: string;
 }
-
 export interface RSAKey {
 	publicKey: string;
 	privateKey: string;
 	privateMessage?: string
 }
-
 export interface UserInfoData {
 	data: {
 		access_token: string;
@@ -152,3 +141,29 @@ export interface UserInfoData {
 	}
     balance: string;
 }
+export interface InvitationItem {
+	email: string;
+	permission: IPermission;
+	messages?: string;
+  }
+export interface ContractTemplate {
+	id: string;
+	name: string;
+	path: string;
+	contractAttributes: any[];
+  }
+export interface IPermission {
+    READ_CONTRACT: boolean;
+    EDIT_CONTRACT: boolean;
+    INVITE_PARTICIPANT: boolean;
+    CHANGE_STATUS_CONTRACT: boolean;
+    SET_OWNER_PARTY: boolean;
+}
+export interface IAddPropertyAreaProps {
+	propertiesCBX: string[];
+	setPropertiesCBX: (value: string[]) => void;
+	newPropertiesArray: string[];
+	setNewProperties: (value: string[]) => void;
+	contractAttribute: any;
+	setContractAttribute: (value: any) => void;
+  }

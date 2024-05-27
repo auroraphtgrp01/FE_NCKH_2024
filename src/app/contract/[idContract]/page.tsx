@@ -20,7 +20,7 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, RSAKey } from "@/interface/contract.i";
+import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, InvitationItem, RSAKey } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -46,9 +46,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
-import { InvitationItem } from "@/app/contract/create/page";
 import { fetchDataWhenEntryPage, getContentFromFile, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, isExportPrivateKey, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { initDisableButton, initVisibleButton } from "@/constants/initVariable.constants";
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
@@ -71,32 +71,9 @@ export default function Dashboard() {
   const [selectTypeKey, setSelectTypeKey] = useState(0);
   const [rsaKey, setRsaKey] = useState<RSAKey>();
   const { toast } = useToast();
-  const [isDisableButton, setIsDisableButton] = useState<IDisableButton>({
-    fetchCompareButton: true,
-    cancelButton: true,
-    withdrawButton: true,
-    transferButton: true,
-    deployButton: true,
-    editContractButton: true,
-    signButton: true,
-    confirmButtonSender: true,
-    confirmButtonReceiver: true
-  });
-  const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>({
-    deployButton: false,
-    withdrawButton: false,
-    confirmButton: false,
-    transferButton: false,
-    buttonDisputed: false,
-    signButton: false,
-    confirmButtonSender: false,
-    confirmButtonReceiver: false
-  });
+  const [isDisableButton, setIsDisableButton] = useState<IDisableButton>(initDisableButton);
+  const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>(initVisibleButton);
   const [dialogInvite, setDialogInvite] = useState(false);
-  const [isHideButton, setIsHideButton] = useState({
-    deployButton: false,
-    signButton: false,
-  });
   const [stages, setStages] = useState<any[]>([
     {
       percent: 100,
@@ -183,7 +160,7 @@ export default function Dashboard() {
   }
 
   async function transferMoney() {
-    transferMoneyFunc(addressContract, userInfo, individual)
+    transferMoneyFunc(addressContract, individual, userInfo)
       .then(() => {
         toast({
           title: "Transfer successfully",
@@ -721,7 +698,6 @@ export default function Dashboard() {
                   Close
                 </Button>
                 <Button
-                  hidden={isHideButton.deployButton}
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
                   onClick={handleOnDeployContract}
@@ -791,7 +767,6 @@ export default function Dashboard() {
                   Close
                 </Button>
                 <Button
-                  hidden={isHideButton.deployButton}
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
                   onClick={() => {

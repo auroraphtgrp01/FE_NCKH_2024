@@ -19,11 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-interface DatePicker {
-  selectedDate: Date | undefined
-  onDateChange: (newDate: any) => void
-}
+import { DatePicker } from "@/interface/base.i"
 
 export function CalendarPicker({ selectedDate, onDateChange }: DatePicker) {
   return (

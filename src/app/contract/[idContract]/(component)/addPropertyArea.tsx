@@ -1,17 +1,8 @@
 import ComboboxCustomize from "@/components/ComboBoxCustomize";
-import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
-export interface IAddPropertyAreaProps {
-  propertiesCBX: string[];
-  setPropertiesCBX: (value: string[]) => void;
-  newPropertiesArray: string[];
-  setNewProperties: (value: string[]) => void;
-  contractAttribute: any;
-  setContractAttribute: (value: any) => void;
-}
+import { IAddPropertyAreaProps } from "@/interface/contract.i";
 
 export default function AddPropertyArea({
   propertiesCBX,
@@ -23,13 +14,7 @@ export default function AddPropertyArea({
 }: IAddPropertyAreaProps) {
   const [properties, setProperty] = useState<string>("");
   const [inputValue, setInputValue] = useState("");
-  const [propertiesAdd, setPropertiesAdd] = useState<any[]>([
-    {
-      property: "",
-      value: "",
-      isCreated: false,
-    },
-  ]);
+  const [propertiesAdd, setPropertiesAdd] = useState<any[]>([]);
   function handleChange(property: string, value: string) {
     setInputValue(value);
     const updatedProperties = propertiesAdd.map((item) => {
@@ -42,11 +27,6 @@ export default function AddPropertyArea({
   }
   function handleInputChange(key: any, event: any) {
     setContractAttribute({ ...contractAttribute, [key]: event });
-  }
-  function removeDuplicates(array: any) {
-    return array.filter(
-      (item: any, index: any) => array.indexOf(item) === index
-    );
   }
   function addProperty() {
     setPropertiesAdd((prevProperties) => [

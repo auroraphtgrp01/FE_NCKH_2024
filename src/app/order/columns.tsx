@@ -4,87 +4,59 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { TData } from "./[id]/page";
-export interface DataWithName {
-  id: string;
-  name: string;
-  unit: string;
-  image: string;
-  price: number;
-  discount: number;
-  quantity: number;
-  taxPrice: number;
-  description: string;
-  idSupplier: string;
-  idOrder: string;
-}
+import { useEffect } from "react";
+import { DataWithName, OrderDetail } from "./[id]/page";
 
-
-
-export function getColumns(data: DataWithName[], setData: React.Dispatch<React.SetStateAction<DataWithName[]>>, getDataOrders: () => void): ColumnDef<DataWithName>[] {
-  const { toast } = useToast()
+export function getColumns(
+  data: DataWithName,
+  setData: React.Dispatch<React.SetStateAction<DataWithName>>,
+  getDataOrders: () => void
+): ColumnDef<OrderDetail>[] {
+  const { toast } = useToast();
   const userInfoString = localStorage.getItem("user-info");
   const user_info = userInfoString ? JSON.parse(userInfoString) : null;
   const isCustomer = user_info && user_info.data.role === "Customer";
   const updateOrder = async (e: any, index: number, type: string) => {
-    const products = data.map((value: any, index: any) => {
-      return {
-        "id": value.id,
-        "name": value.name,
-        "unit": value.unit,
-        "image": value.image,
-        "price": value.price,
-        "discount": value.discount,
-        "quantity": value.quantity,
-        "taxPrice": value.taxPrice,
-        "description": value.description
-      }
-    })
-
-    if (type == 'quantity') {
-      products[index].quantity = (e.target.value ? Number(e.target.value) : products[index].quantity)
-    } else {
-      products[index].discount = (e.target.value ? Number(e.target.value) : products[index].discount)
-    }
-    console.log('>>>>>>>>>>>>>>');
-    console.log("Product thứ index : ", index, ": ", products[index]);
+    const products = data.orderDetails.map((value: any) => {
+      return { ...value };
+    });
+    type == "quantity"
+      ? (products[index].quantity = Number(e.target.value))
+      : (products[index].discount = Number(e.target.value));
     const payload = {
-      id: data[0].idOrder,
-      products: products
+      id: data.orderDetails[0].idOrder,
+      products: products,
     };
-    console.log('>>>>>Payload PATCH lên : ', payload);
     await fetchAPI("/orders", "PATCH", payload)
       .then((res) => {
         toast({
           title: `Update thành công`,
           variant: "success",
-        })
-        getDataOrders()
+        });
+        getDataOrders();
       })
       .catch((err) => {
         toast({
           title: `Update không thành công`,
           variant: "destructive",
-        })
+        });
       });
   };
   return [
     {
       accessorKey: "name",
       header: () => <div className="font-semibold ">Products</div>,
-      cell: ({ row }) => <div className="text-start">{row.getValue("name")}</div>,
-    },
-    {
-      accessorKey: "description",
-      header: () => <div className="font-semibold">Description</div>,
-      cell: ({ row }) => <div className="text-start">{row.getValue("description")}</div>,
+      cell: ({ row }) => (
+        <div className="text-start">{row.getValue("name")}</div>
+      ),
     },
     {
       accessorKey: "price",
       header: () => <div className="font-semibold ">Price</div>,
-      cell: ({ row }) => <div className="text-start">{row.getValue("price")}</div>,
+      cell: ({ row }) => (
+        <div className="text-start">{row.getValue("price")}</div>
+      ),
     },
     {
       accessorKey: "image",
@@ -100,25 +72,27 @@ export function getColumns(data: DataWithName[], setData: React.Dispatch<React.S
     {
       accessorKey: "taxPrice",
       header: () => <div className="font-semibold ">Tax Price</div>,
-      cell: ({ row }) => <div className="text-start">{row.getValue("taxPrice")}</div>,
+      cell: ({ row }) => (
+        <div className="text-start">{row.getValue("taxPrice")}</div>
+      ),
     },
     {
       accessorKey: "quantity",
       header: () => <div className="font-semibold">Quantity</div>,
       cell: ({ row }) => {
         return (
-          <div>
-            {isCustomer ? (
-              <div className="text-start">
-                <Input
-                  className="w-16"
-                  type="text"
-                  onBlur={(e) => { updateOrder(e, row.index, 'quantity') }}
-                  defaultValue={row.getValue("quantity")}
-                />
-              </div>
+          <div className="text-start">
+            {isCustomer && data.status === "Pending" ? (
+              <Input
+                className="w-16"
+                type="text"
+                onBlur={(e) => {
+                  updateOrder(e, row.index, "quantity");
+                }}
+                defaultValue={row.getValue("quantity")}
+              />
             ) : (
-              <div className="text-start">{row.getValue("quantity")}</div>
+              <span>{row.getValue("quantity")}</span>
             )}
           </div>
         );
@@ -128,13 +102,18 @@ export function getColumns(data: DataWithName[], setData: React.Dispatch<React.S
       accessorKey: "discount",
       header: () => <div className="font-semibold ">Discount</div>,
       cell: ({ row }) => (
-        <div>
-          {isCustomer ? (
-            <div className="text-start">{row.getValue("discount")}</div>
+        <div className="text-start">
+          {data.status === "Pending" || data.status === "In Progress" ? (
+            <Input
+              className="w-16"
+              type="text"
+              defaultValue={row.getValue("discount")}
+              onBlur={(e) => {
+                updateOrder(e, row.index, "discount");
+              }}
+            />
           ) : (
-            <div className="text-start">
-              <Input className="w-16" type="text" defaultValue={row.getValue("discount")} onBlur={(e) => { updateOrder(e, row.index, 'discount') }} />
-            </div>
+            <span>{row.getValue("discount")}</span>
           )}
         </div>
       ),
@@ -142,12 +121,16 @@ export function getColumns(data: DataWithName[], setData: React.Dispatch<React.S
     {
       accessorKey: "priceWithoutTax",
       header: () => <div className="font-semibold ">Price without tax</div>,
-      cell: ({ row }) => <div className="text-start">{row.getValue("priceWithoutTax")}</div>,
+      cell: ({ row }) => (
+        <div className="text-start">{row.getValue("priceWithoutTax")}</div>
+      ),
     },
     {
       accessorKey: "unit",
       header: () => <div className="font-semibold ">Unit</div>,
-      cell: ({ row }) => <div className="text-start">{row.getValue("unit")}</div>,
+      cell: ({ row }) => (
+        <div className="text-start">{row.getValue("unit")}</div>
+      ),
     },
   ];
 }

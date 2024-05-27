@@ -1,5 +1,7 @@
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
+import { log } from "console";
+import { Log } from "ethers";
 import { Dispatch, SetStateAction } from "react";
 import Web3 from "web3";
 
@@ -79,7 +81,7 @@ const fetchDataWhenEntryPage = async (
                     return acc;
             }
         }, {} as any);
-        setAddressContract(contractAttributes);
+        setAddressContract(contract.contractAddress);
         setContractParticipants(participants);
         setIndividual(dataIndividual);
         setContractAttribute(contractAttributes);
@@ -245,6 +247,78 @@ const handleSignContractFunc = async (
     }
 }
 
+const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: string, stages: any, userInfo: any, setAddressContract: any, setIsVisibleButton: any, setIsDisableButton: any, idContract: string | string[]) => {
+    if (!individual.totalAmount || individual.totalAmount === '0') {
+      return {
+        message: "Total amount of money must be greater than 0",
+        status: 'destructive'
+      };
+    }
+    if (!privateKey) {
+        return {
+            message: "Private key is required to deploy contract",
+            status: 'destructive'
+          };
+    }
+    try {
+      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+      const abi = privateCode.data.abi.abi;
+      const byteCode = privateCode.data.abi.bytecode;
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(abi);
+      const _user = [individual.senderInd];
+      const _total = individual.totalAmount;
+      const _privateKey = privateKey;
+      const _supplier = individual.receiverInd;
+      
+      const _stages: IStage[] = await Promise.all(
+        stages.map(async (stage: any) => ({
+          percent: stage.percent,
+          deliveryAt: handleDateStringToUint(stage.deliveryAt),
+          description: stage.description || "",
+        }))
+      );
+      
+      const deployTransaction = await contract
+        .deploy({
+          data: byteCode,
+          arguments: [_user, _supplier, "", _total, _stages, _privateKey],
+        })
+        .send({
+          from: userInfo?.data?.addressWallet,
+        });
+     
+      setAddressContract(deployTransaction?.options?.address as string);
+      setIsVisibleButton((prevState: any) => ({
+        ...prevState,
+        deployButton: false,
+        signButton: true,
+      }));
+      setIsDisableButton((prevState: any) => ({
+        ...prevState,
+        transferButton: true,
+        deployButton: true,
+      }));
+      
+      await fetchAPI("/contracts", "PATCH", {
+        id: idContract,
+        contractAddress: deployTransaction?.options?.address as string,
+        status: "ENFORCE",
+        stages: stages,
+      });
+      return { 
+        messages: "Deploy Successfully",
+        description: `Contract address: ${deployTransaction.options.address}`,
+        status: "success",
+      }
+    } catch (error) {
+        return { 
+            message: "Deploy Failed",
+            description: error,
+            status: "destructive",
+        }
+    }
+  }
 
 export {
     updateStateButton,
@@ -255,5 +329,6 @@ export {
     handleDateStringToUint,
     handleConfirmStagesFunc,
     handleCompareContractInformationFunc,
-    handleSignContractFunc
+    handleSignContractFunc,
+    handleOnDeployContractFunc
 }

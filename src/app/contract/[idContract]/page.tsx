@@ -47,15 +47,9 @@ import {
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
 import { InvitationItem } from "@/app/contract/create/page";
-import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleSignContractFunc, inviteNewParticipant, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 
 export default function Dashboard() {
-  interface IStage {
-    percent: number;
-    deliveryAt: number;
-    description?: string;
-  }
-
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([]);
@@ -199,77 +193,14 @@ export default function Dashboard() {
   }
 
   async function handleOnDeployContract() {
-    if (!individual.totalAmount || individual.totalAmount === '0')
+    handleOnDeployContractFunc(individual, privateKey, stages, userInfo, setAddressContract, setIsVisibleButton, setIsDisableButton, idContract).then((result) => {
       toast({
-        title: "Total amount of money must be greater than 0",
-        variant: "destructive",
-      });
-    if (privateKey == "") {
-      alert("Please fill your private key");
-      return;
-    }
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const byteCode = privateCode.data.abi.bytecode;
-      setIsDeployContractAlert(false);
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi);
-      const _user = [individual.senderInd];
-      const _total = individual.totalAmount;
-      const _privateKey = privateKey;
-      const _supplier = individual.receiverInd;
-      const _stages: IStage[] = await Promise.all(
-        stages.map(async (stage) => {
-          return {
-            percent: stage.percent,
-            deliveryAt: handleDateStringToUint(stage.deliveryAt),
-            description: stage.description ? stage.description : "",
-          };
-        })
-      );
-
-      const deployTransaction = await contract
-        .deploy({
-          data: byteCode,
-          arguments: [_user, _supplier, "", _total, _stages, _privateKey],
-        })
-        .send({
-          from: userInfo?.data?.addressWallet,
-        });
-
-      contract.events
-        .contractCreated({
-          fromBlock: deployTransaction.options.address,
-        })
-        .on("data", (event: any) => {
-          toast({
-            title: "Deploy Successfully",
-            description: `Contract address: ${event.returnValues.contractAddress}`,
-            variant: "success",
-          });
-        });
-
-      setAddressContract(deployTransaction?.options?.address as string);
-      setIsVisibleButton({
-        ...isVisibleButton,
-        deployButton: false,
-        signButton: true
+        title: result?.messages,
+        variant: result?.status as any,
+        description: result?.description?.toString() || "",
       })
-      setIsDisableButton({
-        ...isDisableButton,
-        transferButton: true,
-        deployButton: true,
-      });
-      fetchAPI("/contracts", "PATCH", {
-        id: idContract,
-        contractAddress: deployTransaction?.options?.address as string,
-        status: "ENFORCE",
-        stages: stages,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    })
+    setIsDeployContractAlert(false);
   }
 
   async function handleConfirmStages() {

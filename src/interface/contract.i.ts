@@ -125,3 +125,9 @@ export interface IDisableButton {
     editContractButton: boolean,
     signButton: boolean
 }
+
+export interface IStage {
+    percent: number;
+    deliveryAt: number;
+    description?: string;
+  }

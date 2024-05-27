@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
 import { InvitationItem } from "@/app/contract/create/page";
-import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, isExportPrivateKey, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
@@ -270,6 +270,9 @@ export default function Dashboard() {
           <div className="min-w-[300px] px-3 flex-1 flex justify-end">
             <Card className="overflow-hidden w-[430px]">
               <CardHeader className="flex flex-row items-start">
+                <Button onClick={() => {
+                  isExportPrivateKey(idContract, 'HELLO')
+                }}>CHECK</Button>
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">
                     Contract Information

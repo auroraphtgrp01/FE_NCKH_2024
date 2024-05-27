@@ -1,7 +1,9 @@
 import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { log } from "console";
+import { generateKeyPairSync } from "crypto";
 import { Log } from "ethers";
+import NodeRSA from "node-rsa";
 import { Dispatch, SetStateAction } from "react";
 import Web3 from "web3";
 
@@ -235,13 +237,10 @@ const handleSignContractFunc = async (
             contract.methods.getSignature(individual.senderInd).call(),
             contract.methods.getSignature(individual.receiverInd).call()
         ]);
-        await Promise.all([
-            fetchAPI("/contracts", "PATCH", { id: idContract, status: "SIGNED" }),
-            fetchAPI("/participants", "PATCH", {
+        await fetchAPI("/participants", "PATCH", {
                 id: contractParticipants.find(item => item.userId === userInfo?.data?.id)?.id,
                 status: "SIGNED"
             })
-        ]);
     } catch (error) {
         throw Error(`Error occurred while signing the contract: ${error}`);
     }
@@ -320,6 +319,34 @@ const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: s
     }
   }
 
+  const isExportPrivateKey = (contractId: string | string [], messageToSign: string) => {
+    const bitLength: number = 1024;
+    const rsaKeyPair: NodeRSA = new NodeRSA({ b: bitLength });
+    const signature: string = signMessage(messageToSign, rsaKeyPair);
+    const publicKey: string = rsaKeyPair.exportKey('public');
+
+    const isSignatureValid: boolean = verifySignature('HELLO1', signature, publicKey);
+    console.log('Is signature valid:', isSignatureValid);
+    
+    let data = new Blob([`${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`], {type: 'text/csv'});
+    let csvURL = window.URL.createObjectURL(data);
+    const tempLink = document.createElement('a');
+    tempLink.href = csvURL;
+    tempLink.setAttribute('download', `PK_${contractId}.pem`);
+    tempLink.click();
+  }
+
+  function signMessage(message: string, privateKey: NodeRSA): string {
+    const signer = new NodeRSA(privateKey.exportKey('private'));
+    return signer.sign(message, 'base64');
+}
+
+function verifySignature(message: string, signature: string, publicKey: string): boolean {
+    const verifier = new NodeRSA();
+    verifier.importKey(publicKey, 'public');
+    return verifier.verify(Buffer.from(message), Buffer.from(signature, 'base64'));
+}
+
 export {
     updateStateButton,
     fetchDataWhenEntryPage,
@@ -330,5 +357,6 @@ export {
     handleConfirmStagesFunc,
     handleCompareContractInformationFunc,
     handleSignContractFunc,
-    handleOnDeployContractFunc
+    handleOnDeployContractFunc,
+    isExportPrivateKey
 }

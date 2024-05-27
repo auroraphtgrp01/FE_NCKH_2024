@@ -11,6 +11,8 @@ const init = localStorage.getItem("user-info")
 interface AppContextValue {
   userInfo: any;
   setUserInfo: (str: any) => void;
+  dataCreateContract: any;
+  setDataCreateContract: (data: any) => void; // Thêm prop mới
 }
 
 interface AppContextProps {
@@ -29,10 +31,13 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 }
 
 export const AppProvider: React.FC<AppContextProps> = ({ children }) => {
+  const [dataCreateContract, setDataCreateContract] = React.useState({});
   const [userInfo, setUserInfo] = React.useState(init);
   const value: AppContextValue = {
     userInfo,
     setUserInfo,
+    setDataCreateContract,
+    dataCreateContract
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

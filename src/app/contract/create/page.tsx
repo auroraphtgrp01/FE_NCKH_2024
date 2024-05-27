@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import { useEffect, useState } from "react";
 import {
@@ -51,6 +52,9 @@ export default function page() {
     },
   ]);
   const { userInfo, setUserInfo }: any = useAppContext();
+  const { dataCreateContract, setDataCreateContract }: any = useAppContext();
+  console.log(dataCreateContract);
+
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
   const [nameOfContractInput, setNameOfContractInput] = useState("");
   const [templateSelect, setTemplateSelect] = useState<any>(undefined);

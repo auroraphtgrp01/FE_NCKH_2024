@@ -78,7 +78,9 @@ export default function Dashboard() {
     transferButton: true,
     deployButton: true,
     editContractButton: true,
-    signButton: true
+    signButton: true,
+    confirmButtonSender: true,
+    confirmButtonReceiver: true
   });
   const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>({
     deployButton: false,
@@ -87,8 +89,8 @@ export default function Dashboard() {
     transferButton: false,
     buttonDisputed: false,
     signButton: false,
-    confirmButtonCustomer: false,
-    confirmButtonSupplier: false,
+    confirmButtonSender: false,
+    confirmButtonReceiver: false
   });
   const [dialogInvite, setDialogInvite] = useState(false);
   const [isHideButton, setIsHideButton] = useState({
@@ -115,7 +117,7 @@ export default function Dashboard() {
       setContractParticipants,
       setIndividual
     ).then((response) => {
-      updateStateButton(response?.data.contract.status, response?.data.contractAttributes, userInfo?.data?.addressWallet, setIsVisibleButton, setIsDisableButton, individual);
+      updateStateButton(response?.data.contract.status, response?.data.contractAttributes, setIsVisibleButton, setIsDisableButton, individual, response?.data.participants, userInfo);
       response?.data.participants.map((participant: any) => {
         if (participant?.userId === userInfo?.data?.id) {
           if (participant?.status === "SIGNED") {
@@ -274,7 +276,7 @@ export default function Dashboard() {
   }
 
   async function handleSignContract() {
-    handleSignContractFunc(addressContract, userInfo, individual, contractParticipants, idContract).then(() => {
+    handleSignContractFunc(addressContract, userInfo, individual, contractParticipants, idContract, setIsVisibleButton, setIsDisableButton).then(() => {
       toast({
         title: "Sign successfully !",
         description: "You have signed the contract",
@@ -304,10 +306,10 @@ export default function Dashboard() {
           <div className="min-w-[300px] px-3 flex-1 flex justify-end">
             <Card className="overflow-hidden w-[430px]">
               <CardHeader className="flex flex-row items-start">
-                <Button onClick={() => {
+                {/* <Button onClick={() => {
                   setIsOpenEnterPrivateKey(true)
                   setPrivateKey('');
-                }}>CALL</Button>
+                }}>CALL</Button> */}
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">
                     Contract Information
@@ -520,12 +522,7 @@ export default function Dashboard() {
                   )}
                   {isVisibleButton.signButton && (
                     <Button
-                      // disabled={
-                      //   isDisableButton.isButtonSignContractCustomer && isDisableButton.isButtonSignContractSupplier ?
-                      // (userInfo?.data?.addressWallet === individual.senderInd
-                      //   ? isDisableButton.isButtonSignContractCustomer
-                      //   : isDisableButton.isButtonSignContractSupplier) : isDisableButton.isButtonSignContractCustomer
-                      // }
+                      disabled={isDisableButton.signButton}
                       variant={"blue"}
                       className="w-full"
                       onClick={handleSignContract}
@@ -537,7 +534,7 @@ export default function Dashboard() {
                     <Button
                       disabled={isDisableButton.transferButton}
                       variant={"destructive"}
-                      className="ms-2 w-full"
+                      className="w-full"
                       onClick={transferMoney}
                     >
                       Transfer
@@ -546,7 +543,7 @@ export default function Dashboard() {
                   {isVisibleButton.withdrawButton && (
                     <Button
                       disabled={isDisableButton.withdrawButton}
-                      className="ms-2 w-full"
+                      className="w-full"
                       onClick={withdrawMoney}
                     >
                       Withdraw
@@ -554,8 +551,9 @@ export default function Dashboard() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  {isVisibleButton.confirmButtonCustomer && (
+                  {isVisibleButton.confirmButtonSender && (
                     <Button
+                      disabled={isDisableButton.confirmButtonSender}
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
@@ -563,8 +561,9 @@ export default function Dashboard() {
                       Customer confirmation completed
                     </Button>
                   )}
-                  {isVisibleButton.confirmButtonSupplier && (
+                  {isVisibleButton.confirmButtonReceiver && (
                     <Button
+                      disabled={isDisableButton.confirmButtonReceiver}
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={handleConfirmStages}

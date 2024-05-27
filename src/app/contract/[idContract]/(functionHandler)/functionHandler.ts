@@ -1,4 +1,4 @@
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, RSAKey } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { log } from "console";
 import { generateKeyPairSync } from "crypto";
@@ -10,13 +10,14 @@ import Web3 from "web3";
 const updateStateButton = (
     status: EContractStatus,
     contractAttributes: IContractAttribute[],
-    userAddressWallet: string,
     setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
     setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
-    dataIndividual: IIndividual
+    dataIndividual: IIndividual,
+    contractParticipants: any,
+    userInfo: UserInfoData
 ) => {
     const addressMatch = (type: any) =>
-        (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() === userAddressWallet.toLowerCase();
+        (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() === userInfo.data.addressWallet.toLowerCase();
     switch (status) {
         case "PENDING":
             setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
@@ -28,26 +29,32 @@ const updateStateButton = (
             break;
         case "ENFORCE":
             setIsVisibleButton((prev: any) => ({ ...prev, deployButton: false, signButton: true }));
+            const participantsLogin = contractParticipants?.find((participant: any) => {
+                return participant.userId === userInfo.data.id;
+            });
+            if(participantsLogin.status !== "SIGNED") {
+                setIsDisableButton((prev: any) => ({...prev, signButton: false}))
+            }           
             break;
         case "SIGNED":
             setIsVisibleButton((prev: any) => ({
                 ...prev,
                 signButton: false,
                 withdrawButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
+                confirmButtonReceiver: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
+                confirmButtonSender: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND),
                 transferButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND)
             }));
             setIsDisableButton((prev: any) => ({
                 ...prev,
                 withdrawButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
-                transferButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND)
+                transferButton: false
             }));
             break;
         default:
             break;
     }
-    if (userAddressWallet == dataIndividual?.receiverInd?.toLowerCase()) {
-        setIsVisibleButton((prev: any) => ({ ...prev, withdrawButton: true }))
-    }
+ 
 };
 
 const fetchDataWhenEntryPage = async (
@@ -225,7 +232,9 @@ const handleSignContractFunc = async (
     userInfo: any,
     individual: IIndividual,
     contractParticipants: IContractParticipant[],
-    idContract: string | string[]
+    idContract: string | string[],
+    setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>
 ) => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
@@ -237,10 +246,22 @@ const handleSignContractFunc = async (
             contract.methods.getSignature(individual.senderInd).call(),
             contract.methods.getSignature(individual.receiverInd).call()
         ]);
-        await fetchAPI("/participants", "PATCH", {
+       const response = await fetchAPI("/participants", "PATCH", {
                 id: contractParticipants.find(item => item.userId === userInfo?.data?.id)?.id,
                 status: "SIGNED"
             })
+        const isStatusContractUpdated =  response.data.isContractStatusUpdated
+        if(isStatusContractUpdated) {
+            const isCondition = ((userInfo?.data?.addressWallet)?.trim().toLowerCase() || '') === ((individual.senderInd)?.trim().toLowerCase() || '')
+            if(isCondition) {
+                setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, transferButton: true, confirmButtonSender: true }));
+                setIsDisableButton((prevState: any) => ({ ...prevState, transferButton: false }));
+            } else {
+                setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, withdrawButton: true, confirmButtonReceiver: true }));
+            }
+        } else {
+            setIsDisableButton((prevState: any) => ({...prevState, signButton: true}))
+        }
     } catch (error) {
         throw Error(`Error occurred while signing the contract: ${error}`);
     }

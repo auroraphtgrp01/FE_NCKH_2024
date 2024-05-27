@@ -1,4 +1,4 @@
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, RSAKey } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { log } from "console";
 import { generateKeyPairSync } from "crypto";
@@ -260,6 +260,7 @@ const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: s
           };
     }
     try {
+      const {signature, publicKey} = signMessage(privateKey);
       const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
       const abi = privateCode.data.abi.abi;
       const byteCode = privateCode.data.abi.bytecode;
@@ -305,6 +306,7 @@ const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: s
         status: "ENFORCE",
         stages: stages,
       });
+      isExportPrivateKey(idContract, signature, publicKey)
       return { 
         messages: "Deploy Successfully",
         description: `Contract address: ${deployTransaction.options.address}`,
@@ -319,15 +321,7 @@ const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: s
     }
   }
 
-  const isExportPrivateKey = (contractId: string | string [], messageToSign: string) => {
-    const bitLength: number = 1024;
-    const rsaKeyPair: NodeRSA = new NodeRSA({ b: bitLength });
-    const signature: string = signMessage(messageToSign, rsaKeyPair);
-    const publicKey: string = rsaKeyPair.exportKey('public');
-
-    const isSignatureValid: boolean = verifySignature('HELLO1', signature, publicKey);
-    console.log('Is signature valid:', isSignatureValid);
-    
+  const isExportPrivateKey = (contractId: string | string [], signature: string, publicKey: string) => {
     let data = new Blob([`${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`], {type: 'text/csv'});
     let csvURL = window.URL.createObjectURL(data);
     const tempLink = document.createElement('a');
@@ -336,9 +330,15 @@ const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: s
     tempLink.click();
   }
 
-  function signMessage(message: string, privateKey: NodeRSA): string {
-    const signer = new NodeRSA(privateKey.exportKey('private'));
-    return signer.sign(message, 'base64');
+  function signMessage(message: string) {
+      const bitLength: number = 1024;
+      const rsaKeyPair: NodeRSA = new NodeRSA({ b: bitLength });
+      const publicKey: string = rsaKeyPair.exportKey('public');
+    const signer = new NodeRSA(rsaKeyPair.exportKey('private'));
+    return {
+        signature: signer.sign(message, 'base64'),
+        publicKey
+    }
 }
 
 function verifySignature(message: string, signature: string, publicKey: string): boolean {
@@ -346,6 +346,45 @@ function verifySignature(message: string, signature: string, publicKey: string):
     verifier.importKey(publicKey, 'public');
     return verifier.verify(Buffer.from(message), Buffer.from(signature, 'base64'));
 }
+
+export const getContentFromFile = async (file: File, setRsaKey: Dispatch<SetStateAction<RSAKey | undefined>>) => {
+    if (!file) return null;
+    try {
+        const result = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target) {
+                    resolve(event.target.result);
+                }
+            };
+            reader.onerror = (error) => {
+                reject(error);
+            };
+            reader.readAsText(file);
+        });
+    const { publicKey, privateKey } = extractKeys(result as string);
+    setRsaKey({ publicKey, privateKey });
+    return true
+    } catch (error) {
+      return error
+    }
+};
+
+const extractKeys = (keyString: string) => {
+    const publicKeyRegex = /-----BEGIN PUBLIC KEY-----(.|\n)*?-----END PUBLIC KEY-----/;
+    const privateKeyRegex = /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/;
+    const publicKeyMatch = keyString.match(publicKeyRegex);
+    const privateKeyMatch = keyString.match(privateKeyRegex);
+    const publicKey = publicKeyMatch ? publicKeyMatch[0] : '';
+    const privateKeyEx = privateKeyMatch ? privateKeyMatch[0] : ''
+    const headerFooterRegex = /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/;
+    const match = privateKeyEx.match(headerFooterRegex);
+    const privateKeyContent = match ? match[0] : '';
+    const privateKey = privateKeyContent.split('\n').filter(line => !line.includes('BEGIN') && !line.includes('END')).join('\n');
+    return { publicKey, privateKey };
+};
+
+
 
 export {
     updateStateButton,

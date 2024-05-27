@@ -20,7 +20,7 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton } from "@/interface/contract.i";
+import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, RSAKey } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,7 +47,8 @@ import {
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
 import { InvitationItem } from "@/app/contract/create/page";
-import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, isExportPrivateKey, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { fetchDataWhenEntryPage, getContentFromFile, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, isExportPrivateKey, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
@@ -57,14 +58,18 @@ export default function Dashboard() {
   const [contractData, setContractData] = useState<ContractData>();
   const [individual, setIndividual] = useState<IIndividual>({ receiverInd: "", senderInd: "", totalAmount: "" });
   const [isOpenAlert, setIsOpenAlert] = useState(false);
+  const [isOpenEnterPrivateKey, setIsOpenEnterPrivateKey] = useState(false);
   const [messages, setMessages] = useState("");
   const [isDeployContractAlert, setIsDeployContractAlert] = useState(false);
   const [isCompareContractAlert, setIsCompareContractAlert] = useState(false);
   const [isCancelContractAlert, setIsCancelContractAlert] = useState(false);
   const [privateKey, setPrivateKey] = useState("");
+  const [filePrivateKey, setFilePrivateKey] = useState<File>();
   const { userInfo, setUserInfo }: any = useAppContext();
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
   const [addressContract, setAddressContract] = useState<string>("");
+  const [selectTypeKey, setSelectTypeKey] = useState(0);
+  const [rsaKey, setRsaKey] = useState<RSAKey>();
   const { toast } = useToast();
   const [isDisableButton, setIsDisableButton] = useState<IDisableButton>({
     fetchCompareButton: true,
@@ -192,6 +197,35 @@ export default function Dashboard() {
       })
   }
 
+  async function handleBeforeCallFunction() {
+    if (privateKey === "" && filePrivateKey === undefined) {
+      toast({
+        title: "Please fill your private key or upload your signature",
+        variant: "destructive",
+      })
+      return
+    }
+    return new Promise((resolve) => {
+      getContentFromFile(filePrivateKey as File, setRsaKey).then((result) => {
+        if (result) {
+          resolve(true)
+        }
+      })
+    })
+  }
+
+  function pickFilePrivateKey(e: any) {
+    const files = e.target.files;
+    if (files) {
+      setFilePrivateKey(files[0]);
+    } else {
+      toast({
+        title: "Please choose a file !",
+        variant: "destructive",
+      })
+    }
+  }
+
   async function handleOnDeployContract() {
     handleOnDeployContractFunc(individual, privateKey, stages, userInfo, setAddressContract, setIsVisibleButton, setIsDisableButton, idContract).then((result) => {
       toast({
@@ -271,8 +305,9 @@ export default function Dashboard() {
             <Card className="overflow-hidden w-[430px]">
               <CardHeader className="flex flex-row items-start">
                 <Button onClick={() => {
-                  isExportPrivateKey(idContract, 'HELLO')
-                }}>CHECK</Button>
+                  setIsOpenEnterPrivateKey(true)
+                  setPrivateKey('');
+                }}>CALL</Button>
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">
                     Contract Information
@@ -691,6 +726,80 @@ export default function Dashboard() {
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
                   onClick={handleOnDeployContract}
+                >
+                  Deploy Contract
+                </Button>
+              </div>
+            </AlertDialogContent>
+          </AlertDialog>
+          {/* CALL ALERT DIALOG */}
+          <AlertDialog
+            open={isOpenEnterPrivateKey}
+            onOpenChange={setIsOpenEnterPrivateKey}
+          >
+            <AlertDialogContent>
+              <AlertDialogTitle className="text-center">
+                Enter your private key
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                <b className="text-red-500">
+                  You must enter your private key to continue <br />
+                  If you forget the private key, you will not be able to recover
+                </b>
+              </AlertDialogDescription>
+
+              <div className="flex">
+                <Select onValueChange={(e) => {
+                  setPrivateKey('')
+                  setFilePrivateKey(undefined)
+                  setSelectTypeKey(Number(e))
+                }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Type of Private Key" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Type of Private Key</SelectLabel>
+                      <SelectItem value="0">Enter Your Private Key</SelectItem>
+                      <SelectItem value="1">Upload Signature</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                {selectTypeKey === 0 && (
+                  <Input
+                    placeholder="Fill your private key"
+                    className="w-full ms-2"
+                    onChange={(e) => {
+                      setPrivateKey(e.target.value);
+                      console.log(privateKey);
+                    }}
+                  />
+                )}
+                {selectTypeKey === 1 && (
+                  <Input id="picture" type="file" accept=".pem" className="ms-2" onChange={(e) => {
+                    pickFilePrivateKey(e)
+                  }} />
+                )}
+              </div>
+              <div className="w-full flex">
+                <Button
+                  className="ml-auto me-2 w-full "
+                  variant={"destructive"}
+                  onClick={() => {
+                    setIsDeployContractAlert(false);
+                  }}
+                >
+                  Close
+                </Button>
+                <Button
+                  hidden={isHideButton.deployButton}
+                  className="ml-auto mr-auto w-full"
+                  variant={"violet"}
+                  onClick={() => {
+                    handleBeforeCallFunction().then(() => {
+                      console.log('CALL FUNCTION');
+                    })
+                  }}
                 >
                   Deploy Contract
                 </Button>

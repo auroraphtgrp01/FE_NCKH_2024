@@ -130,4 +130,11 @@ export interface IStage {
     percent: number;
     deliveryAt: number;
     description?: string;
-  }
+}
+
+export interface RSAKey {
+	publicKey: string;
+	privateKey: string;
+	privateMessage?: string
+}
+

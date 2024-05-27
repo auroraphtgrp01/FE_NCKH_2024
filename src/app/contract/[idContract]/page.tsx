@@ -20,7 +20,7 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton } from "@/interface/contract.i";
+import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, RSAKey } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,15 +47,10 @@ import {
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
 import { InvitationItem } from "@/app/contract/create/page";
-import { fetchDataWhenEntryPage, handleConfirmStagesFunc, handleDateStringToUint, handleSignContractFunc, inviteNewParticipant, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { fetchDataWhenEntryPage, getContentFromFile, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, isExportPrivateKey, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Dashboard() {
-  interface IStage {
-    percent: number;
-    deliveryAt: number;
-    description?: string;
-  }
-
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([]);
@@ -63,14 +58,18 @@ export default function Dashboard() {
   const [contractData, setContractData] = useState<ContractData>();
   const [individual, setIndividual] = useState<IIndividual>({ receiverInd: "", senderInd: "", totalAmount: "" });
   const [isOpenAlert, setIsOpenAlert] = useState(false);
+  const [isOpenEnterPrivateKey, setIsOpenEnterPrivateKey] = useState(false);
   const [messages, setMessages] = useState("");
   const [isDeployContractAlert, setIsDeployContractAlert] = useState(false);
   const [isCompareContractAlert, setIsCompareContractAlert] = useState(false);
   const [isCancelContractAlert, setIsCancelContractAlert] = useState(false);
   const [privateKey, setPrivateKey] = useState("");
+  const [filePrivateKey, setFilePrivateKey] = useState<File>();
   const { userInfo, setUserInfo }: any = useAppContext();
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
   const [addressContract, setAddressContract] = useState<string>("");
+  const [selectTypeKey, setSelectTypeKey] = useState(0);
+  const [rsaKey, setRsaKey] = useState<RSAKey>();
   const { toast } = useToast();
   const [isDisableButton, setIsDisableButton] = useState<IDisableButton>({
     fetchCompareButton: true,
@@ -79,7 +78,9 @@ export default function Dashboard() {
     transferButton: true,
     deployButton: true,
     editContractButton: true,
-    signButton: true
+    signButton: true,
+    confirmButtonSender: true,
+    confirmButtonReceiver: true
   });
   const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>({
     deployButton: false,
@@ -88,8 +89,8 @@ export default function Dashboard() {
     transferButton: false,
     buttonDisputed: false,
     signButton: false,
-    confirmButtonCustomer: false,
-    confirmButtonSupplier: false,
+    confirmButtonSender: false,
+    confirmButtonReceiver: false
   });
   const [dialogInvite, setDialogInvite] = useState(false);
   const [isHideButton, setIsHideButton] = useState({
@@ -116,7 +117,7 @@ export default function Dashboard() {
       setContractParticipants,
       setIndividual
     ).then((response) => {
-      updateStateButton(response?.data.contract.status, response?.data.contractAttributes, userInfo?.data?.addressWallet, setIsVisibleButton, setIsDisableButton, individual);
+      updateStateButton(response?.data.contract.status, response?.data.contractAttributes, setIsVisibleButton, setIsDisableButton, individual, response?.data.participants, userInfo);
       response?.data.participants.map((participant: any) => {
         if (participant?.userId === userInfo?.data?.id) {
           if (participant?.status === "SIGNED") {
@@ -198,78 +199,44 @@ export default function Dashboard() {
       })
   }
 
-  async function handleOnDeployContract() {
-    if (!individual.totalAmount || individual.totalAmount === '0')
+  async function handleBeforeCallFunction() {
+    if (privateKey === "" && filePrivateKey === undefined) {
       toast({
-        title: "Total amount of money must be greater than 0",
+        title: "Please fill your private key or upload your signature",
         variant: "destructive",
-      });
-    if (privateKey == "") {
-      alert("Please fill your private key");
-      return;
-    }
-    try {
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const byteCode = privateCode.data.abi.bytecode;
-      setIsDeployContractAlert(false);
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi);
-      const _user = [individual.senderInd];
-      const _total = individual.totalAmount;
-      const _privateKey = privateKey;
-      const _supplier = individual.receiverInd;
-      const _stages: IStage[] = await Promise.all(
-        stages.map(async (stage) => {
-          return {
-            percent: stage.percent,
-            deliveryAt: handleDateStringToUint(stage.deliveryAt),
-            description: stage.description ? stage.description : "",
-          };
-        })
-      );
-
-      const deployTransaction = await contract
-        .deploy({
-          data: byteCode,
-          arguments: [_user, _supplier, "", _total, _stages, _privateKey],
-        })
-        .send({
-          from: userInfo?.data?.addressWallet,
-        });
-
-      contract.events
-        .contractCreated({
-          fromBlock: deployTransaction.options.address,
-        })
-        .on("data", (event: any) => {
-          toast({
-            title: "Deploy Successfully",
-            description: `Contract address: ${event.returnValues.contractAddress}`,
-            variant: "success",
-          });
-        });
-
-      setAddressContract(deployTransaction?.options?.address as string);
-      setIsVisibleButton({
-        ...isVisibleButton,
-        deployButton: false,
-        signButton: true
       })
-      setIsDisableButton({
-        ...isDisableButton,
-        transferButton: true,
-        deployButton: true,
-      });
-      fetchAPI("/contracts", "PATCH", {
-        id: idContract,
-        contractAddress: deployTransaction?.options?.address as string,
-        status: "ENFORCE",
-        stages: stages,
-      });
-    } catch (error) {
-      console.log(error);
+      return
     }
+    return new Promise((resolve) => {
+      getContentFromFile(filePrivateKey as File, setRsaKey).then((result) => {
+        if (result) {
+          resolve(true)
+        }
+      })
+    })
+  }
+
+  function pickFilePrivateKey(e: any) {
+    const files = e.target.files;
+    if (files) {
+      setFilePrivateKey(files[0]);
+    } else {
+      toast({
+        title: "Please choose a file !",
+        variant: "destructive",
+      })
+    }
+  }
+
+  async function handleOnDeployContract() {
+    handleOnDeployContractFunc(individual, privateKey, stages, userInfo, setAddressContract, setIsVisibleButton, setIsDisableButton, idContract).then((result) => {
+      toast({
+        title: result?.messages,
+        variant: result?.status as any,
+        description: result?.description?.toString() || "",
+      })
+    })
+    setIsDeployContractAlert(false);
   }
 
   async function handleConfirmStages() {
@@ -309,7 +276,7 @@ export default function Dashboard() {
   }
 
   async function handleSignContract() {
-    handleSignContractFunc(addressContract, userInfo, individual, contractParticipants, idContract).then(() => {
+    handleSignContractFunc(addressContract, userInfo, individual, contractParticipants, idContract, setIsVisibleButton, setIsDisableButton).then(() => {
       toast({
         title: "Sign successfully !",
         description: "You have signed the contract",
@@ -339,6 +306,10 @@ export default function Dashboard() {
           <div className="min-w-[300px] px-3 flex-1 flex justify-end">
             <Card className="overflow-hidden w-[430px]">
               <CardHeader className="flex flex-row items-start">
+                {/* <Button onClick={() => {
+                  setIsOpenEnterPrivateKey(true)
+                  setPrivateKey('');
+                }}>CALL</Button> */}
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">
                     Contract Information
@@ -551,12 +522,7 @@ export default function Dashboard() {
                   )}
                   {isVisibleButton.signButton && (
                     <Button
-                      // disabled={
-                      //   isDisableButton.isButtonSignContractCustomer && isDisableButton.isButtonSignContractSupplier ?
-                      // (userInfo?.data?.addressWallet === individual.senderInd
-                      //   ? isDisableButton.isButtonSignContractCustomer
-                      //   : isDisableButton.isButtonSignContractSupplier) : isDisableButton.isButtonSignContractCustomer
-                      // }
+                      disabled={isDisableButton.signButton}
                       variant={"blue"}
                       className="w-full"
                       onClick={handleSignContract}
@@ -568,7 +534,7 @@ export default function Dashboard() {
                     <Button
                       disabled={isDisableButton.transferButton}
                       variant={"destructive"}
-                      className="ms-2 w-full"
+                      className="w-full"
                       onClick={transferMoney}
                     >
                       Transfer
@@ -577,7 +543,7 @@ export default function Dashboard() {
                   {isVisibleButton.withdrawButton && (
                     <Button
                       disabled={isDisableButton.withdrawButton}
-                      className="ms-2 w-full"
+                      className="w-full"
                       onClick={withdrawMoney}
                     >
                       Withdraw
@@ -585,8 +551,9 @@ export default function Dashboard() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  {isVisibleButton.confirmButtonCustomer && (
+                  {isVisibleButton.confirmButtonSender && (
                     <Button
+                      disabled={isDisableButton.confirmButtonSender}
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
@@ -594,8 +561,9 @@ export default function Dashboard() {
                       Customer confirmation completed
                     </Button>
                   )}
-                  {isVisibleButton.confirmButtonSupplier && (
+                  {isVisibleButton.confirmButtonReceiver && (
                     <Button
+                      disabled={isDisableButton.confirmButtonReceiver}
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={handleConfirmStages}
@@ -757,6 +725,80 @@ export default function Dashboard() {
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
                   onClick={handleOnDeployContract}
+                >
+                  Deploy Contract
+                </Button>
+              </div>
+            </AlertDialogContent>
+          </AlertDialog>
+          {/* CALL ALERT DIALOG */}
+          <AlertDialog
+            open={isOpenEnterPrivateKey}
+            onOpenChange={setIsOpenEnterPrivateKey}
+          >
+            <AlertDialogContent>
+              <AlertDialogTitle className="text-center">
+                Enter your private key
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                <b className="text-red-500">
+                  You must enter your private key to continue <br />
+                  If you forget the private key, you will not be able to recover
+                </b>
+              </AlertDialogDescription>
+
+              <div className="flex">
+                <Select onValueChange={(e) => {
+                  setPrivateKey('')
+                  setFilePrivateKey(undefined)
+                  setSelectTypeKey(Number(e))
+                }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Type of Private Key" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Type of Private Key</SelectLabel>
+                      <SelectItem value="0">Enter Your Private Key</SelectItem>
+                      <SelectItem value="1">Upload Signature</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                {selectTypeKey === 0 && (
+                  <Input
+                    placeholder="Fill your private key"
+                    className="w-full ms-2"
+                    onChange={(e) => {
+                      setPrivateKey(e.target.value);
+                      console.log(privateKey);
+                    }}
+                  />
+                )}
+                {selectTypeKey === 1 && (
+                  <Input id="picture" type="file" accept=".pem" className="ms-2" onChange={(e) => {
+                    pickFilePrivateKey(e)
+                  }} />
+                )}
+              </div>
+              <div className="w-full flex">
+                <Button
+                  className="ml-auto me-2 w-full "
+                  variant={"destructive"}
+                  onClick={() => {
+                    setIsDeployContractAlert(false);
+                  }}
+                >
+                  Close
+                </Button>
+                <Button
+                  hidden={isHideButton.deployButton}
+                  className="ml-auto mr-auto w-full"
+                  variant={"violet"}
+                  onClick={() => {
+                    handleBeforeCallFunction().then(() => {
+                      console.log('CALL FUNCTION');
+                    })
+                  }}
                 >
                   Deploy Contract
                 </Button>

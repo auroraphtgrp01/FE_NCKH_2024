@@ -1,18 +1,23 @@
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
+import { log } from "console";
+import { generateKeyPairSync } from "crypto";
+import { Log } from "ethers";
+import NodeRSA from "node-rsa";
 import { Dispatch, SetStateAction } from "react";
 import Web3 from "web3";
 
 const updateStateButton = (
     status: EContractStatus,
     contractAttributes: IContractAttribute[],
-    userAddressWallet: string,
     setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
     setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
-    dataIndividual: IIndividual
+    dataIndividual: IIndividual,
+    contractParticipants: any,
+    userInfo: UserInfoData
 ) => {
     const addressMatch = (type: any) =>
-        (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() === userAddressWallet.toLowerCase();
+        (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() === userInfo.data.addressWallet.toLowerCase();
     switch (status) {
         case "PENDING":
             setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
@@ -24,26 +29,32 @@ const updateStateButton = (
             break;
         case "ENFORCE":
             setIsVisibleButton((prev: any) => ({ ...prev, deployButton: false, signButton: true }));
+            const participantsLogin = contractParticipants?.find((participant: any) => {
+                return participant.userId === userInfo.data.id;
+            });
+            if(participantsLogin.status !== "SIGNED") {
+                setIsDisableButton((prev: any) => ({...prev, signButton: false}))
+            }           
             break;
         case "SIGNED":
             setIsVisibleButton((prev: any) => ({
                 ...prev,
                 signButton: false,
                 withdrawButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
+                confirmButtonReceiver: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
+                confirmButtonSender: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND),
                 transferButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND)
             }));
             setIsDisableButton((prev: any) => ({
                 ...prev,
                 withdrawButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
-                transferButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND)
+                transferButton: false
             }));
             break;
         default:
             break;
     }
-    if (userAddressWallet == dataIndividual?.receiverInd?.toLowerCase()) {
-        setIsVisibleButton((prev: any) => ({ ...prev, withdrawButton: true }))
-    }
+ 
 };
 
 const fetchDataWhenEntryPage = async (
@@ -79,7 +90,7 @@ const fetchDataWhenEntryPage = async (
                     return acc;
             }
         }, {} as any);
-        setAddressContract(contractAttributes);
+        setAddressContract(contract.contractAddress);
         setContractParticipants(participants);
         setIndividual(dataIndividual);
         setContractAttribute(contractAttributes);
@@ -221,7 +232,9 @@ const handleSignContractFunc = async (
     userInfo: any,
     individual: IIndividual,
     contractParticipants: IContractParticipant[],
-    idContract: string | string[]
+    idContract: string | string[],
+    setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>
 ) => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
@@ -233,17 +246,165 @@ const handleSignContractFunc = async (
             contract.methods.getSignature(individual.senderInd).call(),
             contract.methods.getSignature(individual.receiverInd).call()
         ]);
-        await Promise.all([
-            fetchAPI("/contracts", "PATCH", { id: idContract, status: "SIGNED" }),
-            fetchAPI("/participants", "PATCH", {
+       const response = await fetchAPI("/participants", "PATCH", {
                 id: contractParticipants.find(item => item.userId === userInfo?.data?.id)?.id,
                 status: "SIGNED"
             })
-        ]);
+        const isStatusContractUpdated =  response.data.isContractStatusUpdated
+        if(isStatusContractUpdated) {
+            const isCondition = ((userInfo?.data?.addressWallet)?.trim().toLowerCase() || '') === ((individual.senderInd)?.trim().toLowerCase() || '')
+            if(isCondition) {
+                setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, transferButton: true, confirmButtonSender: true }));
+                setIsDisableButton((prevState: any) => ({ ...prevState, transferButton: false }));
+            } else {
+                setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, withdrawButton: true, confirmButtonReceiver: true }));
+            }
+        } else {
+            setIsDisableButton((prevState: any) => ({...prevState, signButton: true}))
+        }
     } catch (error) {
         throw Error(`Error occurred while signing the contract: ${error}`);
     }
 }
+
+const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: string, stages: any, userInfo: any, setAddressContract: any, setIsVisibleButton: any, setIsDisableButton: any, idContract: string | string[]) => {
+    if (!individual.totalAmount || individual.totalAmount === '0') {
+      return {
+        message: "Total amount of money must be greater than 0",
+        status: 'destructive'
+      };
+    }
+    if (!privateKey) {
+        return {
+            message: "Private key is required to deploy contract",
+            status: 'destructive'
+          };
+    }
+    try {
+      const {signature, publicKey} = signMessage(privateKey);
+      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+      const abi = privateCode.data.abi.abi;
+      const byteCode = privateCode.data.abi.bytecode;
+      const web3 = new Web3(window.ethereum);
+      const contract = new web3.eth.Contract(abi);
+      const _user = [individual.senderInd];
+      const _total = individual.totalAmount;
+      const _privateKey = privateKey;
+      const _supplier = individual.receiverInd;
+      
+      const _stages: IStage[] = await Promise.all(
+        stages.map(async (stage: any) => ({
+          percent: stage.percent,
+          deliveryAt: handleDateStringToUint(stage.deliveryAt),
+          description: stage.description || "",
+        }))
+      );
+      
+      const deployTransaction = await contract
+        .deploy({
+          data: byteCode,
+          arguments: [_user, _supplier, "", _total, _stages, _privateKey],
+        })
+        .send({
+          from: userInfo?.data?.addressWallet,
+        });
+     
+      setAddressContract(deployTransaction?.options?.address as string);
+      setIsVisibleButton((prevState: any) => ({
+        ...prevState,
+        deployButton: false,
+        signButton: true,
+      }));
+      setIsDisableButton((prevState: any) => ({
+        ...prevState,
+        transferButton: true,
+        deployButton: true,
+      }));
+      
+      await fetchAPI("/contracts", "PATCH", {
+        id: idContract,
+        contractAddress: deployTransaction?.options?.address as string,
+        status: "ENFORCE",
+        stages: stages,
+      });
+      isExportPrivateKey(idContract, signature, publicKey)
+      return { 
+        messages: "Deploy Successfully",
+        description: `Contract address: ${deployTransaction.options.address}`,
+        status: "success",
+      }
+    } catch (error) {
+        return { 
+            message: "Deploy Failed",
+            description: error,
+            status: "destructive",
+        }
+    }
+  }
+
+  const isExportPrivateKey = (contractId: string | string [], signature: string, publicKey: string) => {
+    let data = new Blob([`${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`], {type: 'text/csv'});
+    let csvURL = window.URL.createObjectURL(data);
+    const tempLink = document.createElement('a');
+    tempLink.href = csvURL;
+    tempLink.setAttribute('download', `PK_${contractId}.pem`);
+    tempLink.click();
+  }
+
+  function signMessage(message: string) {
+      const bitLength: number = 1024;
+      const rsaKeyPair: NodeRSA = new NodeRSA({ b: bitLength });
+      const publicKey: string = rsaKeyPair.exportKey('public');
+    const signer = new NodeRSA(rsaKeyPair.exportKey('private'));
+    return {
+        signature: signer.sign(message, 'base64'),
+        publicKey
+    }
+}
+
+function verifySignature(message: string, signature: string, publicKey: string): boolean {
+    const verifier = new NodeRSA();
+    verifier.importKey(publicKey, 'public');
+    return verifier.verify(Buffer.from(message), Buffer.from(signature, 'base64'));
+}
+
+export const getContentFromFile = async (file: File, setRsaKey: Dispatch<SetStateAction<RSAKey | undefined>>) => {
+    if (!file) return null;
+    try {
+        const result = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target) {
+                    resolve(event.target.result);
+                }
+            };
+            reader.onerror = (error) => {
+                reject(error);
+            };
+            reader.readAsText(file);
+        });
+    const { publicKey, privateKey } = extractKeys(result as string);
+    setRsaKey({ publicKey, privateKey });
+    return true
+    } catch (error) {
+      return error
+    }
+};
+
+const extractKeys = (keyString: string) => {
+    const publicKeyRegex = /-----BEGIN PUBLIC KEY-----(.|\n)*?-----END PUBLIC KEY-----/;
+    const privateKeyRegex = /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/;
+    const publicKeyMatch = keyString.match(publicKeyRegex);
+    const privateKeyMatch = keyString.match(privateKeyRegex);
+    const publicKey = publicKeyMatch ? publicKeyMatch[0] : '';
+    const privateKeyEx = privateKeyMatch ? privateKeyMatch[0] : ''
+    const headerFooterRegex = /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/;
+    const match = privateKeyEx.match(headerFooterRegex);
+    const privateKeyContent = match ? match[0] : '';
+    const privateKey = privateKeyContent.split('\n').filter(line => !line.includes('BEGIN') && !line.includes('END')).join('\n');
+    return { publicKey, privateKey };
+};
+
 
 
 export {
@@ -255,5 +416,7 @@ export {
     handleDateStringToUint,
     handleConfirmStagesFunc,
     handleCompareContractInformationFunc,
-    handleSignContractFunc
+    handleSignContractFunc,
+    handleOnDeployContractFunc,
+    isExportPrivateKey
 }

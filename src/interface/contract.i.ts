@@ -105,23 +105,50 @@ export interface IIndividual {
 	totalAmount: string
 }
 
-export interface IVisibleButton {
+export interface IVisibleButton extends DynamicType {
 	deployButton: boolean,
     withdrawButton: boolean,
     confirmButton: boolean,
     transferButton: boolean,
     buttonDisputed: boolean,
     signButton: boolean,
-    confirmButtonCustomer: boolean,
-    confirmButtonSupplier: boolean,
+	confirmButtonSender: boolean,
+    confirmButtonReceiver: boolean
 }
 
-export interface IDisableButton {
+export interface IDisableButton extends DynamicType {
 	fetchCompareButton: boolean,
     cancelButton: boolean,
     withdrawButton: boolean,
     transferButton: boolean,
     deployButton: boolean,
     editContractButton: boolean,
-    signButton: boolean
+    signButton: boolean,
+	confirmButtonSender: boolean,
+    confirmButtonReceiver: boolean
+}
+
+export interface IStage {
+    percent: number;
+    deliveryAt: number;
+    description?: string;
+}
+
+export interface RSAKey {
+	publicKey: string;
+	privateKey: string;
+	privateMessage?: string
+}
+
+export interface UserInfoData {
+	data: {
+		access_token: string;
+		refresh_token: string;
+		id: string;
+		name: string;
+		addressWallet: string;
+		email: string;
+		role: string;
+	}
+    balance: string;
 }

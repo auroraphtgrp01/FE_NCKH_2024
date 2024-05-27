@@ -4,18 +4,9 @@ import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { InvitationItem, initPermission } from '@/app/contract/create/page';
 import { Button } from '@/components/ui/button';
-
-export interface IPermission {
-    READ_CONTRACT: boolean;
-    EDIT_CONTRACT: boolean;
-    INVITE_PARTICIPANT: boolean;
-    CHANGE_STATUS_CONTRACT: boolean;
-    SET_OWNER_PARTY: boolean;
-}
-
-
+import { IPermission } from '@/interface/contract.i';
+import { initPermission } from '@/components/InvitationArea';
 
 export default function GrantPermission({ isOpen, setOpen, permission, callback }:
     { isOpen: boolean, setOpen: any, permission: IPermission, callback: (permission: IPermission) => void }) {

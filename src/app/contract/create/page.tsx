@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/carousel";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { IPermission } from "@/components/GrantPermission";
 import { useAppContext } from "@/components/ThemeProvider";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useToast } from "@/components/ui/use-toast";
@@ -27,19 +26,8 @@ import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
 import InvitationArea from "@/components/InvitationArea";
 import Image from "next/image";
+import { ContractTemplate, InvitationItem } from "@/interface/contract.i";
 
-export interface InvitationItem {
-  email: string;
-  permission: IPermission;
-  messages?: string;
-}
-
-export interface ContractTemplate {
-  id: string;
-  name: string;
-  path: string;
-  contractAttributes: any[];
-}
 
 export default function page() {
   const [template, setTemplate] = useState<ContractTemplate[]>([

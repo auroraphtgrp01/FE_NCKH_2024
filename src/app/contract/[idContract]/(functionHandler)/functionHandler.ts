@@ -1,8 +1,5 @@
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, RSAKey, UserInfoData } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { log } from "console";
-import { generateKeyPairSync } from "crypto";
-import { Log } from "ethers";
 import NodeRSA from "node-rsa";
 import { Dispatch, SetStateAction } from "react";
 import Web3 from "web3";
@@ -103,13 +100,13 @@ const fetchDataWhenEntryPage = async (
 
 const inviteNewParticipant = async (
     idContract: string | string[],
-    invitation: any,
+    invitation: InvitationItem[],
     messages: string,
     setContractParticipants: Dispatch<SetStateAction<IContractParticipant[]>>
 ) => {
     const payload = {
         contractId: idContract,
-        invitation: invitation.map((item: any) => {
+        invitation: invitation.map((item) => {
             return {
                 ...item,
                 messages,
@@ -118,7 +115,7 @@ const inviteNewParticipant = async (
     };
     try {
         await fetchAPI("/participants/send-invitation", "POST", payload)
-        const newParticipants = invitation.map((item: any) => {
+        const newParticipants = invitation.map((item) => {
             return {
                 status: "PENDING",
                 email: item.email,
@@ -133,7 +130,7 @@ const inviteNewParticipant = async (
     }
 }
 
-const withdrawMoneyFunc = async (addressContract: string, userInfo: any, individual: IIndividual) => {
+const withdrawMoneyFunc = async (addressContract: string,  userInfo: UserInfoData, individual: IIndividual) => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
         const web3 = new Web3(window.ethereum);
@@ -155,7 +152,7 @@ const withdrawMoneyFunc = async (addressContract: string, userInfo: any, individ
     }
 }
 
-const transferMoneyFunc = async (addressContract: string, individual: IIndividual, userInfo: any) => {
+const transferMoneyFunc = async (addressContract: string, individual: IIndividual, userInfo: UserInfoData) => {
     try {
         const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
         const abi = privateCode.data.abi.abi;
@@ -179,10 +176,10 @@ const handleDateStringToUint = (date: string): number => {
 
 const handleConfirmStagesFunc = async (
     addressContract: string,
-    userInfo: any,
+    userInfo: UserInfoData,
     individual: IIndividual,
-    setIsDisableButton: any,
-    isDisableButton: any
+    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>,
+    setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
 ) => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
@@ -192,11 +189,11 @@ const handleConfirmStagesFunc = async (
             from: userInfo?.data?.addressWallet,
             gas: "1000000",
         });
-        if (userInfo?.data?.addressWallet === individual.senderInd) {
-            setIsDisableButton({ ...isDisableButton });
-        } else {
-            setIsDisableButton({ ...isDisableButton });
-        }
+        // if (userInfo?.data?.addressWallet === individual.senderInd) {
+        //     setIsDisableButton({ ...isDisableButton });
+        // } else {
+        //     setIsDisableButton({ ...isDisableButton });
+        // }
     } catch (error) {
         throw new Error(`Error occurred while handling confirmation stages: ${error}`)
     }
@@ -229,7 +226,7 @@ async function handleCompareContractInformationFunc(setIsCompareContractAlert: a
 
 const handleSignContractFunc = async (
     addressContract: string,
-    userInfo: any,
+    userInfo: UserInfoData,
     individual: IIndividual,
     contractParticipants: IContractParticipant[],
     idContract: string | string[],
@@ -267,7 +264,16 @@ const handleSignContractFunc = async (
     }
 }
 
-const handleOnDeployContractFunc = async (individual: IIndividual, privateKey: string, stages: any, userInfo: any, setAddressContract: any, setIsVisibleButton: any, setIsDisableButton: any, idContract: string | string[]) => {
+const handleOnDeployContractFunc = async (
+    individual: IIndividual, 
+    privateKey: string, 
+    stages: any,  
+    userInfo: UserInfoData, 
+    setAddressContract: Dispatch<SetStateAction<string>>,
+    setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>,
+    idContract: string | string[]
+) => {
     if (!individual.totalAmount || individual.totalAmount === '0') {
       return {
         message: "Total amount of money must be greater than 0",
@@ -368,7 +374,10 @@ function verifySignature(message: string, signature: string, publicKey: string):
     return verifier.verify(Buffer.from(message), Buffer.from(signature, 'base64'));
 }
 
-export const getContentFromFile = async (file: File, setRsaKey: Dispatch<SetStateAction<RSAKey | undefined>>) => {
+export const getContentFromFile = async (
+    file: File, 
+    setRsaKey: Dispatch<SetStateAction<RSAKey | undefined>>
+) => {
     if (!file) return null;
     try {
         const result = await new Promise((resolve, reject) => {
@@ -404,8 +413,6 @@ const extractKeys = (keyString: string) => {
     const privateKey = privateKeyContent.split('\n').filter(line => !line.includes('BEGIN') && !line.includes('END')).join('\n');
     return { publicKey, privateKey };
 };
-
-
 
 export {
     updateStateButton,

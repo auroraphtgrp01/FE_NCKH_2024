@@ -1,9 +1,7 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useParams } from "next/navigation";
 import { EContractAttributeType, IContractAttribute } from "@/interface/contract.i";
-import { ContractState } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 
 export default function PreviewContract({ contractAttribute, setContractAttribute }: { contractAttribute: IContractAttribute[], setContractAttribute: (item: any) => void }) {
   return (

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/select";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useParams } from "next/navigation";
-// 
+//
 import { useAppContext } from "@/components/ThemeProvider";
 import { Router } from "lucide-react";
 export type TData = {
@@ -99,7 +99,7 @@ export interface Product {
 
 export default function Page() {
   const { toast } = useToast();
-  const router = useRouter()
+  const router = useRouter();
   const { dataCreateContract, setDataCreateContract }: any = useAppContext();
   const [data, setData] = useState<DataWithName>({
     status: "",
@@ -183,11 +183,9 @@ export default function Page() {
       supplierId: dataOrder.order.suppliersId,
       userId: dataOrder.order.userId,
       orderId: dataOrder.order.id,
-    })
+    });
 
-    console.log(dataCreateContract);
-    router.push('/contract/create')
-
+    router.push("/contract/create");
   }
 
   async function updateOrder(e: any, type: string) {
@@ -262,9 +260,7 @@ export default function Page() {
   }
 
   return (
-
     <div>
-
       <div className="flex justify-between">
         <h2 className="font-semibold tracking-tight text-lg mb-5">
           Request a quote
@@ -365,7 +361,6 @@ export default function Page() {
           </div>
         ) : (
           <div>
-
             <Button
               className="px-2 py-2 mr-1"
               variant={"outline"}

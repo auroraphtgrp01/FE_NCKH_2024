@@ -51,6 +51,8 @@ export interface Participant {
   position: string;
   company: string;
   avatar?: string;
+  id: string;
+  email: string
 }
 
 
@@ -60,37 +62,21 @@ export type Contract = {
   status: "PENDING" | "SUCCESS" | "FAILED";
   type: string;
   typeName: string;
+  email: string;
 };
 
-const initParticipants: Participant[] = [
-  {
-    addressWallet: "",
-    company: "",
-    fullName: "",
-    position: "",
-    userId: "",
-    avatar: "",
-  },
-  {
-    addressWallet: "",
-    company: "",
-    fullName: "",
-    position: "",
-    userId: "",
-    avatar: "",
-  },
-];
 
 export default function DataTableDemo() {
   const [dataTable, setDataTable] = React.useState([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [participants, setParticipants] =
-    React.useState<Participant[]>(initParticipants);
+  const [participants, setParticipants] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [isOpen, setIsOpen] = React.useState(false);
   async function handleOpenParticipant(contractId: string) {
+    console.log(contractId);
+
     await getParticipants(contractId);
     setIsOpen(true);
   }
@@ -101,7 +87,6 @@ export default function DataTableDemo() {
   const getParticipants = async (contractId: string) => {
     fetchAPI(`/participants/find-all/${contractId}`, "GET").then((res) => {
       console.log(res.data);
-
       setParticipants(res.data);
     }).catch((errors) => {
       console.log(errors);
@@ -109,7 +94,7 @@ export default function DataTableDemo() {
   };
   const userInfoString = localStorage.getItem("user-info");
   const user_info = userInfoString ? JSON.parse(userInfoString) : null;
-    React.useEffect(() => {
+  React.useEffect(() => {
     fetchAPI(
       `/contracts/get-all-contract-details/${user_info.data.addressWallet}`,
       "GET"
@@ -117,13 +102,10 @@ export default function DataTableDemo() {
       if (res.status === 200) {
         console.log(res.data);
         setDataTable(res.data.contracts)
-        // id
-        // type
-        // status
       }
     });
   }, []);
-  const columns: ColumnDef<Contract>[] = [
+  const columnsContracts: ColumnDef<Contract>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -145,9 +127,6 @@ export default function DataTableDemo() {
       ),
       enableSorting: false,
       enableHiding: false,
-      // id
-      // type
-      // status
     },
     {
       accessorKey: "id",
@@ -190,10 +169,7 @@ export default function DataTableDemo() {
             >
               Participants
             </Button>
-            <Link
-              href={`/contract/detail/${row.getValue("type")}/${row.getValue(
-                "id"
-              )}`}
+            <Link href={`/contract/${row.getValue("id")}`}
             >
               <Button className="ms-2" variant={"destructive"}>
                 Detail
@@ -204,10 +180,87 @@ export default function DataTableDemo() {
       },
     },
   ];
+  // ssssss
+  const columnsParticipants: ColumnDef<Contract>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      // id
+      // type
+      // status
+    },
+    {
+      accessorKey: "id",
+      header: ({ column }) => {
+        return <div className="font-semibold ">Id</div>;
+      },
+      cell: ({ row }) => (
+        <div className="lowercase text-start">{row.getValue("id")}</div>
+      ),
+    },
+    {
+      accessorKey: "email",
+      enableHiding: true,
+      header: ({ column }) => {
+        return <div className="font-semibold ">Email</div>;
+      },
+      cell: ({ row }) => (
+        <div className="lowercase text-start">{row.getValue("email")}</div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: () => {
+        return <div className="text-center font-semibold">Status</div>;
+      },
+      cell: ({ row }) => (
+        <div className="capitalize text-center text-green-500 font-semibold">
+          {row.getValue("status")}
+        </div>
+      ),
+    },
 
-  const table = useReactTable({
+  ];
+
+  const tableContracts = useReactTable({
     data: dataTable,
-    columns,
+    columns: columnsContracts,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
+  const tableParticipants = useReactTable({
+    data: participants,
+    columns: columnsParticipants,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -236,9 +289,9 @@ export default function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
+          value={(tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("id")?.setFilterValue(event.target.value)
+            tableContracts.getColumn("id")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -255,7 +308,7 @@ export default function DataTableDemo() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {table
+              {tableContracts
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => {
@@ -279,7 +332,7 @@ export default function DataTableDemo() {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {tableContracts.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
@@ -297,8 +350,8 @@ export default function DataTableDemo() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {tableContracts.getRowModel().rows?.length ? (
+              tableContracts.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
@@ -316,7 +369,7 @@ export default function DataTableDemo() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={columnsContracts.length}
                   className="h-24 text-center"
                 >
                   No results.
@@ -328,23 +381,23 @@ export default function DataTableDemo() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {tableContracts.getFilteredSelectedRowModel().rows.length} of{" "}
+          {tableContracts.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => tableContracts.previousPage()}
+            disabled={!tableContracts.getCanPreviousPage()}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => tableContracts.nextPage()}
+            disabled={!tableContracts.getCanNextPage()}
           >
             Next
           </Button>
@@ -354,7 +407,7 @@ export default function DataTableDemo() {
         <DialogPortal>
           <DialogOverlay>
             <DialogContent
-              className="p-8 min-w-[650px]"
+              className="p-8 min-w-[800px]"
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   e.preventDefault();
@@ -363,10 +416,60 @@ export default function DataTableDemo() {
             >
               <DialogHeader>
                 <DialogTitle>Individuals involved in the contract</DialogTitle>
-                <DialogDescription>
+                <div className="text-sm text-muted-foreground">
                   The information here is extracted from the database. You can
                   re-fetch it from the chain-network
-                </DialogDescription>
+                  <div className="rounded-md border mt-3">
+                    <Table>
+                      <TableHeader>
+                        {tableParticipants.getHeaderGroups().map((headerGroup) => (
+                          <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => {
+                              return (
+                                <TableHead key={header.id}>
+                                  {header.isPlaceholder
+                                    ? null
+                                    : flexRender(
+                                      header.column.columnDef.header,
+                                      header.getContext()
+                                    )}
+                                </TableHead>
+                              );
+                            })}
+                          </TableRow>
+                        ))}
+                      </TableHeader>
+                      <TableBody>
+                        {tableParticipants.getRowModel().rows?.length ? (
+                          tableParticipants.getRowModel().rows.map((row) => (
+                            <TableRow
+                              key={row.id}
+                              data-state={row.getIsSelected() && "selected"}
+                            >
+                              {row.getVisibleCells().map((cell) => (
+                                <TableCell key={cell.id}>
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext()
+                                  )}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columnsParticipants.length}
+                              className="h-24 text-center"
+                            >
+                              No results.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
               </DialogHeader>
             </DialogContent>
           </DialogOverlay>

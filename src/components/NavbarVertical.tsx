@@ -11,11 +11,24 @@ import {
 } from "@/components/ui/tooltip"
 import { ModeToggle } from './DarkModeToggle';
 import { useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from 'next/navigation'
 import { toast } from "@/components/ui/use-toast"
 import { useAppContext } from "@/components/ThemeProvider";
 export default function NavbarVertical() {
     const { userInfo, setUserInfo }: any = useAppContext()
     const Router = useRouter()
+    const pathname = usePathname()
+    var containsContract = pathname.includes('contract');
+    var containsSupplier = pathname.includes('supplier');
+    if (containsContract) {
+        containsSupplier = false
+    } else if (containsSupplier) {
+        containsContract = false
+    } else {
+        containsSupplier = false
+        containsContract = false
+    }
+
     function logout() {
         localStorage.removeItem('user-info')
         setUserInfo(null)
@@ -44,7 +57,7 @@ export default function NavbarVertical() {
                                         href="/contract"
                                         className="flex h-9 w-9 items-center justify-center rounded-lg mt-4"
                                     >
-                                        <Button className="justify-start flex rounded-lg transition-colors w-full mt-2 px-2  bg-black text-white hover:bg-black hover:text-white" variant={'outline'}>
+                                        <Button className={`justify-start flex rounded-lg transition-colors w-full mt-2 px-2  hover:bg-black hover:text-white  ${containsContract ? 'bg-black text-white' : ''}`} variant={'outline'}>
                                             <Icons.briefcase className="h-5 w-5" />
                                         </Button>
                                     </Link>
@@ -63,8 +76,8 @@ export default function NavbarVertical() {
                                         href="/supplier"
                                         className="flex h-9 w-9 items-center justify-center rounded-lg mt-2"
                                     >
-                                        <Button className="justify-start flex transition-colors w-full mt-2 px-2" variant={'outline'}>
-                                            <Icons.layers className="h-5 w-5 " />
+                                        <Button className={`justify-start flex rounded-lg transition-colors w-full mt-2 px-2  hover:bg-black hover:text-white  ${containsSupplier ? 'bg-black text-white' : ''}`} variant={'outline'}>
+                                            <Icons.layers className="h-5 w-5" />
                                         </Button>
                                     </Link>
                                 </TooltipTrigger>
@@ -129,6 +142,6 @@ export default function NavbarVertical() {
                     }
                 </nav>
             </aside>
-        </div>
+        </div >
     )
 }

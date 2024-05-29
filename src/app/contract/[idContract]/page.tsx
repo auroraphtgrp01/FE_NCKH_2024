@@ -20,7 +20,7 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { ContractData, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, InvitationItem, RSAKey } from "@/interface/contract.i";
+import { ContractData, EContractAttributeType, EFunctionCall, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, InvitationItem, RSAKey } from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -46,7 +46,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
-import { fetchDataWhenEntryPage, getContentFromFile, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, inviteNewParticipant, isExportPrivateKey, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { fetchDataWhenEntryPage, getContentFromFile, handleCallFunctionOfBlockchain, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, hashStringWithSHA512, inviteNewParticipant, isExportPrivateKey, signMessage, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { initDisableButton, initVisibleButton } from "@/constants/initVariable.constants";
 
@@ -82,6 +82,7 @@ export default function Dashboard() {
       description: "This is the stage of the contract",
     },
   ]);
+  const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>();
   const [showChat, setShowChat] = useState(false);
   const { idContract } = useParams();
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -106,7 +107,18 @@ export default function Dashboard() {
           }
         }
       })
+      const addressMatch = (type: any) =>
+        (response?.data.contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() === userInfo.data.addressWallet.toLowerCase();
       setContractStatus(response?.data.contract.status)
+      if (response?.data.contract.status === 'SIGNED' || response?.data.contract.status === 'ENFORCE') {
+        setIsDisableButton((prev: any) => ({
+          ...prev,
+          cancelButton: false,
+          fetchCompareButton: false,
+          withdrawButton: !addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
+          transferButton: !addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND),
+        }))
+      }
     })
   }, []);
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -178,20 +190,25 @@ export default function Dashboard() {
       })
   }
 
-  async function handleBeforeCallFunction() {
-    if (privateKey === "" && filePrivateKey === undefined) {
-      toast({
-        title: "Please fill your private key or upload your signature",
-        variant: "destructive",
-      })
-      return
-    }
-    return new Promise((resolve) => {
-      getContentFromFile(filePrivateKey as File, setRsaKey).then((result) => {
-        if (result) {
-          resolve(true)
+  async function onCallFunctionInBlockchain() {
+    setIsOpenEnterPrivateKey(false);
+    const responseMessage = await handleCallFunctionOfBlockchain(
+      {
+        typeAuthentication: selectTypeKey,
+        privateKey: privateKey,
+        filePrivateKey: filePrivateKey,
+      },
+      {
+        nameFunctionCall,
+        signContractParams: {
+          addressContract, userInfo, setUserInfo, individual, contractParticipants, setIsVisibleButton, setIsDisableButton
         }
-      })
+      }
+    )
+    toast({
+      title: responseMessage.message,
+      variant: responseMessage.status,
+      description: responseMessage.description
     })
   }
 
@@ -208,7 +225,7 @@ export default function Dashboard() {
   }
 
   async function handleOnDeployContract() {
-    handleOnDeployContractFunc(individual, privateKey, stages, userInfo, setAddressContract, setIsVisibleButton, setIsDisableButton, idContract).then((result) => {
+    handleOnDeployContractFunc(individual, privateKey, stages, userInfo, setUserInfo, setAddressContract, setIsVisibleButton, setIsDisableButton, idContract).then((result) => {
       toast({
         title: result?.messages,
         variant: result?.status as any,
@@ -254,23 +271,6 @@ export default function Dashboard() {
   async function handleCompareContractInformation() {
   }
 
-  async function handleSignContract() {
-    handleSignContractFunc(addressContract, userInfo, individual, contractParticipants, idContract, setIsVisibleButton, setIsDisableButton).then(() => {
-      toast({
-        title: "Sign successfully !",
-        description: "You have signed the contract",
-        variant: "success",
-      });
-    })
-      .catch((error) => {
-        toast({
-          title: "Error occurred while signing contract",
-          description: error,
-          variant: "destructive",
-        });
-      })
-  }
-
   return (
     <div className="flex min-h-screen w-full flex-col ">
       <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
@@ -285,10 +285,7 @@ export default function Dashboard() {
           <div className="min-w-[300px] px-3 flex-1 flex justify-end">
             <Card className="overflow-hidden w-[430px] h-[755px]">
               <CardHeader className="flex flex-row items-start">
-                {/* <Button onClick={() => {
-                  setIsOpenEnterPrivateKey(true)
-                  setPrivateKey('');
-                }}>CALL</Button> */}
+
                 <div className="w-full">
                   <CardTitle className="flex items-center text-lg">
                     Contract Information
@@ -370,13 +367,21 @@ export default function Dashboard() {
                       disabled={isDisableButton.cancelButton}
                       variant={"destructive"}
                       className="ms-2"
-                      onClick={() => setIsCancelContractAlert(true)}
+                      onClick={() => {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.CANCEL_CONTRACT)
+                        setPrivateKey('');
+                      }}
                     >
                       Cancel The Contract
                     </Button>
                   </div>
                   <div className="flex">
-                    <Button disabled={isDisableButton.fetchCompareButton} onClick={() => setIsCompareContractAlert(true)}>
+                    <Button disabled={isDisableButton.fetchCompareButton} onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.FETCH_COMPARE_CONTRACT)
+                      setPrivateKey('');
+                    }}>
                       Fetch Blockchain to Compare Database
                     </Button>
                     <Button
@@ -442,18 +447,6 @@ export default function Dashboard() {
                 </div>
                 <div className="grid gap-3 mt-2">
                   <div className="flex align-middle">
-                    <div className="font-semibold">Joined Party :</div>
-                    <div className="translate-y-[-7px] translate-x-[67px] ms-4">
-                      <Input
-                        readOnly
-                        className="w-[180px]"
-                        placeholder="Empty"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="grid gap-3 mt-2">
-                  <div className="flex align-middle">
                     <div className="font-semibold">Total Amount of Money:</div>
                     <div className="translate-y-[-7px] translate-x-[15px]">
                       <Input
@@ -484,7 +477,11 @@ export default function Dashboard() {
                       disabled={isDisableButton.signButton}
                       variant={"blue"}
                       className="w-full"
-                      onClick={handleSignContract}
+                      onClick={() => {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
+                        setPrivateKey('');
+                      }}
                     >
                       Sign Contract
                     </Button>
@@ -494,7 +491,11 @@ export default function Dashboard() {
                       disabled={isDisableButton.transferButton}
                       variant={"destructive"}
                       className="w-full"
-                      onClick={transferMoney}
+                      onClick={() => {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
+                        setPrivateKey('');
+                      }}
                     >
                       Transfer
                     </Button>
@@ -503,7 +504,11 @@ export default function Dashboard() {
                     <Button
                       disabled={isDisableButton.withdrawButton}
                       className="w-full"
-                      onClick={withdrawMoney}
+                      onClick={() => {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
+                        setPrivateKey('');
+                      }}
                     >
                       Withdraw
                     </Button>
@@ -515,7 +520,11 @@ export default function Dashboard() {
                       disabled={isDisableButton.confirmButtonSender}
                       variant={"indigo"}
                       className="w-full mt-2"
-                      onClick={handleConfirmStages}
+                      onClick={() => {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_SENDER)
+                        setPrivateKey('');
+                      }}
                     >
                       Customer confirmation completed
                     </Button>
@@ -525,7 +534,11 @@ export default function Dashboard() {
                       disabled={isDisableButton.confirmButtonReceiver}
                       variant={"indigo"}
                       className="w-full mt-2"
-                      onClick={handleConfirmStages}
+                      onClick={() => {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_RECEIVER)
+                        setPrivateKey('');
+                      }}
                     >
                       Supplier confirmation completed
                     </Button>
@@ -752,12 +765,10 @@ export default function Dashboard() {
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
                   onClick={() => {
-                    handleBeforeCallFunction().then(() => {
-                      console.log('CALL FUNCTION');
-                    })
+                    onCallFunctionInBlockchain()
                   }}
                 >
-                  Deploy Contract
+                  Execute Function
                 </Button>
               </div>
             </AlertDialogContent>
@@ -830,9 +841,7 @@ export default function Dashboard() {
                 <Button
                   className="ml-auto mr-auto w-full"
                   variant={"violet"}
-                  onClick={() => {
-                    handleCancelContract();
-                  }}
+
                 >
                   Cancel Contract
                 </Button>

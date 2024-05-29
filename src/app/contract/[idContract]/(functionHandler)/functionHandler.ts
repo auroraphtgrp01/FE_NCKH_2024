@@ -1,5 +1,7 @@
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IStage, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
+import { initResponseMessages } from "@/constants/initVariable.constants";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
+import { handleInstanceWeb3 } from "@/utils/web3Instance";
 import NodeRSA from "node-rsa";
 import { Dispatch, SetStateAction } from "react";
 import Web3 from "web3";
@@ -45,13 +47,13 @@ const updateStateButton = (
             setIsDisableButton((prev: any) => ({
                 ...prev,
                 withdrawButton: addressMatch(EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE),
-                transferButton: false
+                transferButton: false,
+                cancelButton: false,
             }));
             break;
         default:
             break;
     }
-
 };
 
 const fetchDataWhenEntryPage = async (
@@ -225,42 +227,47 @@ async function handleCompareContractInformationFunc(setIsCompareContractAlert: a
 }
 
 const handleSignContractFunc = async (
-    addressContract: string,
-    userInfo: UserInfoData,
-    individual: IIndividual,
-    contractParticipants: IContractParticipant[],
-    idContract: string | string[],
-    setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
-    setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
-) => {
+    dataParams: ISignContractFunctionCallParams
+): Promise<IResponseFunction> => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
         const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(abi, addressContract);
-        await contract.methods.sign(userInfo?.data?.addressWallet.toString())
-            .send({ from: userInfo?.data?.addressWallet, gas: "1000000" });
+        const contract = new web3.eth.Contract(abi, dataParams.addressContract);
+        await contract.methods.sign(dataParams.userInfo?.data?.addressWallet.toString())
+            .send({ from: dataParams.userInfo?.data?.addressWallet, gas: "1000000" });
         await Promise.all([
-            contract.methods.getSignature(individual.senderInd).call(),
-            contract.methods.getSignature(individual.receiverInd).call()
+            contract.methods.getSignature(dataParams.individual.senderInd).call(),
+            contract.methods.getSignature(dataParams.individual.receiverInd).call()
         ]);
         const response = await fetchAPI("/participants", "PATCH", {
-            id: contractParticipants.find(item => item.userId === userInfo?.data?.id)?.id,
+            id: dataParams.contractParticipants.find((item: any) => item.userId === dataParams.userInfo?.data?.id)?.id,
             status: "SIGNED"
         })
+        const { balance } = await handleInstanceWeb3();
+        dataParams.setUserInfo((prev: any) => ({ ...prev, balance }));
         const isStatusContractUpdated = response.data.isContractStatusUpdated
         if (isStatusContractUpdated) {
-            const isCondition = ((userInfo?.data?.addressWallet)?.trim().toLowerCase() || '') === ((individual.senderInd)?.trim().toLowerCase() || '')
+            const isCondition = ((dataParams.userInfo?.data?.addressWallet)?.trim().toLowerCase() || '') === ((dataParams.individual.senderInd)?.trim().toLowerCase() || '')
             if (isCondition) {
-                setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, transferButton: true, confirmButtonSender: true }));
-                setIsDisableButton((prevState: any) => ({ ...prevState, transferButton: false }));
+                dataParams.setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, transferButton: true, confirmButtonSender: true }));
+                dataParams.setIsDisableButton((prevState: any) => ({ ...prevState, transferButton: false }));
             } else {
-                setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, withdrawButton: true, confirmButtonReceiver: true }));
+                dataParams.setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, withdrawButton: true, confirmButtonReceiver: true }));
             }
         } else {
-            setIsDisableButton((prevState: any) => ({ ...prevState, signButton: true }))
+            dataParams.setIsDisableButton((prevState: any) => ({ ...prevState, signButton: true }))
+        }
+        return {
+            message: "Sign Successfully !",
+            description: "Contract has been signed successfully",
+            status: "success"
         }
     } catch (error) {
-        throw Error(`Error occurred while signing the contract: ${error}`);
+        return {
+            message: "Sign Failed !",
+            description: error?.toString(),
+            status: "destructive"
+        }
     }
 }
 
@@ -269,6 +276,7 @@ const handleOnDeployContractFunc = async (
     privateKey: string,
     stages: any,
     userInfo: UserInfoData,
+    setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
     setAddressContract: Dispatch<SetStateAction<string>>,
     setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
     setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
@@ -287,17 +295,16 @@ const handleOnDeployContractFunc = async (
         };
     }
     try {
-        const { signature, publicKey } = signMessage(privateKey);
         const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
         const abi = privateCode.data.abi.abi;
         const byteCode = privateCode.data.abi.bytecode;
-        const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(abi);
+        const { instance } = await handleInstanceWeb3()
+        const contract = new instance.eth.Contract(abi);
         const _user = [individual.senderInd];
         const _total = individual.totalAmount;
-        const _privateKey = privateKey;
         const _supplier = individual.receiverInd;
-
+        const { publicKey } = signMessage(privateKey);
+        const _privateKey = await hashStringWithSHA512(privateKey);
         const _stages: IStage[] = await Promise.all(
             stages.map(async (stage: any) => ({
                 percent: stage.percent,
@@ -313,7 +320,8 @@ const handleOnDeployContractFunc = async (
             .send({
                 from: userInfo?.data?.addressWallet,
             });
-
+        const { balance } = await handleInstanceWeb3();
+        setUserInfo((prev: any) => ({ ...prev, balance }));
         setAddressContract(deployTransaction?.options?.address as string);
         setIsVisibleButton((prevState: any) => ({
             ...prevState,
@@ -325,14 +333,16 @@ const handleOnDeployContractFunc = async (
             transferButton: true,
             deployButton: true,
         }));
-
-        await fetchAPI("/contracts", "PATCH", {
+        await Promise.all([fetchAPI("/contracts", "PATCH", {
             id: idContract,
             contractAddress: deployTransaction?.options?.address as string,
             status: "ENFORCE",
             stages: stages,
-        });
-        isExportPrivateKey(idContract, signature, publicKey)
+        }),
+        fetchAPI("/contracts/handle-deploy", 'POST', {
+            contractId: idContract,
+        })])
+        isExportPrivateKey(idContract, _privateKey, publicKey)
         return {
             messages: "Deploy Successfully",
             description: `Contract address: ${deployTransaction.options.address}`,
@@ -340,7 +350,7 @@ const handleOnDeployContractFunc = async (
         }
     } catch (error) {
         console.log('error', error);
-        
+
         return {
             message: "Deploy Failed",
             description: error,
@@ -376,16 +386,15 @@ function verifySignature(message: string, signature: string, publicKey: string):
 }
 
 export const getContentFromFile = async (
-    file: File,
-    setRsaKey: Dispatch<SetStateAction<RSAKey | undefined>>
-) => {
+    file: File | undefined,
+): Promise<{ publicKey: string, privateKey: string } | null> => {
     if (!file) return null;
     try {
-        const result = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
+        const reader = new FileReader();
+        const result = await new Promise<string>((resolve, reject) => {
             reader.onload = (event) => {
                 if (event.target) {
-                    resolve(event.target.result);
+                    resolve(event.target.result as string);
                 }
             };
             reader.onerror = (error) => {
@@ -393,11 +402,11 @@ export const getContentFromFile = async (
             };
             reader.readAsText(file);
         });
-        const { publicKey, privateKey } = extractKeys(result as string);
-        setRsaKey({ publicKey, privateKey });
-        return true
+        const { publicKey, privateKey } = extractKeys(result);
+        return { publicKey, privateKey };
     } catch (error) {
-        return error
+        console.error("Error reading file:", error);
+        return null;
     }
 };
 
@@ -415,6 +424,75 @@ const extractKeys = (keyString: string) => {
     return { publicKey, privateKey };
 };
 
+async function hashStringWithSHA512(input: string | undefined): Promise<string> {
+    if (!input) return ''
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+const handleCallFunctionOfBlockchain = async (
+    dataAuthentication: {
+        typeAuthentication: number,
+        filePrivateKey?: File | undefined,
+        privateKey?: string
+    },
+    dataFunctionCall: {
+        nameFunctionCall: EFunctionCall | undefined,
+        signContractParams?: ISignContractFunctionCallParams
+    }): Promise<IResponseFunction> => {
+    if (dataAuthentication.privateKey === "" && dataAuthentication.filePrivateKey === undefined) {
+        return {
+            description: "Please fill your private key or upload your signature",
+            message: "Private key or signature is required",
+            status: "destructive"
+        }
+    }
+    let privateKey: string = ''
+    switch (dataAuthentication.typeAuthentication) {
+        case 0:
+            const privateKeyGen = await hashStringWithSHA512(dataAuthentication.privateKey)
+            privateKey = privateKeyGen
+            break;
+        case 1:
+            const privateMessage = await getContentFromFile(dataAuthentication.filePrivateKey)
+            privateKey = privateMessage?.privateKey || '';
+            break
+    }
+    console.log('privateKey', privateKey, dataFunctionCall?.nameFunctionCall);
+    let responseMessages: IResponseFunction = initResponseMessages
+    switch (dataFunctionCall.nameFunctionCall) {
+        case EFunctionCall.FETCH_COMPARE_CONTRACT:
+            console.log('Fetch Compare Contract');
+            break;
+        case EFunctionCall.CANCEL_CONTRACT:
+            console.log('Cancel Contract');
+            break;
+        case EFunctionCall.WITHDRAW_CONTRACT:
+            console.log('Withdraw Contract');
+            break;
+        case EFunctionCall.TRANSFER_CONTRACT:
+            console.log('Transfer Contract');
+            break;
+        case EFunctionCall.SIGN_CONTRACT:
+            responseMessages = await handleSignContractFunc({
+                ...dataFunctionCall.signContractParams,
+                privateKey
+            } as ISignContractFunctionCallParams)
+            break;
+        case EFunctionCall.CONFIRM_CONTRACT_SENDER:
+            console.log('Confirm Contract Sender');
+            break;
+        case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
+            console.log('Confirm Contract Receiver');
+            break;
+    }
+    return responseMessages
+}
+
 export {
     updateStateButton,
     fetchDataWhenEntryPage,
@@ -426,5 +504,8 @@ export {
     handleCompareContractInformationFunc,
     handleSignContractFunc,
     handleOnDeployContractFunc,
-    isExportPrivateKey
+    isExportPrivateKey,
+    signMessage,
+    hashStringWithSHA512,
+    handleCallFunctionOfBlockchain
 }

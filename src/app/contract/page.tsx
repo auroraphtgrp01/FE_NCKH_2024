@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ImportIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -53,30 +53,12 @@ export interface Participant {
   avatar?: string;
 }
 
-const data: Contract[] = [
-  {
-    id: "m5gr84i9",
-    status: "SUCCESS",
-    address:
-      "0x4f19cf235dee93c0105d40083ae214b060001a7ef22ade30e5adce0cee5b0fb6",
-    typeID: "e8d5c929-9d64-41b0-bf09-bcdf41412480",
-    typeName: "SCM Contract ",
-  },
-  {
-    id: "m5gr84i9",
-    status: "FAILED",
-    address:
-      "0x4f19cf235dee93c0105d40083ae214b060001a7ef22ade30e5adce0cee5b0fb6",
-    typeID: "e8d5c929-9d64-41b0-bf09-bcdf41412480",
-    typeName: "Buy/Sell Contract",
-  },
-];
 
 export type Contract = {
   id: string;
   address: string;
   status: "PENDING" | "SUCCESS" | "FAILED";
-  typeID: string;
+  type: string;
   typeName: string;
 };
 
@@ -100,6 +82,7 @@ const initParticipants: Participant[] = [
 ];
 
 export default function DataTableDemo() {
+  const [dataTable, setDataTable] = React.useState([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [participants, setParticipants] =
     React.useState<Participant[]>(initParticipants);
@@ -107,20 +90,39 @@ export default function DataTableDemo() {
     []
   );
   const [isOpen, setIsOpen] = React.useState(false);
-  async function handleOpenParticipant(addressWallet: string) {
-    await getParticipants(addressWallet);
+  async function handleOpenParticipant(contractId: string) {
+    await getParticipants(contractId);
     setIsOpen(true);
   }
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const getParticipants = async (addressWallet: string) => {
-    fetchAPI(`/contract/participants/${addressWallet}`, "GET").then((res) => {
-      setParticipants(res.data);
-    });
-  };
+  const getParticipants = async (contractId: string) => {
+    fetchAPI(`/participants/find-all/${contractId}`, "GET").then((res) => {
+      console.log(res.data);
 
+      setParticipants(res.data);
+    }).catch((errors) => {
+      console.log(errors);
+    })
+  };
+  const userInfoString = localStorage.getItem("user-info");
+  const user_info = userInfoString ? JSON.parse(userInfoString) : null;
+    React.useEffect(() => {
+    fetchAPI(
+      `/contracts/get-all-contract-details/${user_info.data.addressWallet}`,
+      "GET"
+    ).then((res) => {
+      if (res.status === 200) {
+        console.log(res.data);
+        setDataTable(res.data.contracts)
+        // id
+        // type
+        // status
+      }
+    });
+  }, []);
   const columns: ColumnDef<Contract>[] = [
     {
       id: "select",
@@ -143,24 +145,27 @@ export default function DataTableDemo() {
       ),
       enableSorting: false,
       enableHiding: false,
+      // id
+      // type
+      // status
     },
     {
-      accessorKey: "address",
+      accessorKey: "id",
       header: ({ column }) => {
         return <div className="font-semibold ">Address Contract</div>;
       },
       cell: ({ row }) => (
-        <div className="lowercase text-start">{row.getValue("address")}</div>
+        <div className="lowercase text-start">{row.getValue("id")}</div>
       ),
     },
     {
-      accessorKey: "typeID",
+      accessorKey: "type",
       enableHiding: true,
       header: ({ column }) => {
         return <div className="font-semibold ">Type Contract</div>;
       },
       cell: ({ row }) => (
-        <div className="lowercase text-start">{row.getValue("typeID")}</div>
+        <div className="lowercase text-start">{row.getValue("type")}</div>
       ),
     },
     {
@@ -181,13 +186,13 @@ export default function DataTableDemo() {
         return (
           <div className="text-center">
             <Button
-              onClick={() => handleOpenParticipant(row.getValue("address"))}
+              onClick={() => handleOpenParticipant(row.getValue("id"))}
             >
               Participants
             </Button>
             <Link
-              href={`/contract/detail/${row.getValue("typeID")}/${row.getValue(
-                "address"
+              href={`/contract/detail/${row.getValue("type")}/${row.getValue(
+                "id"
               )}`}
             >
               <Button className="ms-2" variant={"destructive"}>
@@ -201,7 +206,7 @@ export default function DataTableDemo() {
   ];
 
   const table = useReactTable({
-    data,
+    data: dataTable,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -231,9 +236,9 @@ export default function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("id")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

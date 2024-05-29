@@ -46,7 +46,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
-import { fetchDataWhenEntryPage, getContentFromFile, handleCallFunctionOfBlockchain, handleConfirmStagesFunc, handleDateStringToUint, handleOnDeployContractFunc, handleSignContractFunc, hashStringWithSHA512, inviteNewParticipant, isExportPrivateKey, signMessage, transferMoneyFunc, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import { fetchDataWhenEntryPage, handleCallFunctionOfBlockchain, handleDateStringToUint, handleOnDeployContractFunc, inviteNewParticipant, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { initDisableButton, initVisibleButton } from "@/constants/initVariable.constants";
 
@@ -54,7 +54,6 @@ export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([]);
-  const [contractUsers, setContractUsers] = useState<any[]>([]);
   const [contractData, setContractData] = useState<ContractData>();
   const [individual, setIndividual] = useState<IIndividual>({ receiverInd: "", senderInd: "", totalAmount: "" });
   const [isOpenAlert, setIsOpenAlert] = useState(false);
@@ -70,7 +69,6 @@ export default function Dashboard() {
   const [contractStatus, setContractStatus] = useState<string>("");
   const [addressContract, setAddressContract] = useState<string>("");
   const [selectTypeKey, setSelectTypeKey] = useState(0);
-  const [rsaKey, setRsaKey] = useState<RSAKey>();
   const { toast } = useToast();
   const [isDisableButton, setIsDisableButton] = useState<IDisableButton>(initDisableButton);
   const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>(initVisibleButton);
@@ -173,23 +171,6 @@ export default function Dashboard() {
       })
   }
 
-  async function transferMoney() {
-    transferMoneyFunc(addressContract, individual, userInfo)
-      .then(() => {
-        toast({
-          title: "Transfer successfully",
-          variant: "success",
-        });
-      })
-      .catch((error) => {
-        toast({
-          title: "Error occurred while transferring money",
-          description: error,
-          variant: "destructive",
-        })
-      })
-  }
-
   async function onCallFunctionInBlockchain() {
     setIsOpenEnterPrivateKey(false);
     const responseMessage = await handleCallFunctionOfBlockchain(
@@ -202,13 +183,19 @@ export default function Dashboard() {
         nameFunctionCall,
         signContractParams: {
           addressContract, userInfo, setUserInfo, individual, contractParticipants, setIsVisibleButton, setIsDisableButton
+        },
+        transferMoneyParams: {
+          addressContract, individual, userInfo, setUserInfo
+        },
+        confirmStageParams: {
+          addressContract, userInfo, setUserInfo, individual, setIsDisableButton, setIsVisibleButton
         }
       }
     )
     toast({
       title: responseMessage.message,
       variant: responseMessage.status,
-      description: responseMessage.description
+      description: responseMessage.description,
     })
   }
 
@@ -233,24 +220,6 @@ export default function Dashboard() {
       })
     })
     setIsDeployContractAlert(false);
-  }
-
-  async function handleConfirmStages() {
-    handleConfirmStagesFunc(addressContract, userInfo, individual, setIsDisableButton, setIsVisibleButton)
-      .then(() => {
-        toast({
-          title: "Confirm successfully !",
-          description: "You have confirmed the stage",
-          variant: "success",
-        });
-      })
-      .catch((error) => {
-        toast({
-          title: "Error occurred while confirming stage",
-          description: error,
-          variant: "destructive",
-        });
-      })
   }
 
   async function handleCancelContract() {
@@ -522,7 +491,7 @@ export default function Dashboard() {
                       className="w-full mt-2"
                       onClick={() => {
                         setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_SENDER)
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT)
                         setPrivateKey('');
                       }}
                     >
@@ -536,7 +505,7 @@ export default function Dashboard() {
                       className="w-full mt-2"
                       onClick={() => {
                         setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_RECEIVER)
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT)
                         setPrivateKey('');
                       }}
                     >

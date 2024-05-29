@@ -174,8 +174,7 @@ export enum EFunctionCall {
 	WITHDRAW_CONTRACT = "WITHDRAW_CONTRACT",
 	TRANSFER_CONTRACT = "TRANSFER_CONTRACT",
 	SIGN_CONTRACT = "SIGN_CONTRACT",
-	CONFIRM_CONTRACT_SENDER = "CONFIRM_CONTRACT_SENDER",
-	CONFIRM_CONTRACT_RECEIVER = "CONFIRM_CONTRACT_RECEIVER",
+	CONFIRM_CONTRACT = "CONFIRM_CONTRACT",
 }
 
 export interface ISignContractFunctionCallParams {
@@ -189,6 +188,23 @@ export interface ISignContractFunctionCallParams {
 	privateKey?: string
 }
 
+export interface ITransferMoneyFunctionCallParams {
+	addressContract: string,
+	individual: IIndividual,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	privateKey?: string
+}
+
+export interface IConfirmStageFunctionCallParams {
+	addressContract: string,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	individual: IIndividual,
+	setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
+	setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+	privateKey?: string
+}
 export interface IResponseFunction {
 	status: "success" | 'destructive'
 	message: string;

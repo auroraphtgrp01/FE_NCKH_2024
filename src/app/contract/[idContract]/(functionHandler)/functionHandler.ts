@@ -1,5 +1,5 @@
 import { initResponseMessages } from "@/constants/initVariable.constants";
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, IConfirmStageFunctionCallParams, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, ITransferMoneyFunctionCallParams, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { handleInstanceWeb3 } from "@/utils/web3Instance";
 import NodeRSA from "node-rsa";
@@ -154,21 +154,30 @@ const withdrawMoneyFunc = async (addressContract: string, userInfo: UserInfoData
     }
 }
 
-const transferMoneyFunc = async (addressContract: string, individual: IIndividual, userInfo: UserInfoData) => {
+const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): Promise<IResponseFunction> => {
     try {
         const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
         const abi = privateCode.data.abi.abi;
         const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(abi, addressContract as string);
+        const contract = new web3.eth.Contract(abi, dataParams.addressContract as string);
         await contract.methods.sendToSmartContract().send({
-            from: userInfo?.data?.addressWallet,
-            value: web3.utils.toWei(individual?.totalAmount, "ether"),
+            from: dataParams.userInfo?.data?.addressWallet,
+            value: web3.utils.toWei(dataParams.individual?.totalAmount, "ether"),
             gas: "1000000",
         });
         //   const balance: string = await contract.methods.getBalance().call();
         //   setCurrentBalance(parseFloat(fromWei(balance, "ether")));
+        return {
+            message: "Transfer Successfully !",
+            description: "Money has been transferred successfully",
+            status: "success"
+        }
     } catch (error) {
-        throw error
+        return {
+            message: "Transfer Failed !",
+            description: error?.toString(),
+            status: "destructive"
+        }
     }
 }
 
@@ -177,18 +186,14 @@ const handleDateStringToUint = (date: string): number => {
 }
 
 const handleConfirmStagesFunc = async (
-    addressContract: string,
-    userInfo: UserInfoData,
-    individual: IIndividual,
-    setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
-    setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
-) => {
+    dataParams: IConfirmStageFunctionCallParams
+): Promise<IResponseFunction> => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
         const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(abi, addressContract as string);
+        const contract = new web3.eth.Contract(abi, dataParams.addressContract as string);
         await contract.methods.confirmStage().send({
-            from: userInfo?.data?.addressWallet,
+            from: dataParams.userInfo?.data?.addressWallet,
             gas: "1000000",
         });
         // if (userInfo?.data?.addressWallet === individual.senderInd) {
@@ -196,8 +201,17 @@ const handleConfirmStagesFunc = async (
         // } else {
         //     setIsDisableButton({ ...isDisableButton });
         // }
+        return {
+            message: "Confirm Successfully !",
+            description: "Stage has been confirmed successfully",
+            status: "success"
+        }
     } catch (error) {
-        throw new Error(`Error occurred while handling confirmation stages: ${error}`)
+        return {
+            message: "Confirm Failed !",
+            description: error?.toString(),
+            status: "destructive"
+        }
     }
 }
 
@@ -442,7 +456,9 @@ const handleCallFunctionOfBlockchain = async (
     },
     dataFunctionCall: {
         nameFunctionCall: EFunctionCall | undefined,
-        signContractParams?: ISignContractFunctionCallParams
+        signContractParams?: ISignContractFunctionCallParams,
+        transferMoneyParams?: ITransferMoneyFunctionCallParams,
+        confirmStageParams?: IConfirmStageFunctionCallParams
     }): Promise<IResponseFunction> => {
     if (dataAuthentication.privateKey === "" && dataAuthentication.filePrivateKey === undefined) {
         return {
@@ -475,7 +491,10 @@ const handleCallFunctionOfBlockchain = async (
             console.log('Withdraw Contract');
             break;
         case EFunctionCall.TRANSFER_CONTRACT:
-            console.log('Transfer Contract');
+            responseMessages = await transferMoneyFunc({
+                ...dataFunctionCall.transferMoneyParams,
+                privateKey
+            } as ITransferMoneyFunctionCallParams)
             break;
         case EFunctionCall.SIGN_CONTRACT:
             responseMessages = await handleSignContractFunc({
@@ -483,11 +502,11 @@ const handleCallFunctionOfBlockchain = async (
                 privateKey
             } as ISignContractFunctionCallParams)
             break;
-        case EFunctionCall.CONFIRM_CONTRACT_SENDER:
-            console.log('Confirm Contract Sender');
-            break;
-        case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
-            console.log('Confirm Contract Receiver');
+        case EFunctionCall.CONFIRM_CONTRACT:
+            responseMessages = await handleConfirmStagesFunc({
+                ...dataFunctionCall.confirmStageParams,
+                privateKey
+            } as IConfirmStageFunctionCallParams)
             break;
     }
     return responseMessages
@@ -498,14 +517,7 @@ export {
     fetchDataWhenEntryPage,
     inviteNewParticipant,
     withdrawMoneyFunc,
-    transferMoneyFunc,
     handleDateStringToUint,
-    handleConfirmStagesFunc,
-    handleCompareContractInformationFunc,
-    handleSignContractFunc,
     handleOnDeployContractFunc,
-    isExportPrivateKey,
-    signMessage,
-    hashStringWithSHA512,
     handleCallFunctionOfBlockchain
 }

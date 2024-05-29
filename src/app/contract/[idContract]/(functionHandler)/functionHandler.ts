@@ -29,9 +29,9 @@ const updateStateButton = (
             const participantsLogin = contractParticipants?.find((participant: any) => {
                 return participant.userId === userInfo.data.id;
             });
-            if(participantsLogin.status !== "SIGNED") {
-                setIsDisableButton((prev: any) => ({...prev, signButton: false}))
-            }           
+            if (participantsLogin?.status !== "SIGNED") {
+                setIsDisableButton((prev: any) => ({ ...prev, signButton: false }))
+            }
             break;
         case "SIGNED":
             setIsVisibleButton((prev: any) => ({
@@ -51,7 +51,7 @@ const updateStateButton = (
         default:
             break;
     }
- 
+
 };
 
 const fetchDataWhenEntryPage = async (
@@ -130,7 +130,7 @@ const inviteNewParticipant = async (
     }
 }
 
-const withdrawMoneyFunc = async (addressContract: string,  userInfo: UserInfoData, individual: IIndividual) => {
+const withdrawMoneyFunc = async (addressContract: string, userInfo: UserInfoData, individual: IIndividual) => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
         const web3 = new Web3(window.ethereum);
@@ -178,7 +178,7 @@ const handleConfirmStagesFunc = async (
     addressContract: string,
     userInfo: UserInfoData,
     individual: IIndividual,
-    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>,
+    setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
     setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
 ) => {
     try {
@@ -231,7 +231,7 @@ const handleSignContractFunc = async (
     contractParticipants: IContractParticipant[],
     idContract: string | string[],
     setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
-    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>
+    setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
 ) => {
     try {
         const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
@@ -243,21 +243,21 @@ const handleSignContractFunc = async (
             contract.methods.getSignature(individual.senderInd).call(),
             contract.methods.getSignature(individual.receiverInd).call()
         ]);
-       const response = await fetchAPI("/participants", "PATCH", {
-                id: contractParticipants.find(item => item.userId === userInfo?.data?.id)?.id,
-                status: "SIGNED"
-            })
-        const isStatusContractUpdated =  response.data.isContractStatusUpdated
-        if(isStatusContractUpdated) {
+        const response = await fetchAPI("/participants", "PATCH", {
+            id: contractParticipants.find(item => item.userId === userInfo?.data?.id)?.id,
+            status: "SIGNED"
+        })
+        const isStatusContractUpdated = response.data.isContractStatusUpdated
+        if (isStatusContractUpdated) {
             const isCondition = ((userInfo?.data?.addressWallet)?.trim().toLowerCase() || '') === ((individual.senderInd)?.trim().toLowerCase() || '')
-            if(isCondition) {
+            if (isCondition) {
                 setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, transferButton: true, confirmButtonSender: true }));
                 setIsDisableButton((prevState: any) => ({ ...prevState, transferButton: false }));
             } else {
                 setIsVisibleButton((prevState: any) => ({ ...prevState, signButton: false, withdrawButton: true, confirmButtonReceiver: true }));
             }
         } else {
-            setIsDisableButton((prevState: any) => ({...prevState, signButton: true}))
+            setIsDisableButton((prevState: any) => ({ ...prevState, signButton: true }))
         }
     } catch (error) {
         throw Error(`Error occurred while signing the contract: ${error}`);
@@ -265,102 +265,103 @@ const handleSignContractFunc = async (
 }
 
 const handleOnDeployContractFunc = async (
-    individual: IIndividual, 
-    privateKey: string, 
-    stages: any,  
-    userInfo: UserInfoData, 
+    individual: IIndividual,
+    privateKey: string,
+    stages: any,
+    userInfo: UserInfoData,
     setAddressContract: Dispatch<SetStateAction<string>>,
     setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
-    setIsDisableButton:  Dispatch<SetStateAction<IDisableButton>>,
+    setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
     idContract: string | string[]
 ) => {
     if (!individual.totalAmount || individual.totalAmount === '0') {
-      return {
-        message: "Total amount of money must be greater than 0",
-        status: 'destructive'
-      };
+        return {
+            message: "Total amount of money must be greater than 0",
+            status: 'destructive'
+        };
     }
     if (!privateKey) {
         return {
             message: "Private key is required to deploy contract",
             status: 'destructive'
-          };
+        };
     }
     try {
-      const {signature, publicKey} = signMessage(privateKey);
-      const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
-      const abi = privateCode.data.abi.abi;
-      const byteCode = privateCode.data.abi.bytecode;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi);
-      const _user = [individual.senderInd];
-      const _total = individual.totalAmount;
-      const _privateKey = privateKey;
-      const _supplier = individual.receiverInd;
-      
-      const _stages: IStage[] = await Promise.all(
-        stages.map(async (stage: any) => ({
-          percent: stage.percent,
-          deliveryAt: handleDateStringToUint(stage.deliveryAt),
-          description: stage.description || "",
-        }))
-      );
-      
-      const deployTransaction = await contract
-        .deploy({
-          data: byteCode,
-          arguments: [_user, _supplier, "", _total, _stages, _privateKey],
-        })
-        .send({
-          from: userInfo?.data?.addressWallet,
+        const { signature, publicKey } = signMessage(privateKey);
+        const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
+        const abi = privateCode.data.abi.abi;
+        const byteCode = privateCode.data.abi.bytecode;
+        const web3 = new Web3(window.ethereum);
+        const contract = new web3.eth.Contract(abi);
+        const _user = [individual.senderInd];
+        const _total = individual.totalAmount;
+        const _privateKey = privateKey;
+        const _supplier = individual.receiverInd;
+
+        const _stages: IStage[] = await Promise.all(
+            stages.map(async (stage: any) => ({
+                percent: stage.percent,
+                deliveryAt: handleDateStringToUint(stage.deliveryAt),
+                description: stage.description || "",
+            }))
+        );
+        const deployTransaction = await contract
+            .deploy({
+                data: byteCode,
+                arguments: [_user, _supplier, "", _total, _stages, _privateKey],
+            })
+            .send({
+                from: userInfo?.data?.addressWallet,
+            });
+
+        setAddressContract(deployTransaction?.options?.address as string);
+        setIsVisibleButton((prevState: any) => ({
+            ...prevState,
+            deployButton: false,
+            signButton: true,
+        }));
+        setIsDisableButton((prevState: any) => ({
+            ...prevState,
+            transferButton: true,
+            deployButton: true,
+        }));
+
+        await fetchAPI("/contracts", "PATCH", {
+            id: idContract,
+            contractAddress: deployTransaction?.options?.address as string,
+            status: "ENFORCE",
+            stages: stages,
         });
-     
-      setAddressContract(deployTransaction?.options?.address as string);
-      setIsVisibleButton((prevState: any) => ({
-        ...prevState,
-        deployButton: false,
-        signButton: true,
-      }));
-      setIsDisableButton((prevState: any) => ({
-        ...prevState,
-        transferButton: true,
-        deployButton: true,
-      }));
-      
-      await fetchAPI("/contracts", "PATCH", {
-        id: idContract,
-        contractAddress: deployTransaction?.options?.address as string,
-        status: "ENFORCE",
-        stages: stages,
-      });
-      isExportPrivateKey(idContract, signature, publicKey)
-      return { 
-        messages: "Deploy Successfully",
-        description: `Contract address: ${deployTransaction.options.address}`,
-        status: "success",
-      }
+        isExportPrivateKey(idContract, signature, publicKey)
+        return {
+            messages: "Deploy Successfully",
+            description: `Contract address: ${deployTransaction.options.address}`,
+            status: "success",
+        }
     } catch (error) {
-        return { 
+        console.log('error', error);
+        
+        return {
             message: "Deploy Failed",
             description: error,
             status: "destructive",
         }
     }
-  }
+}
 
-  const isExportPrivateKey = (contractId: string | string [], signature: string, publicKey: string) => {
-    let data = new Blob([`${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`], {type: 'text/csv'});
+const isExportPrivateKey = (contractId: string | string[], signature: string, publicKey: string) => {
+    let data = new Blob([`${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`], { type: 'text/csv' });
     let csvURL = window.URL.createObjectURL(data);
     const tempLink = document.createElement('a');
     tempLink.href = csvURL;
     tempLink.setAttribute('download', `PK_${contractId}.pem`);
     tempLink.click();
-  }
+}
 
-  function signMessage(message: string) {
-      const bitLength: number = 1024;
-      const rsaKeyPair: NodeRSA = new NodeRSA({ b: bitLength });
-      const publicKey: string = rsaKeyPair.exportKey('public');
+function signMessage(message: string) {
+    const bitLength: number = 1024;
+    const rsaKeyPair: NodeRSA = new NodeRSA({ b: bitLength });
+    const publicKey: string = rsaKeyPair.exportKey('public');
     const signer = new NodeRSA(rsaKeyPair.exportKey('private'));
     return {
         signature: signer.sign(message, 'base64'),
@@ -375,7 +376,7 @@ function verifySignature(message: string, signature: string, publicKey: string):
 }
 
 export const getContentFromFile = async (
-    file: File, 
+    file: File,
     setRsaKey: Dispatch<SetStateAction<RSAKey | undefined>>
 ) => {
     if (!file) return null;
@@ -392,11 +393,11 @@ export const getContentFromFile = async (
             };
             reader.readAsText(file);
         });
-    const { publicKey, privateKey } = extractKeys(result as string);
-    setRsaKey({ publicKey, privateKey });
-    return true
+        const { publicKey, privateKey } = extractKeys(result as string);
+        setRsaKey({ publicKey, privateKey });
+        return true
     } catch (error) {
-      return error
+        return error
     }
 };
 

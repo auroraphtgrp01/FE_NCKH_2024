@@ -67,6 +67,7 @@ export default function Dashboard() {
   const [filePrivateKey, setFilePrivateKey] = useState<File>();
   const { userInfo, setUserInfo }: any = useAppContext();
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
+  const [contractStatus, setContractStatus] = useState<string>("");
   const [addressContract, setAddressContract] = useState<string>("");
   const [selectTypeKey, setSelectTypeKey] = useState(0);
   const [rsaKey, setRsaKey] = useState<RSAKey>();
@@ -105,6 +106,7 @@ export default function Dashboard() {
           }
         }
       })
+      setContractStatus(response?.data.contract.status)
     })
   }, []);
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -281,7 +283,7 @@ export default function Dashboard() {
       <div className="flex justify-center">
         <main className="flex items-start py-4">
           <div className="min-w-[300px] px-3 flex-1 flex justify-end">
-            <Card className="overflow-hidden w-[430px]">
+            <Card className="overflow-hidden w-[430px] h-[755px]">
               <CardHeader className="flex flex-row items-start">
                 {/* <Button onClick={() => {
                   setIsOpenEnterPrivateKey(true)
@@ -321,7 +323,21 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <div className="font-semibold">Contract Progress </div>
-                    <Progress value={25} className="my-2" />
+                    {contractStatus === "PENDING" && (
+                      <Progress value={0} className="my-2" />
+                    )}
+                    {contractStatus === "PARTICIPATED" && (
+                      <Progress value={25} className="my-2" />
+                    )}
+                    {contractStatus === "ENFORCE" && (
+                      <Progress value={50} className="my-2" />
+                    )}
+                    {contractStatus === "SIGNED" && (
+                      <Progress value={75} className="my-2" />
+                    )}
+                    {contractStatus === "COMPLETED" && (
+                      <Progress value={100} className="my-2" />
+                    )}
                     <div className="flex">
                       <div className="text-center ms-1 font-semibold">
                         Participated
@@ -373,40 +389,6 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
-                </div>
-                <Separator className="my-4" />
-                <div>
-                  <Card x-chunk="dashboard-01-chunk-5">
-                    <CardHeader>
-                      <div className="flex justify-between">
-                        <CardTitle className="">
-                          Contract Signing Status
-                        </CardTitle>
-                      </div>
-                      <Separator className="mb-2" />
-                    </CardHeader>
-                    <ScrollArea className="max-h-[300px] h-[120px]">
-                      <CardContent className="grid gap-8">
-                        {contractUsers.map((user: any, index) => (
-                          <div className="flex items-center gap-4" key={index}>
-                            <div className="grid gap-1">
-                              <p className="text-sm font-medium leading-none">
-                                {user.property}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                ************************{user.value.slice(-5)}
-                              </p>
-                            </div>
-                            <div className="ml-auto font-medium">
-                              <Badge variant={"default"} className="me-2 mb-2">
-                                Signed
-                              </Badge>
-                            </div>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </ScrollArea>
-                  </Card>
                 </div>
               </CardContent>
             </Card>

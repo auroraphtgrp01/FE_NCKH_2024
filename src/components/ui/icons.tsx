@@ -5,11 +5,26 @@ import {
   LucideIcon,
   ScanFace,
   KeyRound,
-  Key, Check, BadgePlus, BadgeX, BadgeInfo, ShieldPlus, UserRoundPlus, Newspaper, Layers, Briefcase, LogOut, MoonStar, CloudSun, WalletMinimal, ShoppingCart
-} from "lucide-react"
-import Image from "next/image"
+  Key,
+  Check,
+  BadgePlus,
+  BadgeX,
+  BadgeInfo,
+  ShieldPlus,
+  UserRoundPlus,
+  Newspaper,
+  Layers,
+  Briefcase,
+  LogOut,
+  MoonStar,
+  CloudSun,
+  WalletMinimal,
+  ShoppingCart,
+  FileCheck2Icon,
+} from "lucide-react";
+import Image from "next/image";
 
-export type Icon = LucideIcon
+export type Icon = LucideIcon;
 
 export const Icons = {
   sun: SunMedium,
@@ -31,8 +46,9 @@ export const Icons = {
   cloudSun: CloudSun,
   walletMinimal: WalletMinimal,
   shoppingCart: ShoppingCart,
+  FileCheck2Icon: FileCheck2Icon,
   logo: (props: LucideProps) => (
-    <Image src={'/metamask.png'} alt="" height={62} width={62} />
+    <Image src={"/metamask.png"} alt="" height={62} width={62} />
   ),
   gitHub: (props: LucideProps) => (
     <svg viewBox="0 0 438.549 438.549" {...props}>
@@ -42,4 +58,4 @@ export const Icons = {
       ></path>
     </svg>
   ),
-}
+};

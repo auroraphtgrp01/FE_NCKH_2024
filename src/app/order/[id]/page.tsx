@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -36,7 +38,9 @@ import {
 } from "@/components/ui/select";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { useParams } from "next/navigation";
-
+//
+import { useAppContext } from "@/components/ThemeProvider";
+import { Router } from "lucide-react";
 export type TData = {
   id: string;
   name: string;
@@ -50,29 +54,6 @@ export type TData = {
   idSupplier: string;
   idOrder: string; // Thuộc tính idOrder cần phải có
 };
-export interface DataWithName {
-  id: string;
-  name: string;
-  unit: string;
-  image: string;
-  price: number;
-  discount: number;
-  quantity: number;
-  taxPrice: number;
-  description: string;
-  idSupplier: string;
-}
-export interface DataTableProps<TData extends DataWithName, TValue> {
-  data: TData[];
-  getDataOrders: () => void;
-  setData: React.Dispatch<React.SetStateAction<TData[]>>;
-}
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  idSupplier: number;
-}
 
 export interface OrderDetail {
   id: string;
@@ -87,24 +68,131 @@ export interface OrderDetail {
   unit: string;
   idOrder: string;
   idSupplier: string;
+  orderStatus: string;
+}
+
+export interface DataWithName {
+  status: string;
+  orderDetails: OrderDetail[];
+}
+
+export interface UserInfo {
+  access_token: string;
+  addressWallet: string;
+  email: string;
+  id: string;
+  name: string;
+  refresh_token: string;
+  role: string;
+}
+export interface DataTableProps<TData extends DataWithName> {
+  data: TData;
+  getDataOrders: () => void;
+  setData: React.Dispatch<React.SetStateAction<TData>>;
+}
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  idSupplier: number;
 }
 
 export default function Page() {
   const { toast } = useToast();
-  const [data, setData] = useState<OrderDetail[]>([]);
+  const router = useRouter();
+  const { dataCreateContract, setDataCreateContract }: any = useAppContext();
+  const [data, setData] = useState<DataWithName>({
+    status: "",
+    orderDetails: [],
+  });
   const { id } = useParams<{ id: string }>();
-  const [dataOrder, setDataOrder] = useState<any>([]);
-  const [supplier, setsupplier] = useState("");
+  const [dataOrder, setDataOrder] = useState<any>({});
   const [endDate, setEndate] = useState("");
-  const [supplierCode, setSupplierCode] = useState("");
   const [delivery, setDelivery] = useState("");
-  const updateOrder = async (e: any, type: string) => {
-    var payload = {};
+  const [isDisableButton, setIsDisableButton] = useState({
+    isDisableButtonSendRq: false,
+    isDisableButtonResendRq: false,
+    isDisableButtonDeleteSurvey: false,
+    isDisableButtonCreateContract: false,
+    isDisableButtonRefuseSurvey: false,
+  });
+  const [isCustomer, setIsCustomer] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    access_token: "",
+    addressWallet: "",
+    email: "",
+    id: "",
+    refresh_token: "",
+    name: "",
+    role: "",
+  });
+  // xxxxxx
+  useEffect(() => {
+    getDataOrders();
+    console.log(isDisableButton.isDisableButtonSendRq);
+    console.log(isDisableButton.isDisableButtonResendRq);
+
+    const info = JSON.parse(localStorage.getItem("user-info") as string);
+    setUserInfo(info);
+    if (info.data.role === "Customer") setIsCustomer(true);
+  }, []);
+
+  async function sendRequestToSupplier() {
+    await fetchAPI(`/orders/send-request/${dataOrder.id}`, "GET")
+      .then((res) => {
+        toast({
+          title: res.data.message,
+          variant: "success",
+        });
+
+        setIsDisableButton({ ...isDisableButton, isDisableButtonSendRq: true });
+        getDataOrders();
+      })
+      .catch((err) =>
+        toast({
+          title: err.message,
+          variant: "destructive",
+        })
+      );
+  }
+
+  async function resendSurveyToCustomer() {
+    await fetchAPI(`/orders/resend-request/${dataOrder.id}`, "GET")
+      .then((res) => {
+        toast({
+          title: res.data.message,
+          variant: "success",
+        });
+
+        setIsDisableButton({
+          ...isDisableButton,
+          isDisableButtonResendRq: true,
+        });
+        getDataOrders();
+      })
+      .catch((err) =>
+        toast({
+          title: err.message,
+          variant: "destructive",
+        })
+      );
+  }
+
+  async function createContract() {
+    setDataCreateContract({
+      supplierId: dataOrder.order.suppliersId,
+      userId: dataOrder.order.userId,
+      orderId: dataOrder.order.id,
+    });
+
+    router.push("/contract/create");
+  }
+
+  async function updateOrder(e: any, type: string) {
+    let payload = {};
     const dateValue = new Date(e.target.value);
     if (!isNaN(dateValue.getTime())) {
       const isoDate = dateValue.toISOString();
-      let payload;
-
       if (type === "endDate") {
         payload = {
           id: id,
@@ -116,15 +204,14 @@ export default function Page() {
           executeDate: isoDate,
         };
       }
-
       if (payload) {
-        console.log(">>>>>Payload PATCH lên : ", payload);
         try {
-          const res = await fetchAPI("/orders", "PATCH", payload);
-          getDataOrders();
-          toast({
-            title: `Update thành công`,
-            variant: "success",
+          await fetchAPI("/orders", "PATCH", payload).then((res) => {
+            getDataOrders();
+            toast({
+              title: `Update thành công`,
+              variant: "success",
+            });
           });
         } catch (err) {
           toast({
@@ -136,36 +223,42 @@ export default function Page() {
     } else {
       console.log("Chưa nhập xong");
     }
-  };
-  const getDataOrders = () => {
+  }
+  function getDataOrders() {
     fetchAPI(`/orders/${id}`, "GET")
       .then((res) => {
-        setEndate(res.data.order.endDate.split("T")[0]);
-        setDelivery(res.data.order.executeDate.split("T")[0]);
+        setDataOrder(res.data);
+        if (res.data.order.endDate !== null)
+          setEndate(res.data.order.endDate.split("T")[0]);
+        if (res.data.order.executeDate !== null)
+          setDelivery(res.data.order.executeDate.split("T")[0]);
+        const { products, ...rest } = res.data.order;
+        setIsDisableButton({
+          ...isDisableButton,
+          isDisableButtonSendRq: res.data.order.status !== "Pending",
+          isDisableButtonResendRq:
+            res.data.order.status === "Completed" ||
+            res.data.order.status === "Cancelled",
+          isDisableButtonCreateContract: res.data.order.status !== "Completed",
+          isDisableButtonRefuseSurvey: res.data.order.status !== "In Progress",
+          isDisableButtonDeleteSurvey: res.data.order.status !== "Pending",
+        });
 
-        setDataOrder(res.data.supplier);
-        const productOrder = res.data.order.products.map((product: any) => ({
-          id: product.id,
-          name: product.name,
-          description: product.description,
-          price: product.price,
-          image: product.image,
-          taxPrice: product.taxPrice,
-          discount: product.discount,
-          priceWithoutTax:
-            (product.price - product.discount) * product.quantity,
-          unit: product.unit,
-          idSupplier: res.data.supplier.id,
-          quantity: product.quantity,
-          idOrder: id,
-        }));
-        setData(productOrder);
+        const productOrder = res.data.order.products.map((product: any) => {
+          return {
+            ...product,
+            priceWithoutTax:
+              product.price * product.quantity - product.discount,
+            idSupplier: res.data.supplier.id,
+            idOrder: id,
+          };
+        });
+
+        setData({ status: rest.status, orderDetails: productOrder });
       })
       .catch((error) => console.error("Lỗi khi lấy dữ liệu sản phẩm:", error));
-  };
-  useEffect(() => {
-    getDataOrders();
-  }, []);
+  }
+
   return (
     <div>
       <div className="flex justify-between">
@@ -197,7 +290,7 @@ export default function Page() {
           <Input
             className="w-[50%] ml-4"
             placeholder="Tên, Email, hoặc Tham chiếu"
-            value={dataOrder.name}
+            defaultValue={dataOrder.supplier?.name}
             disabled
           ></Input>
         </div>
@@ -207,7 +300,7 @@ export default function Page() {
             className="w-[50%] ml-4"
             type="date"
             placeholder="Tên, Email, hoặc Tham chiếu"
-            value={endDate}
+            defaultValue={endDate}
             onBlur={(e) => {
               updateOrder(e, "endDate");
             }}
@@ -220,8 +313,7 @@ export default function Page() {
           <Input
             className="w-[50.5%] ml-4"
             placeholder="xxxx-xxxx-xxxx"
-            onBlur={(e) => setSupplierCode(e.target.value)}
-            value={dataOrder.taxCode}
+            defaultValue={dataOrder.supplier?.taxCode}
             disabled
           ></Input>
         </div>
@@ -231,7 +323,7 @@ export default function Page() {
             className="w-[50.5%] ml-4"
             type="date"
             placeholder="Tên, Email, hoặc Tham chiếu"
-            value={delivery}
+            defaultValue={delivery}
             onBlur={(e) => {
               updateOrder(e, "delivery");
             }}
@@ -249,15 +341,60 @@ export default function Page() {
         </TabsContent>
       </Tabs>
       <div className="flex justify-end">
-        <Button className="px-2 py-2 mr-1" variant={"default"}>
-          Gửi Yêu Cầu
-        </Button>
-        <Button className="px-2 py-2 mr-1" variant={"destructive"}>
-          Xác Nhận Đơn Hàng
-        </Button>
-        <Button className="px-2 py-2" variant={"secondary"}>
-          Hủy
-        </Button>
+        {isCustomer === false ? (
+          <div>
+            <Button
+              className="px-2 py-2 mr-1"
+              variant={"default"}
+              disabled={isDisableButton.isDisableButtonResendRq}
+              onClick={() => resendSurveyToCustomer()}
+            >
+              Resend to customer
+            </Button>
+            <Button
+              className="px-2 py-2"
+              variant={"destructive"}
+              disabled={isDisableButton.isDisableButtonRefuseSurvey}
+            >
+              Refuse
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <Button
+              className="px-2 py-2 mr-1"
+              variant={"outline"}
+              // disabled={isDisableButton.isDisableButtonCreateContract}
+              onClick={createContract}
+            >
+              Create contract
+            </Button>
+            {/* <Link href={{
+              pathname: '/contract/create',
+              // query: {
+              //   supplierId: dataOrder?.order?.suppliersId ?? '',
+              //   userId: dataOrder?.order?.userId ?? '',
+              //   orderId: dataOrder?.order?.id ?? '',
+              // },
+            }}>
+            </Link> */}
+            <Button
+              className="px-2 py-2 mr-1"
+              variant={"default"}
+              disabled={isDisableButton.isDisableButtonSendRq}
+              onClick={() => sendRequestToSupplier()}
+            >
+              Send request to supplier
+            </Button>
+            <Button
+              className="px-2 py-2"
+              variant={"destructive"}
+              disabled={isDisableButton.isDisableButtonDeleteSurvey}
+            >
+              Delete
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

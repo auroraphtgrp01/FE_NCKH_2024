@@ -1,4 +1,5 @@
 import { Executor, User, UserPermission } from "@/interface/base.i"
+import { Dispatch, SetStateAction } from "react"
 
 export enum EContractAttributeType {
 	CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = "Contract Attribute Party Address Wallet Joined",
@@ -51,7 +52,7 @@ export enum EStatusAttribute {
 	PREPARE = "Prepare",
 	NOT_CHANGE = "Not Change",
 }
-export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {}
+export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> { }
 export interface IContractParticipant {
 	id: string
 	userId: string
@@ -100,29 +101,29 @@ export interface IIndividual {
 }
 export interface IVisibleButton extends DynamicType {
 	deployButton: boolean,
-    withdrawButton: boolean,
-    confirmButton: boolean,
-    transferButton: boolean,
-    buttonDisputed: boolean,
-    signButton: boolean,
+	withdrawButton: boolean,
+	confirmButton: boolean,
+	transferButton: boolean,
+	buttonDisputed: boolean,
+	signButton: boolean,
 	confirmButtonSender: boolean,
-    confirmButtonReceiver: boolean
+	confirmButtonReceiver: boolean
 }
 export interface IDisableButton extends DynamicType {
 	fetchCompareButton: boolean,
-    cancelButton: boolean,
-    withdrawButton: boolean,
-    transferButton: boolean,
-    deployButton: boolean,
-    editContractButton: boolean,
-    signButton: boolean,
+	cancelButton: boolean,
+	withdrawButton: boolean,
+	transferButton: boolean,
+	deployButton: boolean,
+	editContractButton: boolean,
+	signButton: boolean,
 	confirmButtonSender: boolean,
-    confirmButtonReceiver: boolean
+	confirmButtonReceiver: boolean
 }
 export interface IStage {
-    percent: number;
-    deliveryAt: number;
-    description?: string;
+	percent: number;
+	deliveryAt: number;
+	description?: string;
 }
 export interface RSAKey {
 	publicKey: string;
@@ -139,25 +140,25 @@ export interface UserInfoData {
 		email: string;
 		role: string;
 	}
-    balance: string;
+	balance: string;
 }
 export interface InvitationItem {
 	email: string;
 	permission: IPermission;
 	messages?: string;
-  }
+}
 export interface ContractTemplate {
 	id: string;
 	name: string;
 	path: string;
 	contractAttributes: any[];
-  }
+}
 export interface IPermission {
-    READ_CONTRACT: boolean;
-    EDIT_CONTRACT: boolean;
-    INVITE_PARTICIPANT: boolean;
-    CHANGE_STATUS_CONTRACT: boolean;
-    SET_OWNER_PARTY: boolean;
+	READ_CONTRACT: boolean;
+	EDIT_CONTRACT: boolean;
+	INVITE_PARTICIPANT: boolean;
+	CHANGE_STATUS_CONTRACT: boolean;
+	SET_OWNER_PARTY: boolean;
 }
 export interface IAddPropertyAreaProps {
 	propertiesCBX: string[];
@@ -166,4 +167,46 @@ export interface IAddPropertyAreaProps {
 	setNewProperties: (value: string[]) => void;
 	contractAttribute: any;
 	setContractAttribute: (value: any) => void;
-  }
+}
+export enum EFunctionCall {
+	FETCH_COMPARE_CONTRACT = "FETCH_COMPARE_CONTRACT",
+	CANCEL_CONTRACT = "CANCEL_CONTRACT",
+	WITHDRAW_CONTRACT = "WITHDRAW_CONTRACT",
+	TRANSFER_CONTRACT = "TRANSFER_CONTRACT",
+	SIGN_CONTRACT = "SIGN_CONTRACT",
+	CONFIRM_CONTRACT = "CONFIRM_CONTRACT",
+}
+
+export interface ISignContractFunctionCallParams {
+	addressContract: string,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	individual: IIndividual,
+	contractParticipants: IContractParticipant[],
+	setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+	setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+	privateKey?: string
+}
+
+export interface ITransferMoneyFunctionCallParams {
+	addressContract: string,
+	individual: IIndividual,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	privateKey?: string
+}
+
+export interface IConfirmStageFunctionCallParams {
+	addressContract: string,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	individual: IIndividual,
+	setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
+	setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+	privateKey?: string
+}
+export interface IResponseFunction {
+	status: "success" | 'destructive'
+	message: string;
+	description?: string;
+}

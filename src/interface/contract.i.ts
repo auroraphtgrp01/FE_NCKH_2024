@@ -107,7 +107,8 @@ export interface IVisibleButton extends DynamicType {
 	buttonDisputed: boolean,
 	signButton: boolean,
 	confirmButtonSender: boolean,
-	confirmButtonReceiver: boolean
+	confirmButtonReceiver: boolean,
+	openDisputedButton: boolean,
 }
 export interface IDisableButton extends DynamicType {
 	fetchCompareButton: boolean,
@@ -118,7 +119,8 @@ export interface IDisableButton extends DynamicType {
 	editContractButton: boolean,
 	signButton: boolean,
 	confirmButtonSender: boolean,
-	confirmButtonReceiver: boolean
+	confirmButtonReceiver: boolean,
+	openDisputedButton: boolean,
 }
 export interface IStage {
 	percent: number;
@@ -175,6 +177,7 @@ export enum EFunctionCall {
 	TRANSFER_CONTRACT = "TRANSFER_CONTRACT",
 	SIGN_CONTRACT = "SIGN_CONTRACT",
 	CONFIRM_CONTRACT = "CONFIRM_CONTRACT",
+	OPEN_DISPUTED = "OPEN_DISPUTED",
 }
 
 export interface ISignContractFunctionCallParams {
@@ -209,4 +212,25 @@ export interface IResponseFunction {
 	status: "success" | 'destructive'
 	message: string;
 	description?: string;
+}
+
+export interface IOpenDisputedComponentProps {
+	isDisableButton: IDisableButton;
+	isVisibleButton: IVisibleButton;
+}
+
+export interface IStagesContract {
+	id: string
+	percent: number;
+	requestBy: string;
+	requestTo: string;
+	description?: string;
+	status: EStageStatus
+}
+
+export enum EStageStatus {
+	PENDING = "PENDING",
+	APPROVED = "APPROVED",
+	REJECTED = "REJECTED",
+	OUT_OF_DATE = "OUT_OF_DATE",
 }

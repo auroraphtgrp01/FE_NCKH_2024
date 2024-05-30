@@ -1,5 +1,4 @@
-import { InvitationItem } from '@/app/contract/create/page';
-import GrantPermission, { IPermission } from '@/components/GrantPermission';
+import GrantPermission from '@/components/GrantPermission';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { IPermission, InvitationItem } from '@/interface/contract.i';
 import React, { useEffect, useState } from 'react'
 export const initPermission: IPermission = {
     READ_CONTRACT: false,

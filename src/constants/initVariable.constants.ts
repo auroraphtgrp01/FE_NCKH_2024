@@ -9,7 +9,8 @@ export const initDisableButton: IDisableButton = {
   editContractButton: true,
   signButton: true,
   confirmButtonSender: true,
-  confirmButtonReceiver: true
+  confirmButtonReceiver: true,
+  openDisputedButton: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -20,7 +21,8 @@ export const initVisibleButton: IVisibleButton = {
   buttonDisputed: false,
   signButton: false,
   confirmButtonSender: false,
-  confirmButtonReceiver: false
+  confirmButtonReceiver: false,
+  openDisputedButton: true
 }
 
 export const initResponseMessages: IResponseFunction = {

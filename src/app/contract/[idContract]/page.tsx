@@ -49,6 +49,7 @@ import InvitationArea from "@/components/InvitationArea";
 import { fetchDataWhenEntryPage, handleCallFunctionOfBlockchain, handleDateStringToUint, handleOnDeployContractFunc, inviteNewParticipant, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { initDisableButton, initVisibleButton } from "@/constants/initVariable.constants";
+import Dispute from "@/app/contract/[idContract]/(component)/Dispute";
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
@@ -363,6 +364,7 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
+                  <Dispute isDisableButton={isDisableButton} isVisibleButton={isVisibleButton} />
                 </div>
               </CardContent>
             </Card>
@@ -512,59 +514,7 @@ export default function Dashboard() {
                       Supplier confirmation completed
                     </Button>
                   )}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      {isVisibleButton.confirmButton && (
-                        <Button
-                          variant={"destructive"}
-                          className="w-full mt-2"
-                        >
-                          Disputed
-                        </Button>
-                      )}
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure to create dispute contract?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          <div className="max-w-md mx-auto">
-                            <div className="flex flex-col space-y-2">
-                              <div className="flex">
-                                <div className="w-40">Stage:</div>
-                                <div className="flex-1">
-                                  <b>...</b>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                <div className="w-40">Customer confirmed:</div>
-                                <div className="flex-1">
-                                  <b>...</b>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                <div className="w-40">Supplier confirmed:</div>
-                                <div className="flex-1">
-                                  <b>...</b>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                <div className="w-40">Total amount:</div>
-                                <div className="flex-1">
-                                  <b>...</b>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Close</AlertDialogCancel>
-                        <AlertDialogAction>Dispute</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+
                 </div>
 
                 <Separator className="my-4" />

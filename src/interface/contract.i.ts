@@ -220,6 +220,7 @@ export interface IResponseFunction {
 	status: "success" | 'destructive'
 	message: string;
 	description?: string;
+	[key: string]: any
 }
 
 export interface IOpenDisputedComponentProps {
@@ -242,4 +243,26 @@ export enum EStageStatus {
 	APPROVED = "APPROVED",
 	REJECTED = "REJECTED",
 	OUT_OF_DATE = "OUT_OF_DATE",
+}
+
+export interface ITemplateContract {
+	contractAttributes?: string[];
+	createdAt?: string;
+	createdBy?: string | null;
+	deletedAt?: string | null;
+	deletedBy?: string | null;
+	id: string;
+	name?: string;
+	path?: string | null;
+	updatedAt?: string | null;
+	updatedBy?: string | null;
+}
+
+export interface IContractCreateParams {
+	templateId?: string
+	name: string
+	addressWallet: string
+	invitation?: InvitationItem[]
+	messagesForInvitation?: string
+	type?: "CONTRACT" | "DISPUTE"
 }

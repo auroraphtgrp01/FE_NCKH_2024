@@ -1,6 +1,8 @@
+import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler';
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/components/ui/use-toast';
 import { EStageStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i';
 import { getDateNow } from '@/utils/dayjs';
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog';
@@ -42,6 +44,24 @@ const stages: IStagesContract[] = [
 ]
 
 export default function Dispute({ isDisableButton, isVisibleButton }: IOpenDisputedComponentProps) {
+    const { toast } = useToast();
+    const handleOpenDisputeContract = () => {
+        onCreateANewContract(
+            {
+                addressWallet: '0x1366441c4a37c946dcbee7d8dda1d6ab108a635d',
+                name: "Disputed Contract - Supply Chain Management",
+                type: "DISPUTE",
+                templateId: "ac321ca5-1393-4474-9f09-f8d09ab15b1d",
+                invitation: []
+            }
+        ).then((res) => {
+            toast({
+                title: res.message,
+                description: res.description,
+                variant: res.status
+            })
+        })
+    }
     return (
         <div>
             <AlertDialog>
@@ -96,7 +116,7 @@ export default function Dispute({ isDisableButton, isVisibleButton }: IOpenDispu
                                 Close
                             </Button>
                         </AlertDialogCancel>
-                        <AlertDialogAction className='me-1'>Open Dispute Contract</AlertDialogAction>
+                        <AlertDialogAction className='me-1' onClick={handleOpenDisputeContract}>Open Dispute Contract</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -1,5 +1,5 @@
 import { initResponseMessages } from "@/constants/initVariable.constants";
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, IConfirmStageFunctionCallParams, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, ITransferMoneyFunctionCallParams, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, IConfirmStageFunctionCallParams, IContractAttribute, IContractCreateParams, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, ITransferMoneyFunctionCallParams, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { handleInstanceWeb3 } from "@/utils/web3Instance";
 import NodeRSA from "node-rsa";
@@ -512,6 +512,34 @@ const handleCallFunctionOfBlockchain = async (
     return responseMessages
 }
 
+const onCreateANewContract = async (
+    dataParams: IContractCreateParams
+): Promise<IResponseFunction> => {
+    try {
+        const res = await fetchAPI("/contracts", "POST", dataParams);
+        if (res.status === 201) {
+            return {
+                message: "Create contract successfully",
+                status: "success",
+                description: "Contract has been created successfully",
+                contractId: res.data.contract.id
+            };
+        } else {
+            return {
+                message: "Create contract failed",
+                status: "destructive",
+                description: "Error occurred while creating contract",
+            };
+        }
+    } catch (err) {
+        return {
+            message: "Create contract failed",
+            status: "destructive",
+            description: err?.toString(),
+        };
+    }
+};
+
 export {
     updateStateButton,
     fetchDataWhenEntryPage,
@@ -519,5 +547,6 @@ export {
     withdrawMoneyFunc,
     handleDateStringToUint,
     handleOnDeployContractFunc,
-    handleCallFunctionOfBlockchain
+    handleCallFunctionOfBlockchain,
+    onCreateANewContract
 }

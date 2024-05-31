@@ -1,4 +1,8 @@
-import { IDisableButton, IResponseFunction, IVisibleButton } from "@/interface/contract.i";
+import {
+  IDisableButton,
+  IResponseFunction,
+  IVisibleButton,
+} from "@/interface/contract.i";
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
@@ -9,8 +13,8 @@ export const initDisableButton: IDisableButton = {
   editContractButton: true,
   signButton: true,
   confirmButtonSender: true,
-  confirmButtonReceiver: true
-}
+  confirmButtonReceiver: true,
+};
 
 export const initVisibleButton: IVisibleButton = {
   deployButton: false,
@@ -20,11 +24,11 @@ export const initVisibleButton: IVisibleButton = {
   buttonDisputed: false,
   signButton: false,
   confirmButtonSender: false,
-  confirmButtonReceiver: false
-}
+  confirmButtonReceiver: false,
+};
 
 export const initResponseMessages: IResponseFunction = {
-  message: '',
-  status: 'destructive',
-  description: ''
-}
+  message: "",
+  status: "destructive",
+  description: "",
+};

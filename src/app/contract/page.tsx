@@ -52,9 +52,8 @@ export interface Participant {
   company: string;
   avatar?: string;
   id: string;
-  email: string
+  email: string;
 }
-
 
 export type Contract = {
   id: string;
@@ -64,7 +63,6 @@ export type Contract = {
   typeName: string;
   email: string;
 };
-
 
 export default function DataTableDemo() {
   const [dataTable, setDataTable] = React.useState([]);
@@ -85,23 +83,21 @@ export default function DataTableDemo() {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const getParticipants = async (contractId: string) => {
-    fetchAPI(`/participants/find-all/${contractId}`, "GET").then((res) => {
-      console.log(res.data);
-      setParticipants(res.data);
-    }).catch((errors) => {
-      console.log(errors);
-    })
+    fetchAPI(`/participants/find-all/${contractId}`, "GET")
+      .then((res) => {
+        console.log(res.data);
+        setParticipants(res.data);
+      })
+      .catch((errors) => {
+        console.log(errors);
+      });
   };
   const userInfoString = localStorage.getItem("user-info");
   const user_info = userInfoString ? JSON.parse(userInfoString) : null;
   React.useEffect(() => {
-    fetchAPI(
-      `/contracts/get-all-contract-details/${user_info.data.addressWallet}`,
-      "GET"
-    ).then((res) => {
+    fetchAPI(`/contracts/get-all-contract-details`, "GET").then((res) => {
       if (res.status === 200) {
-        console.log(res.data);
-        setDataTable(res.data.contracts)
+        setDataTable(res.data);
       }
     });
   }, []);
@@ -164,13 +160,10 @@ export default function DataTableDemo() {
       cell: ({ row }) => {
         return (
           <div className="text-center">
-            <Button
-              onClick={() => handleOpenParticipant(row.getValue("id"))}
-            >
+            <Button onClick={() => handleOpenParticipant(row.getValue("id"))}>
               Participants
             </Button>
-            <Link href={`/contract/${row.getValue("id")}`}
-            >
+            <Link href={`/contract/${row.getValue("id")}`}>
               <Button className="ms-2" variant={"destructive"}>
                 Detail
               </Button>
@@ -237,7 +230,6 @@ export default function DataTableDemo() {
         </div>
       ),
     },
-
   ];
 
   const tableContracts = useReactTable({
@@ -289,7 +281,9 @@ export default function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""}
+          value={
+            (tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             tableContracts.getColumn("id")?.setFilterValue(event.target.value)
           }
@@ -340,9 +334,9 @@ export default function DataTableDemo() {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -422,22 +416,24 @@ export default function DataTableDemo() {
                   <div className="rounded-md border mt-3">
                     <Table>
                       <TableHeader>
-                        {tableParticipants.getHeaderGroups().map((headerGroup) => (
-                          <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                              return (
-                                <TableHead key={header.id}>
-                                  {header.isPlaceholder
-                                    ? null
-                                    : flexRender(
-                                      header.column.columnDef.header,
-                                      header.getContext()
-                                    )}
-                                </TableHead>
-                              );
-                            })}
-                          </TableRow>
-                        ))}
+                        {tableParticipants
+                          .getHeaderGroups()
+                          .map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                              {headerGroup.headers.map((header) => {
+                                return (
+                                  <TableHead key={header.id}>
+                                    {header.isPlaceholder
+                                      ? null
+                                      : flexRender(
+                                          header.column.columnDef.header,
+                                          header.getContext()
+                                        )}
+                                  </TableHead>
+                                );
+                              })}
+                            </TableRow>
+                          ))}
                       </TableHeader>
                       <TableBody>
                         {tableParticipants.getRowModel().rows?.length ? (

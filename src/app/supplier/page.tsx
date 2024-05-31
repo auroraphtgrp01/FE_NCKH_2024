@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
@@ -47,7 +48,7 @@ export default function page() {
         </div>
       </div>
       <div className="mt-5 grid">
-        <div className="grid pl-4 grid-cols-5">
+        <div className="grid pl-4 grid-cols-5 gap-5">
           {supplierList.map((item: any, index: any) => (
             <Link href={`/supplier/${item.id}`} key={index}>
               <div className=" rounded-lg shadow-md overflow-hidden dark:bg-zinc-800 hover:scale-105 hover:delay-250 duration-300">
@@ -79,6 +80,9 @@ export default function page() {
                   <p className="text-gray-500 select-none dark:text-gray-400 line-clamp-2">
                     TaxCode: {item.taxCode}
                   </p>
+                  <div className="text-center mt-2">
+                    <Button>Đặt ngay</Button>
+                  </div>
                 </div>
               </div>
             </Link>

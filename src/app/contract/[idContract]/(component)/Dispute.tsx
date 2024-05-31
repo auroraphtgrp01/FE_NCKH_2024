@@ -43,18 +43,10 @@ const stages: IStagesContract[] = [
     }
 ]
 
-export default function Dispute({ isDisableButton, isVisibleButton }: IOpenDisputedComponentProps) {
+export default function Dispute({ isDisableButton, isVisibleButton, payload }: IOpenDisputedComponentProps) {
     const { toast } = useToast();
     const handleOpenDisputeContract = () => {
-        onCreateANewContract(
-            {
-                addressWallet: '0x1366441c4a37c946dcbee7d8dda1d6ab108a635d',
-                name: "Disputed Contract - Supply Chain Management",
-                type: "DISPUTE",
-                templateId: "ac321ca5-1393-4474-9f09-f8d09ab15b1d",
-                invitation: []
-            }
-        ).then((res) => {
+        onCreateANewContract(payload).then((res) => {
             toast({
                 title: res.message,
                 description: res.description,

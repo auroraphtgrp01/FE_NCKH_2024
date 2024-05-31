@@ -56,6 +56,7 @@ import {
 import InvitationArea from "@/components/InvitationArea";
 import {
   fetchDataWhenEntryPage,
+  getDataToOpenDisputeContract,
   handleCallFunctionOfBlockchain,
   handleOnDeployContractFunc,
   inviteNewParticipant,
@@ -379,7 +380,7 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
-                  <Dispute isDisableButton={isDisableButton} isVisibleButton={isVisibleButton} />
+                  <Dispute isDisableButton={isDisableButton} isVisibleButton={isVisibleButton} payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)} />
                 </div>
               </CardContent>
             </Card>

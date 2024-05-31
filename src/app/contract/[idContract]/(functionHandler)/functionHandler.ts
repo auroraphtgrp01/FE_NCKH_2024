@@ -1,5 +1,5 @@
 import { initResponseMessages } from "@/constants/initVariable.constants";
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, IConfirmStageFunctionCallParams, IContractAttribute, IContractCreateParams, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, ITransferMoneyFunctionCallParams, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
+import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, ERolesOfParticipant, IConfirmStageFunctionCallParams, IContractAttribute, IContractCreateParams, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, ITransferMoneyFunctionCallParams, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { handleInstanceWeb3 } from "@/utils/web3Instance";
 import NodeRSA from "node-rsa";
@@ -540,6 +540,23 @@ const onCreateANewContract = async (
     }
 };
 
+const getDataToOpenDisputeContract = (participantContract: IContractParticipant[], addressWallet: string): IContractCreateParams => {
+    const invitations = participantContract.map((item) => {
+        if (item.permission?.ROLES === ERolesOfParticipant.SENDER || item.permission?.ROLES === ERolesOfParticipant.RECEIVER)
+            return {
+                email: item.email,
+                permission: item.permission,
+                messages: "You have a invitation to join a dispute contract"
+            }
+    })
+    return {
+        addressWallet,
+        name: "Disputed Contract - Supply Chain Management",
+        type: "DISPUTE",
+        templateId: "ac321ca5-1393-4474-9f09-f8d09ab15b1d",
+        invitation: invitations as InvitationItem[]
+    }
+}
 export {
     updateStateButton,
     fetchDataWhenEntryPage,
@@ -548,5 +565,6 @@ export {
     handleDateStringToUint,
     handleOnDeployContractFunc,
     handleCallFunctionOfBlockchain,
-    onCreateANewContract
+    onCreateANewContract,
+    getDataToOpenDisputeContract
 }

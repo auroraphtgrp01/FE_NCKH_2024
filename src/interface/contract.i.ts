@@ -61,6 +61,7 @@ export interface IContractParticipant {
 	email: string
 	status: string
 	User: User
+	permission?: IPermission
 }
 export enum EContractStatus {
 	PENDING = "PENDING",
@@ -226,6 +227,7 @@ export interface IResponseFunction {
 export interface IOpenDisputedComponentProps {
 	isDisableButton: IDisableButton;
 	isVisibleButton: IVisibleButton;
+	payload: IContractCreateParams
 }
 
 export interface IStagesContract {

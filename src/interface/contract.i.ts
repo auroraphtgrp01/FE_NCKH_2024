@@ -234,6 +234,7 @@ export interface IStagesContract {
 	requestTo: string;
 	description?: string;
 	status: EStageStatus
+	dueDate: string | Date
 }
 
 export enum EStageStatus {

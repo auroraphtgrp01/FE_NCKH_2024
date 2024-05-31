@@ -1,7 +1,8 @@
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { EFunctionCall, EStageStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i';
+import { EStageStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i';
+import { getDateNow } from '@/utils/dayjs';
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog';
 import React from 'react'
 
@@ -11,28 +12,32 @@ const stages: IStagesContract[] = [
         percent: 0,
         requestBy: '0x',
         requestTo: '1x',
-        status: EStageStatus.PENDING
+        status: EStageStatus.PENDING,
+        dueDate: getDateNow()
     },
     {
         id: '2',
         percent: 0,
         requestBy: '0x',
         requestTo: '1x',
-        status: EStageStatus.PENDING
+        status: EStageStatus.PENDING,
+        dueDate: getDateNow()
     },
     {
         id: '3',
         percent: 0,
         requestBy: '0x',
         requestTo: '1x',
-        status: EStageStatus.PENDING
+        status: EStageStatus.PENDING,
+        dueDate: getDateNow()
     },
     {
         id: '4',
         percent: 0,
         requestBy: '0x',
         requestTo: '1x',
-        status: EStageStatus.APPROVED
+        status: EStageStatus.APPROVED,
+        dueDate: getDateNow()
     }
 ]
 
@@ -74,6 +79,8 @@ export default function Dispute({ isDisableButton, isVisibleButton }: IOpenDispu
                                         <TableRow key={item.id}>
                                             <TableCell>{index}</TableCell>
                                             <TableCell>{item.requestBy}</TableCell>
+                                            <TableCell>{item.requestTo}</TableCell>
+                                            <TableCell>{item.dueDate.toString()}</TableCell>
                                             <TableCell className="text-right">
                                                 {item.status}
                                             </TableCell>
@@ -84,8 +91,12 @@ export default function Dispute({ isDisableButton, isVisibleButton }: IOpenDispu
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Close</AlertDialogCancel>
-                        <AlertDialogAction>Dispute</AlertDialogAction>
+                        <AlertDialogCancel>
+                            <Button variant={'destructive'}>
+                                Close
+                            </Button>
+                        </AlertDialogCancel>
+                        <AlertDialogAction className='me-1'>Open Dispute Contract</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

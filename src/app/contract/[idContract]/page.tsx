@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
-import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,7 +19,17 @@ import ChatBox from "@/components/ChatBox";
 import { useParams } from "next/navigation";
 import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { fetchAPI } from "@/utils/fetchAPI";
-import { ContractData, EContractAttributeType, EFunctionCall, IContractAttribute, IContractParticipant, IDisableButton, IIndividual, IVisibleButton, InvitationItem, RSAKey } from "@/interface/contract.i";
+import {
+  ContractData,
+  EContractAttributeType,
+  EFunctionCall,
+  IContractAttribute,
+  IContractParticipant,
+  IDisableButton,
+  IIndividual,
+  IVisibleButton,
+  InvitationItem
+} from "@/interface/contract.i";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,7 +41,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Web3 from "web3";
 import { useAppContext } from "@/components/ThemeProvider";
@@ -46,13 +54,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import InvitationArea from "@/components/InvitationArea";
-import { fetchDataWhenEntryPage, handleCallFunctionOfBlockchain, handleDateStringToUint, handleOnDeployContractFunc, inviteNewParticipant, updateStateButton, withdrawMoneyFunc } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+import {
+  fetchDataWhenEntryPage,
+  handleCallFunctionOfBlockchain,
+  handleOnDeployContractFunc,
+  inviteNewParticipant,
+  updateStateButton,
+  withdrawMoneyFunc
+} from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { initDisableButton, initVisibleButton } from "@/constants/initVariable.constants";
 import Dispute from "@/app/contract/[idContract]/(component)/Dispute";
 
 export default function Dashboard() {
-  const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute);
+  const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>([]);
   const [currentBalance, setCurrentBalance] = useState<number>(0);
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([]);
   const [contractData, setContractData] = useState<ContractData>();

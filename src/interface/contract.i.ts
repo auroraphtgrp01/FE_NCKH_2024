@@ -43,8 +43,8 @@ export interface IContractAttribute {
 	property?: string
 	isCreate?: boolean
 	statusAttribute?: EStatusAttribute
-	createdBy: Executor
-	updatedBy: Executor | null;
+	createdBy?: Executor
+	updatedBy?: Executor | null;
 }
 export enum EStatusAttribute {
 	CREATE = "Create",
@@ -161,6 +161,14 @@ export interface IPermission {
 	INVITE_PARTICIPANT: boolean;
 	CHANGE_STATUS_CONTRACT: boolean;
 	SET_OWNER_PARTY: boolean;
+	ROLES: ERolesOfParticipant
+}
+
+export enum ERolesOfParticipant {
+	SENDER = "Sender Users",
+	RECEIVER = "Receiver Users",
+	ARBITRATION = 'Arbitration',
+	PARTICIPANT = 'Participant',
 }
 export interface IAddPropertyAreaProps {
 	propertiesCBX: string[];

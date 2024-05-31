@@ -1,4 +1,4 @@
-import { IDisableButton, IResponseFunction, IVisibleButton } from "@/interface/contract.i";
+import { ERolesOfParticipant, IDisableButton, IPermission, IResponseFunction, IVisibleButton } from "@/interface/contract.i";
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
@@ -30,3 +30,17 @@ export const initResponseMessages: IResponseFunction = {
   status: 'destructive',
   description: ''
 }
+
+export const initPermission: IPermission = {
+  READ_CONTRACT: false,
+  EDIT_CONTRACT: false,
+  INVITE_PARTICIPANT: false,
+  CHANGE_STATUS_CONTRACT: false,
+  SET_OWNER_PARTY: false,
+  ROLES: ERolesOfParticipant.PARTICIPANT
+};
+
+export const rolesTypeParticipant: { key: string, value: string }[] = Object.keys(ERolesOfParticipant).map((key) => ({
+  key,
+  value: ERolesOfParticipant[key as keyof typeof ERolesOfParticipant],
+}));

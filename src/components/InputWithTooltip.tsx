@@ -29,7 +29,7 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
         const newContractAttribute: IContractAttribute = {
             value: '',
             id: '',
-            statusAttribute: EStatusAttribute.PREPARE
+            statusAttribute: EStatusAttribute.PREPARE,
         }
         const newContractAttributeArray = [...contractAttribute]
         newContractAttributeArray.splice(index, 0, newContractAttribute)

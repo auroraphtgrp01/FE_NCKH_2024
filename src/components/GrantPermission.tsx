@@ -3,20 +3,23 @@ import { Label } from '@/components/ui/label';
 import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Accordion, AccordionItem, AccordionContent } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
-import { IPermission } from '@/interface/contract.i';
-import { initPermission } from '@/components/InvitationArea';
+import { ERolesOfParticipant, IPermission } from '@/interface/contract.i';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { initPermission, rolesTypeParticipant } from '@/constants/initVariable.constants';
+import { Separator } from '@/components/ui/separator';
 
 export default function GrantPermission({ isOpen, setOpen, permission, callback }:
     { isOpen: boolean, setOpen: any, permission: IPermission, callback: (permission: IPermission) => void }) {
-
     const [permissionClone, setPermissionClone] = useState<IPermission>(permission)
-
-    const onCheckedChange = (e: boolean, property: any) => {
+    const [rolesType, setRolesType] = useState<{
+        key: string;
+        value: string;
+    }[]>(rolesTypeParticipant)
+    const onCheckedChange = (e: boolean | string, property: any) => {
         setPermissionClone({ ...permissionClone, [property]: e })
     }
-
     const updatePer = () => {
         callback(permissionClone)
         setPermissionClone(initPermission)
@@ -25,6 +28,9 @@ export default function GrantPermission({ isOpen, setOpen, permission, callback 
     useEffect(() => {
         setPermissionClone(permission)
     }, [isOpen])
+    useEffect(() => {
+        console.log(permissionClone);
+    }, [permissionClone])
     return (
         <div>
             <Dialog open={isOpen} onOpenChange={setOpen}>
@@ -34,43 +40,36 @@ export default function GrantPermission({ isOpen, setOpen, permission, callback 
                             <DialogHeader>
                                 <DialogTitle>Grant Permission</DialogTitle>
                                 <DialogDescription>
-                                    Grant Permisson to ...
+                                    Grant Permission to participant
                                 </DialogDescription>
                             </DialogHeader>
                             <Accordion type="single" defaultValue="item-1">
                                 <AccordionItem value="item-1">
                                     <AccordionContent>
                                         <table >
-                                            {/* <thead className='border-b-2 border-[#cccccc37]'>
-                                                <tr>
-                                                    <td className='pt-1 pb-2 px-1'>
-                                                        <div className='flex items-center space-x-2'>
-                                                            <Switch  defaultChecked={fullPermission}  checked={fullPermission} onCheckedChange={(e) => {
-                                                                if (e) {
-                                                                    setPermission({
-                                                                        READ_CONTRACT: true,
-                                                                        EDIT_CONTRACT: true,
-                                                                        INVITE_PARTICIPANT: true,
-                                                                        CHANGE_STATUS_CONTRACT: true,
-                                                                        SET_OWNER_PARTY: true
-                                                                    })
-                                                                } else {
-                                                                    setPermission({
-                                                                        READ_CONTRACT: false,
-                                                                        EDIT_CONTRACT: false,
-                                                                        INVITE_PARTICIPANT: false,
-                                                                        CHANGE_STATUS_CONTRACT: false,
-                                                                        SET_OWNER_PARTY: false
-                                                                    })
-                                                                }
-                                                            }} />
-                                                            <Label htmlFor="readContractSwitch">Full Permission</Label>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </thead> */}
                                             <tbody>
                                                 <tr>
+                                                    <td className='pt-2 pb-4 px-1' colSpan={3}>
+                                                        <Label className='mt-2 mb-2'>Set Roles</Label>
+                                                        <Select onValueChange={
+                                                            (e) => {
+                                                                onCheckedChange(e, 'ROLES')
+                                                            }}>
+                                                            <SelectTrigger className="w-full mt-2">
+                                                                <SelectValue placeholder={ERolesOfParticipant.PARTICIPANT} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectGroup>
+                                                                    {rolesType.map((item, index) => (
+                                                                        <SelectItem value={item.key}>{item.value}</SelectItem>
+                                                                    ))}
+                                                                </SelectGroup>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <Separator className="my-4" />
+                                                    </td>
+                                                </tr>
+                                                <tr className='mt-3'>
                                                     <td className='px-1'>
                                                         <div className='flex items-center space-x-2'>
                                                             <Switch

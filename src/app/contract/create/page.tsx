@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -27,7 +27,8 @@ import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
 import InvitationArea from "@/components/InvitationArea";
 import Image from "next/image";
-import { ContractTemplate, InvitationItem } from "@/interface/contract.i";
+import { ContractTemplate, ITemplateContract, InvitationItem } from "@/interface/contract.i";
+import { onCreateANewContract } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
 
 
 export default function page() {
@@ -41,30 +42,41 @@ export default function page() {
   ]);
   const { userInfo, setUserInfo }: any = useAppContext();
   const { dataCreateContract, setDataCreateContract }: any = useAppContext();
-
   const [invitation, setInvitation] = useState<InvitationItem[]>([]);
   const [nameOfContractInput, setNameOfContractInput] = useState("");
-  const [templateSelect, setTemplateSelect] = useState<any>(undefined);
+  const [templateSelect, setTemplateSelect] = useState<ITemplateContract[]>();
   const [messages, setMessages] = useState("");
   const [contractAttribute, setContractAttribute] = useState<any[]>([]);
   const Router = useRouter();
   const { toast } = useToast();
   useEffect(() => {
-    fetchAPI("/template-contracts", "GET").then((res) => {
-      if (res.status === 200 || res.status === 201) {
-        setTemplate([...res.data]);
-        if (res.data.length !== 0)
-          fetchAPI(
-            `/template-contracts/${res.data[0]?.id}/attributes`,
-            "GET"
-          ).then((res) => {
-            if (res.status === 200) {
-              setContractAttribute(res.data.contractAttributes);
-            }
-          });
-        else setContractAttribute([]);
-      }
-    });
+    fetchAPI("/template-contracts", "GET")
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setTemplate([res?.data]);
+          if (res.data.length > 0) {
+            const firstTemplateId = res.data[0]?.id;
+            fetchAPI(`/template-contracts/${firstTemplateId}/attributes`, "GET")
+              .then((res) => {
+                if (res.status === 200) {
+                  setContractAttribute(res.data.contractAttributes);
+                } else {
+                  setContractAttribute([]);
+                }
+              })
+              .catch((error) => {
+                console.error("Error fetching contract attributes:", error);
+                setContractAttribute([]);
+              });
+          } else {
+            setContractAttribute([]);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching template contracts:", error);
+      });
+
   }, []);
 
   const [api, setApi] = useState<CarouselApi>();
@@ -92,37 +104,30 @@ export default function page() {
       setContractAttribute([]);
     }
   }, [current]);
-  async function onClickCreateContractButton() {
-    console.log(nameOfContractInput, templateSelect, invitation, messages);
 
-    const payload = {
-      addressWallet: userInfo?.data?.addressWallet,
-      name: nameOfContractInput,
-      templateId: templateSelect?.id || undefined,
-      invitation: invitation,
-      messagesForInvitation: messages,
-    };
-    await fetchAPI("/contracts", "POST", payload)
-      .then((res) => {
-        if (res.status === 201) {
-          toast({
-            title: "Create contract success",
-            description: "You have successfully created a contract",
-            variant: "success",
-            duration: 1000,
-          });
-          Router.push(`/contract/${res.data.contract.id}`);
-        }
+  useEffect(() => {
+    console.log(templateSelect);
+  }, [templateSelect])
+  async function onClickCreateContractButton() {
+    const templateId = templateSelect ? templateSelect[0].id : undefined;
+    onCreateANewContract(
+      {
+        addressWallet: userInfo?.data?.addressWallet,
+        name: nameOfContractInput,
+        templateId,
+        invitation: invitation,
+        messagesForInvitation: messages,
+      }
+    ).then((res) => {
+      res.contractId ? Router.push(`/contract/${res?.contractId}`) : null
+      toast({
+        title: res.message,
+        description: res.description,
+        variant: res.status
       })
-      .catch((err) => {
-        toast({
-          title: "Create contract failed",
-          description: "Please check your information again",
-          variant: "destructive",
-          duration: 2000,
-        });
-      });
+    })
   }
+
   return (
     <div>
       <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
@@ -216,7 +221,7 @@ export default function page() {
                 className="w-full me-2"
                 variant={"destructive"}
                 onClick={() => {
-                  setTemplateSelect(template[current]);
+                  setTemplateSelect(template[current] as any);
                 }}
               >
                 Choose a Template
@@ -227,7 +232,7 @@ export default function page() {
         <div className="flex py-4 ms-4">
           <Card className="min-w-[450px]">
             <CardHeader>
-              <CardTitle>Infomation of Contract</CardTitle>
+              <CardTitle>Information of Contract</CardTitle>
               <CardDescription>Please fill in all to continue</CardDescription>
             </CardHeader>
             <CardContent>

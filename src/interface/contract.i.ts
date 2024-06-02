@@ -37,15 +37,15 @@ export enum EContractAttributeTypeAdditionalHeader {
   CONTRACT_TITLE = "Contract Title",
 }
 export interface IContractAttribute {
-  id?: string;
-  index?: number;
-  type?: EContractAttributeType;
-  value?: string;
-  property?: string;
-  isCreate?: boolean;
-  statusAttribute?: EStatusAttribute;
-  createdBy: Executor;
-  updatedBy: Executor | null;
+	id?: string
+	index?: number
+	type?: EContractAttributeType
+	value?: string
+	property?: string
+	isCreate?: boolean
+	statusAttribute?: EStatusAttribute
+	createdBy?: Executor
+	updatedBy?: Executor | null;
 }
 export enum EStatusAttribute {
   CREATE = "Create",
@@ -56,13 +56,14 @@ export enum EStatusAttribute {
 export interface IDefinitionContractAttribute
   extends Omit<IContractAttribute, "id" | "value" | "property"> {}
 export interface IContractParticipant {
-  id: string;
-  userId: string;
-  address: string;
-  name: string;
-  email: string;
-  status: string;
-  User: User;
+	id: string
+	userId: string
+	address: string
+	name: string
+	email: string
+	status: string
+	User: User
+	permission?: IPermission
 }
 export enum EContractStatus {
   PENDING = "PENDING",
@@ -102,25 +103,27 @@ export interface IIndividual {
   totalAmount: string;
 }
 export interface IVisibleButton extends DynamicType {
-  deployButton: boolean;
-  withdrawButton: boolean;
-  confirmButton: boolean;
-  transferButton: boolean;
-  buttonDisputed: boolean;
-  signButton: boolean;
-  confirmButtonSender: boolean;
-  confirmButtonReceiver: boolean;
+	deployButton: boolean,
+	withdrawButton: boolean,
+	confirmButton: boolean,
+	transferButton: boolean,
+	buttonDisputed: boolean,
+	signButton: boolean,
+	confirmButtonSender: boolean,
+	confirmButtonReceiver: boolean,
+	openDisputedButton: boolean,
 }
 export interface IDisableButton extends DynamicType {
-  fetchCompareButton: boolean;
-  cancelButton: boolean;
-  withdrawButton: boolean;
-  transferButton: boolean;
-  deployButton: boolean;
-  editContractButton: boolean;
-  signButton: boolean;
-  confirmButtonSender: boolean;
-  confirmButtonReceiver: boolean;
+	fetchCompareButton: boolean,
+	cancelButton: boolean,
+	withdrawButton: boolean,
+	transferButton: boolean,
+	deployButton: boolean,
+	editContractButton: boolean,
+	signButton: boolean,
+	confirmButtonSender: boolean,
+	confirmButtonReceiver: boolean,
+	openDisputedButton: boolean,
 }
 export interface IStage {
   percent: number;
@@ -156,11 +159,19 @@ export interface ContractTemplate {
   contractAttributes: any[];
 }
 export interface IPermission {
-  READ_CONTRACT: boolean;
-  EDIT_CONTRACT: boolean;
-  INVITE_PARTICIPANT: boolean;
-  CHANGE_STATUS_CONTRACT: boolean;
-  SET_OWNER_PARTY: boolean;
+	READ_CONTRACT: boolean;
+	EDIT_CONTRACT: boolean;
+	INVITE_PARTICIPANT: boolean;
+	CHANGE_STATUS_CONTRACT: boolean;
+	SET_OWNER_PARTY: boolean;
+	ROLES: ERolesOfParticipant
+}
+
+export enum ERolesOfParticipant {
+	SENDER = "Sender Users",
+	RECEIVER = "Receiver Users",
+	ARBITRATION = 'Arbitration',
+	PARTICIPANT = 'Participant',
 }
 export interface IAddPropertyAreaProps {
   propertiesCBX: string[];
@@ -171,13 +182,13 @@ export interface IAddPropertyAreaProps {
   setContractAttribute: (value: any) => void;
 }
 export enum EFunctionCall {
-  FETCH_COMPARE_CONTRACT = "FETCH_COMPARE_CONTRACT",
-  CANCEL_CONTRACT = "CANCEL_CONTRACT",
-  WITHDRAW_CONTRACT = "WITHDRAW_CONTRACT",
-  TRANSFER_CONTRACT = "TRANSFER_CONTRACT",
-  SIGN_CONTRACT = "SIGN_CONTRACT",
-  CONFIRM_CONTRACT_SENDER = "CONFIRM_CONTRACT_SENDER",
-  CONFIRM_CONTRACT_RECEIVER = "CONFIRM_CONTRACT_RECEIVER",
+	FETCH_COMPARE_CONTRACT = "FETCH_COMPARE_CONTRACT",
+	CANCEL_CONTRACT = "CANCEL_CONTRACT",
+	WITHDRAW_CONTRACT = "WITHDRAW_CONTRACT",
+	TRANSFER_CONTRACT = "TRANSFER_CONTRACT",
+	SIGN_CONTRACT = "SIGN_CONTRACT",
+	CONFIRM_CONTRACT = "CONFIRM_CONTRACT",
+	OPEN_DISPUTED = "OPEN_DISPUTED",
 }
 
 export interface ISignContractFunctionCallParams {
@@ -202,13 +213,71 @@ export interface ITransferMoneytFunctionCallParams {
   privateKey?: string;
 }
 
-export interface IResponseFunction {
-  status: "success" | "destructive";
-  message: string;
-  description?: string;
+export interface ITransferMoneyFunctionCallParams {
+	addressContract: string,
+	individual: IIndividual,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	privateKey?: string
 }
 
-export interface IResponseFunctionFetchData {
-  contractData: any;
-  contractBallance?: number;
+export interface IConfirmStageFunctionCallParams {
+	addressContract: string,
+	userInfo: UserInfoData,
+	setUserInfo: Dispatch<SetStateAction<UserInfoData>>,
+	individual: IIndividual,
+	setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
+	setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
+	privateKey?: string
+}
+export interface IResponseFunction {
+	status: "success" | 'destructive'
+	message: string;
+	description?: string;
+	[key: string]: any
+}
+
+export interface IOpenDisputedComponentProps {
+	isDisableButton: IDisableButton;
+	isVisibleButton: IVisibleButton;
+	payload: IContractCreateParams
+}
+
+export interface IStagesContract {
+	id: string
+	percent: number;
+	requestBy: string;
+	requestTo: string;
+	description?: string;
+	status: EStageStatus
+	dueDate: string | Date
+}
+
+export enum EStageStatus {
+	PENDING = "PENDING",
+	APPROVED = "APPROVED",
+	REJECTED = "REJECTED",
+	OUT_OF_DATE = "OUT_OF_DATE",
+}
+
+export interface ITemplateContract {
+	contractAttributes?: string[];
+	createdAt?: string;
+	createdBy?: string | null;
+	deletedAt?: string | null;
+	deletedBy?: string | null;
+	id: string;
+	name?: string;
+	path?: string | null;
+	updatedAt?: string | null;
+	updatedBy?: string | null;
+}
+
+export interface IContractCreateParams {
+	templateId?: string
+	name: string
+	addressWallet: string
+	invitation?: InvitationItem[]
+	messagesForInvitation?: string
+	type?: "CONTRACT" | "DISPUTE"
 }

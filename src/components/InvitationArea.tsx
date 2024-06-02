@@ -1,21 +1,15 @@
-import { InvitationItem } from '@/app/contract/create/page';
-import GrantPermission, { IPermission } from '@/components/GrantPermission';
+import GrantPermission from '@/components/GrantPermission';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import React, { useEffect, useState } from 'react'
-export const initPermission: IPermission = {
-    READ_CONTRACT: false,
-    EDIT_CONTRACT: false,
-    INVITE_PARTICIPANT: false,
-    CHANGE_STATUS_CONTRACT: false,
-    SET_OWNER_PARTY: false,
-};
+import { initPermission } from '@/constants/initVariable.constants';
+import { IPermission, InvitationItem } from '@/interface/contract.i';
+import React, { useState } from 'react'
+
 
 export interface IInvitationArea {
     invitation: InvitationItem[];

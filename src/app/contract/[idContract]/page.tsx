@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
-import { initContractAttribute } from "@/app/contract/[idContract]/(component)/(store)/storeContractData";
 import { useEffect, useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -43,7 +42,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Web3 from "web3";
 import { useAppContext } from "@/components/ThemeProvider";
@@ -90,6 +88,7 @@ export default function Dashboard() {
     IContractParticipant[]
   >([]);
   const [contractUsers, setContractUsers] = useState<any[]>([]);
+
   const [contractData, setContractData] = useState<ContractData>();
   const [individual, setIndividual] = useState<IIndividual>({
     receiverInd: "",
@@ -109,7 +108,6 @@ export default function Dashboard() {
   const [contractStatus, setContractStatus] = useState<string>("");
   const [addressContract, setAddressContract] = useState<string>("");
   const [selectTypeKey, setSelectTypeKey] = useState(0);
-  const [rsaKey, setRsaKey] = useState<RSAKey>();
   const { toast } = useToast();
   const [isDisableButton, setIsDisableButton] =
     useState<IDisableButton>(initDisableButton);
@@ -489,6 +487,7 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
+                  <Dispute isDisableButton={isDisableButton} isVisibleButton={isVisibleButton} payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)} />
                 </div>
               </CardContent>
             </Card>
@@ -616,11 +615,9 @@ export default function Dashboard() {
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
-                        setNameFunctionCall(
-                          EFunctionCall.CONFIRM_CONTRACT_SENDER
-                        );
-                        setPrivateKey("");
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT)
+                        setPrivateKey('');
                       }}
                     >
                       Customer confirmation completed
@@ -632,11 +629,9 @@ export default function Dashboard() {
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
-                        setNameFunctionCall(
-                          EFunctionCall.CONFIRM_CONTRACT_RECEIVER
-                        );
-                        setPrivateKey("");
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT)
+                        setPrivateKey('');
                       }}
                     >
                       Supplier confirmation completed
@@ -693,7 +688,6 @@ export default function Dashboard() {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-
                 <Separator className="my-4" />
                 <div>
                   <Card x-chunk="dashboard-01-chunk-5">

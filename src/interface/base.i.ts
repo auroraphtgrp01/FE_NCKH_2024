@@ -16,8 +16,8 @@ export interface User {
     role: string;
     createdAt: string;
     updatedAt: string | null;
-    createdBy: any; 
-    updatedBy: any; 
+    createdBy: any;
+    updatedBy: any;
     deletedAt: string | null;
     deletedBy: string | null;
 }
@@ -37,5 +37,4 @@ export interface Executor {
 export interface DatePicker {
     selectedDate: Date | undefined
     onDateChange: (newDate: any) => void
-  }
-  
+}

@@ -148,39 +148,39 @@ export default function Dashboard() {
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0
       );
-      response?.contractData.participants.map((participant: any) => {
-        if (participant?.userId === userInfo?.data?.id) {
-          if (participant?.status === "SIGNED") {
-            setIsDisableButton({
-              ...isDisableButton,
-              signButton: true,
-            });
-          }
-        }
-      });
-      const addressMatch = (type: any) =>
-        (
-          response?.contractData.contractAttributes.find(
-            (item: any) => item.type === type
-          )?.value || ""
-        ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
       setContractStatus(response?.contractData.contract.status);
-      if (
-        response?.contractData.contract.status === "SIGNED" ||
-        response?.contractData.contract.status === "ENFORCE"
-      ) {
-        setIsDisableButton((prev: any) => ({
-          ...prev,
-          cancelButton: false,
-          fetchCompareButton: false,
-          withdrawButton: !addressMatch(
-            EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-          ),
-          transferButton: !addressMatch(
-            EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
-          ),
-        }));
-      }
+      // response?.contractData.participants.map((participant: any) => {
+      //   if (participant?.userId === userInfo?.data?.id) {
+      //     if (participant?.status === "SIGNED") {
+      //       setIsDisableButton((prev: any) => ({
+      //         ...prev,
+      //         signButton: true,
+      //       }));
+      //     }
+      //   }
+      // });
+      // const addressMatch = (type: any) =>
+      //   (
+      //     response?.contractData.contractAttributes.find(
+      //       (item: any) => item.type === type
+      //     )?.value || ""
+      //   ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
+      // if (
+      //   response?.contractData.contract.status === "SIGNED" ||
+      //   response?.contractData.contract.status === "ENFORCE"
+      // ) {
+      //   setIsDisableButton((prev: any) => ({
+      //     ...prev,
+      //     cancelButton: false,
+      //     fetchCompareButton: false,
+      //     withdrawButton: !addressMatch(
+      //       EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
+      //     ),
+      //     transferButton: !addressMatch(
+      //       EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
+      //     ),
+      //   }));
+      // }
     });
   }, []);
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -267,6 +267,7 @@ export default function Dashboard() {
           setUserInfo,
           individual,
           contractParticipants,
+          setContractParticipants,
           setIsVisibleButton,
           setIsDisableButton,
         },

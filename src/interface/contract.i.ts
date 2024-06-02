@@ -186,6 +186,7 @@ export interface ISignContractFunctionCallParams {
   setUserInfo: Dispatch<SetStateAction<UserInfoData>>;
   individual: IIndividual;
   contractParticipants: IContractParticipant[];
+  setContractParticipants: Dispatch<SetStateAction<IContractParticipant[]>>;
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>;
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>;
   privateKey?: string;

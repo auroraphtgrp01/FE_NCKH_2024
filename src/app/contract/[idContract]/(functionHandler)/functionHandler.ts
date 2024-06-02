@@ -39,6 +39,7 @@ const updateStateButton = (
     (
       contractAttributes.find((item: any) => item.type === type)?.value || ""
     ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
+
   switch (status) {
     case "PENDING":
       setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
@@ -46,7 +47,10 @@ const updateStateButton = (
       break;
     case "PARTICIPATED":
       setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
-      setIsDisableButton((prev: any) => ({ ...prev, cancelButton: false }));
+      setIsDisableButton((prev: any) => ({
+        ...prev,
+        cancelButton: false,
+      }));
       break;
     case "ENFORCE":
       setIsVisibleButton((prev: any) => ({
@@ -60,41 +64,32 @@ const updateStateButton = (
         }
       );
       if (participantsLogin?.status !== "SIGNED") {
-        setIsDisableButton((prev: any) => ({ ...prev, signButton: false }));
+        setIsDisableButton((prev: any) => ({
+          ...prev,
+          signButton: false,
+          fetchCompareButton: false,
+        }));
       }
       break;
     case "SIGNED":
       setIsVisibleButton((prev: any) => ({
         ...prev,
         signButton: false,
-        withdrawButton: addressMatch(
-          EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-        ),
-        confirmButtonReceiver: addressMatch(
-          EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-        ),
-        confirmButtonSender: addressMatch(
-          EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
-        ),
-        transferButton: addressMatch(
-          EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
-        ),
+        confirmButtonSender: userInfo.data.role === "Customer",
+        confirmButtonReceiver: userInfo.data.role === "Supplier",
+        transferButton: userInfo.data.role === "Customer",
+        withdrawButton: userInfo.data.role === "Supplier",
       }));
       setIsDisableButton((prev: any) => ({
         ...prev,
-        withdrawButton: addressMatch(
-          EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-        ),
-        transferButton: false,
-        cancelButton: false,
+        transferButton: currentBalance !== 0,
+        cancelButton: true,
+        fetchCompareButton: false,
       }));
       break;
     default:
       break;
   }
-
-  if (currentBalance !== 0)
-    setIsVisibleButton((prev: any) => ({ ...prev, transferButton: false }));
 };
 
 const fetchDataWhenEntryPage = async (
@@ -236,7 +231,7 @@ const transferMoneyFunc = async (
       abi,
       dataParams.addressContract as string
     );
-    await contract.methods.sendToSmartContract().send({
+    await contract.methods.sendToSmartContract(dataParams.privateKey).send({
       from: dataParams.userInfo.data.addressWallet,
       value: web3.utils.toWei(dataParams.individual.totalAmount, "ether"),
       gas: "1000000",
@@ -248,7 +243,7 @@ const transferMoneyFunc = async (
     );
     dataParams.setIsVisibleButton((prevState: any) => ({
       ...prevState,
-      transferButton: true,
+      transferButton: false,
     }));
     dataParams.setIsDisableButton((prev: any) => ({
       ...prev,
@@ -342,18 +337,28 @@ const handleSignContractFunc = async (
     const web3 = new Web3(window.ethereum);
     const contract = new web3.eth.Contract(abi, dataParams.addressContract);
     await contract.methods
-      .sign(dataParams.userInfo?.data?.addressWallet.toString())
+      .sign(
+        dataParams.userInfo?.data?.addressWallet.toString(),
+        dataParams.privateKey
+      )
       .send({ from: dataParams.userInfo?.data?.addressWallet, gas: "1000000" });
-
+    const findParticipant = dataParams.contractParticipants.find(
+      (item: any) => item.userId === dataParams.userInfo?.data?.id
+    );
     const response = await fetchAPI("/participants", "PATCH", {
-      id: dataParams.contractParticipants.find(
-        (item: any) => item.userId === dataParams.userInfo?.data?.id
-      )?.id,
+      id: findParticipant?.id,
       status: "SIGNED",
     });
+    const indexChanged = dataParams.contractParticipants.findIndex(
+      (item: any) => item === findParticipant
+    );
+    dataParams.contractParticipants[indexChanged] = {
+      ...dataParams.contractParticipants[indexChanged],
+      status: "SIGNED",
+    };
+    dataParams.setContractParticipants(dataParams.contractParticipants);
     const { balance } = await handleInstanceWeb3();
     dataParams.setUserInfo((prev: any) => ({ ...prev, balance }));
-
     if (response.data.contractStatus === "SIGNED") {
       const isCondition =
         (dataParams.userInfo?.data?.addressWallet?.trim().toLowerCase() ||
@@ -607,8 +612,6 @@ const handleCallFunctionOfBlockchain = async (
     transferFunctionParams?: ITransferMoneytFunctionCallParams;
   }
 ): Promise<IResponseFunction> => {
-  console.log("name function call:", dataFunctionCall.nameFunctionCall);
-
   if (
     dataAuthentication.privateKey === "" &&
     dataAuthentication.filePrivateKey === undefined

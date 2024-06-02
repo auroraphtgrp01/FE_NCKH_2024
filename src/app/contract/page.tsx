@@ -45,104 +45,61 @@ import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog";
 import { fetchAPI } from "@/utils/fetchAPI";
 
 export interface Participant {
-  userId: string;
-  fullName: string;
-  addressWallet: string;
-  position: string;
-  company: string;
-  avatar?: string;
+  userName: string;
   id: string;
   email: string;
+  status: string;
 }
 
 export type Contract = {
   id: string;
-  address: string;
-  status: "PENDING" | "SUCCESS" | "FAILED";
+  contractAddress: string;
+  name: string; // Contract Title
+  status: string;
   type: string;
-  typeName: string;
   email: string;
 };
 
-const sampleDataTable: Contract[] = [
-  {
-    id: "1",
-    address: "0x123",
-    status: "PENDING",
-    type: "Type A",
-    typeName: "Type A Name",
-    email: "example1@example.com",
-  },
-  {
-    id: "2",
-    address: "0x456",
-    status: "SUCCESS",
-    type: "Type B",
-    typeName: "Type B Name",
-    email: "example2@example.com",
-  },
-];
-
-const sampleParticipants: Participant[] = [
-  {
-    userId: "1",
-    fullName: "John Doe",
-    addressWallet: "0x789",
-    id: "1",
-    company: "công ty abc",
-    position: 'giám dốc',
-    email: "johndoe@example.com",
-  },
-  {
-    userId: "2",
-    fullName: "Jane Smith",
-    addressWallet: "0xabc",
-    id: "2",
-    company: "công ty abc",
-    position: 'giám dốc',
-    email: "janesmith@example.com",
-  },
-];
-
 export default function DataTableDemo() {
-  const [dataTable, setDataTable] = React.useState<Contract[]>(sampleDataTable);
+  const [dataTable, setDataTable] = React.useState<Contract[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [participants, setParticipants] = React.useState<Participant[]>(sampleParticipants);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [participants, setParticipants] = React.useState<Participant[]>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [isOpen, setIsOpen] = React.useState(false);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  // api dataTable
-  // Mấy chỗ t đóng là hắn gọi api lấy data nhưng hắn sai ở api , nên t set thẳng dữ liệu mẫu là : sampleDataTable và sampleParticipants
   React.useEffect(() => {
-    // fetchAPI(`/contracts/get-all-contract-details`, "GET").then((res) => {
-    //   if (res.status === 200) {
-    //     console.log(res.data);
-    //     setDataTable(res.data.contracts);
-    //   }
-    // });
-    setDataTable(sampleDataTable);
+    fetchAPI(`/contracts/get-all-contract-details`, "GET").then((res) => {
+      if (res.status === 200 || res.status === 201) {
+        console.log(res.data.contracts);
+        setDataTable(res.data.contracts);
+      }
+    });
   }, []);
-
-  // // api participants
-  const getParticipants = async (contractId: string) => {
-    // fetchAPI(`/participants/find-all/${contractId}`, "GET")
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     setParticipants(res.data);
-    //   })
-    //   .catch((errors) => {
-    //     console.log(errors);
-    //   });
-
-    // data init  này test khi onlick vào nút participants -> lấy data init 
-    setParticipants(sampleParticipants)
-  };
-
   // api-> khi click vào nút participant trên dataTable
   async function handleOpenParticipant(contractId: string) {
-    await getParticipants(contractId);
+    const response = await fetchAPI(
+      `/participants/find-all/${contractId}`,
+      "GET"
+    );
+    console.log(response.data);
+    const data: Participant[] = await Promise.all(
+      response.data.map((item: any) => {
+        const result: Participant = {
+          id: item.id,
+          email: item.email,
+          userName: item.User.name,
+          status: item.status,
+        };
+        return result;
+      })
+    );
+    setParticipants(data);
+    // setParticipants(sampleParticipants);
     setIsOpen(true);
   }
 
@@ -170,15 +127,35 @@ export default function DataTableDemo() {
       enableHiding: false,
     },
     {
-      accessorKey: "id",
-      header: ({ column }) => <div className="font-semibold">Address Contract</div>,
-      cell: ({ row }) => <div className="lowercase text-start">{row.getValue("id")}</div>,
+      accessorKey: "contractAddress",
+      header: ({ column }) => (
+        <div className="font-semibold">Address Contract</div>
+      ),
+      cell: ({ row }) => (
+        <div className=" text-start">
+          {row.getValue("contractAddress") !== undefined ||
+          row.getValue("contractAddress") !== ""
+            ? row.getValue("contractAddress")
+            : "Not yet deployed"}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "contractTitle",
+      header: ({ column }) => (
+        <div className="font-semibold">Contract Title</div>
+      ),
+      cell: ({ row }) => (
+        <div className=" text-start">{row.getValue("contractTitle")}</div>
+      ),
     },
     {
       accessorKey: "type",
       enableHiding: true,
-      header: ({ column }) => <div className="font-semibold">Type Contract</div>,
-      cell: ({ row }) => <div className="lowercase text-start">{row.getValue("type")}</div>,
+      header: ({ column }) => <div className="font-semibold">Type</div>,
+      cell: ({ row }) => (
+        <div className=" text-start">{row.getValue("type")}</div>
+      ),
     },
     {
       accessorKey: "status",
@@ -190,7 +167,7 @@ export default function DataTableDemo() {
       ),
     },
     {
-      accessorKey: "participants",
+      accessorKey: "id",
       header: () => <div className="text-center font-semibold">Action</div>,
       cell: ({ row }) => (
         <div className="text-center">
@@ -231,25 +208,27 @@ export default function DataTableDemo() {
       enableHiding: false,
     },
     {
-      accessorKey: "id",
-      header: ({ column }) => <div className="font-semibold">Id</div>,
-      cell: ({ row }) => <div className="lowercase text-start">{row.getValue("id")}</div>,
+      accessorKey: "userName",
+      header: ({ column }) => <div className="font-semibold">User Name</div>,
+      cell: ({ row }) => (
+        <div className="capitalize font-semibold">
+          {row.getValue("userName")}
+        </div>
+      ),
     },
 
     {
       accessorKey: "email",
-      header: () => <div className="text-center font-semibold">Email</div>,
+      header: () => <div className="font-semibold">Email</div>,
       cell: ({ row }) => (
-        <div className="capitalize text-center font-semibold">
-          {row.getValue("email")}
-        </div>
+        <div className="capitalize font-semibold">{row.getValue("email")}</div>
       ),
     },
     {
       accessorKey: "status",
-      header: () => <div className="text-center font-semibold">Status</div>,
+      header: () => <div className="font-semibold">Status</div>,
       cell: ({ row }) => (
-        <div className="capitalize text-center font-semibold">
+        <div className="capitalize  font-semibold">
           {row.getValue("status")}
         </div>
       ),
@@ -306,7 +285,9 @@ export default function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""}
+          value={
+            (tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             tableContracts.getColumn("id")?.setFilterValue(event.target.value)
           }
@@ -333,7 +314,9 @@ export default function DataTableDemo() {
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -351,7 +334,10 @@ export default function DataTableDemo() {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -360,17 +346,26 @@ export default function DataTableDemo() {
           <TableBody>
             {tableContracts.getRowModel().rows?.length ? (
               tableContracts.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columnsContracts.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columnsContracts.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -427,9 +422,9 @@ export default function DataTableDemo() {
                                     {header.isPlaceholder
                                       ? null
                                       : flexRender(
-                                        header.column.columnDef.header,
-                                        header.getContext()
-                                      )}
+                                          header.column.columnDef.header,
+                                          header.getContext()
+                                        )}
                                   </TableHead>
                                 );
                               })}
@@ -475,5 +470,3 @@ export default function DataTableDemo() {
     </div>
   );
 }
-
-

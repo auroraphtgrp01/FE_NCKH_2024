@@ -2,18 +2,26 @@
 
 import * as React from "react";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
-  flexRender,
+  useReactTable,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  getFilteredRowModel,
+  flexRender,
 } from "@tanstack/react-table";
-import { ChevronDown, ImportIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -31,18 +39,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import Link from "next/link";
+import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import { DialogOverlay, DialogPortal } from "@radix-ui/react-dialog";
 import { fetchAPI } from "@/utils/fetchAPI";
-import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 
 export interface Participant {
   userId: string;
@@ -64,44 +64,88 @@ export type Contract = {
   email: string;
 };
 
-export default function DataTableDemo() {
-  const [dataTable, setDataTable] = React.useState([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [participants, setParticipants] = React.useState([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [isOpen, setIsOpen] = React.useState(false);
-  async function handleOpenParticipant(contractId: string) {
-    console.log(contractId);
+const sampleDataTable: Contract[] = [
+  {
+    id: "1",
+    address: "0x123",
+    status: "PENDING",
+    type: "Type A",
+    typeName: "Type A Name",
+    email: "example1@example.com",
+  },
+  {
+    id: "2",
+    address: "0x456",
+    status: "SUCCESS",
+    type: "Type B",
+    typeName: "Type B Name",
+    email: "example2@example.com",
+  },
+];
 
+const sampleParticipants: Participant[] = [
+  {
+    userId: "1",
+    fullName: "John Doe",
+    addressWallet: "0x789",
+    id: "1",
+    company: "công ty abc",
+    position: 'giám dốc',
+    email: "johndoe@example.com",
+  },
+  {
+    userId: "2",
+    fullName: "Jane Smith",
+    addressWallet: "0xabc",
+    id: "2",
+    company: "công ty abc",
+    position: 'giám dốc',
+    email: "janesmith@example.com",
+  },
+];
+
+export default function DataTableDemo() {
+  const [dataTable, setDataTable] = React.useState<Contract[]>(sampleDataTable);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [participants, setParticipants] = React.useState<Participant[]>(sampleParticipants);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+
+  // api dataTable
+  // Mấy chỗ t đóng là hắn gọi api lấy data nhưng hắn sai ở api , nên t set thẳng dữ liệu mẫu là : sampleDataTable và sampleParticipants
+  React.useEffect(() => {
+    // fetchAPI(`/contracts/get-all-contract-details`, "GET").then((res) => {
+    //   if (res.status === 200) {
+    //     console.log(res.data);
+    //     setDataTable(res.data.contracts);
+    //   }
+    // });
+    setDataTable(sampleDataTable);
+  }, []);
+
+  // // api participants
+  const getParticipants = async (contractId: string) => {
+    // fetchAPI(`/participants/find-all/${contractId}`, "GET")
+    //   .then((res) => {
+    //     console.log(res.data);
+    //     setParticipants(res.data);
+    //   })
+    //   .catch((errors) => {
+    //     console.log(errors);
+    //   });
+
+    // data init  này test khi onlick vào nút participants -> lấy data init 
+    setParticipants(sampleParticipants)
+  };
+
+  // api-> khi click vào nút participant trên dataTable
+  async function handleOpenParticipant(contractId: string) {
     await getParticipants(contractId);
     setIsOpen(true);
   }
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
 
-  const getParticipants = async (contractId: string) => {
-    fetchAPI(`/participants/find-all/${contractId}`, "GET")
-      .then((res) => {
-        console.log(res.data);
-        setParticipants(res.data);
-      })
-      .catch((errors) => {
-        console.log(errors);
-      });
-  };
-  const userInfoString = localStorage.getItem("user-info");
-  const user_info = userInfoString ? JSON.parse(userInfoString) : null;
-  React.useEffect(() => {
-    fetchAPI(`/contracts/get-all-contract-details`, "GET").then((res) => {
-      if (res.status === 200) {
-        console.log(res.data);
-        setDataTable(res.data.contracts);
-      }
-    });
-  }, []);
   const columnsContracts: ColumnDef<Contract>[] = [
     {
       id: "select",
@@ -127,28 +171,18 @@ export default function DataTableDemo() {
     },
     {
       accessorKey: "id",
-      header: ({ column }) => {
-        return <div className="font-semibold ">Address Contract</div>;
-      },
-      cell: ({ row }) => (
-        <div className="lowercase text-start">{row.getValue("id")}</div>
-      ),
+      header: ({ column }) => <div className="font-semibold">Address Contract</div>,
+      cell: ({ row }) => <div className="lowercase text-start">{row.getValue("id")}</div>,
     },
     {
       accessorKey: "type",
       enableHiding: true,
-      header: ({ column }) => {
-        return <div className="font-semibold ">Type Contract</div>;
-      },
-      cell: ({ row }) => (
-        <div className="lowercase text-start">{row.getValue("type")}</div>
-      ),
+      header: ({ column }) => <div className="font-semibold">Type Contract</div>,
+      cell: ({ row }) => <div className="lowercase text-start">{row.getValue("type")}</div>,
     },
     {
       accessorKey: "status",
-      header: () => {
-        return <div className="text-center font-semibold">Status</div>;
-      },
+      header: () => <div className="text-center font-semibold">Status</div>,
       cell: ({ row }) => (
         <div className="capitalize text-center text-green-500 font-semibold">
           {row.getValue("status")}
@@ -158,24 +192,22 @@ export default function DataTableDemo() {
     {
       accessorKey: "participants",
       header: () => <div className="text-center font-semibold">Action</div>,
-      cell: ({ row }) => {
-        return (
-          <div className="text-center">
-            <Button onClick={() => handleOpenParticipant(row.getValue("id"))}>
-              Participants
+      cell: ({ row }) => (
+        <div className="text-center">
+          <Button onClick={() => handleOpenParticipant(row.getValue("id"))}>
+            Participants
+          </Button>
+          <Link href={`/contract/${row.getValue("id")}`}>
+            <Button className="ms-2" variant={"destructive"}>
+              Detail
             </Button>
-            <Link href={`/contract/${row.getValue("id")}`}>
-              <Button className="ms-2" variant={"destructive"}>
-                Detail
-              </Button>
-            </Link>
-          </div>
-        );
-      },
+          </Link>
+        </div>
+      ),
     },
   ];
-  // ssssss
-  const columnsParticipants: ColumnDef<Contract>[] = [
+
+  const columnsParticipants: ColumnDef<Participant>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -197,36 +229,27 @@ export default function DataTableDemo() {
       ),
       enableSorting: false,
       enableHiding: false,
-      // id
-      // type
-      // status
     },
     {
       accessorKey: "id",
-      header: ({ column }) => {
-        return <div className="font-semibold ">Id</div>;
-      },
-      cell: ({ row }) => (
-        <div className="lowercase text-start">{row.getValue("id")}</div>
-      ),
+      header: ({ column }) => <div className="font-semibold">Id</div>,
+      cell: ({ row }) => <div className="lowercase text-start">{row.getValue("id")}</div>,
     },
+
     {
       accessorKey: "email",
-      enableHiding: true,
-      header: ({ column }) => {
-        return <div className="font-semibold ">Email</div>;
-      },
+      header: () => <div className="text-center font-semibold">Email</div>,
       cell: ({ row }) => (
-        <div className="lowercase text-start">{row.getValue("email")}</div>
+        <div className="capitalize text-center font-semibold">
+          {row.getValue("email")}
+        </div>
       ),
     },
     {
       accessorKey: "status",
-      header: () => {
-        return <div className="text-center font-semibold">Status</div>;
-      },
+      header: () => <div className="text-center font-semibold">Status</div>,
       cell: ({ row }) => (
-        <div className="capitalize text-center text-green-500 font-semibold">
+        <div className="capitalize text-center font-semibold">
           {row.getValue("status")}
         </div>
       ),
@@ -251,6 +274,7 @@ export default function DataTableDemo() {
       rowSelection,
     },
   });
+
   const tableParticipants = useReactTable({
     data: participants,
     columns: columnsParticipants,
@@ -282,9 +306,7 @@ export default function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={
-            (tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""
-          }
+          value={(tableContracts.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             tableContracts.getColumn("id")?.setFilterValue(event.target.value)
           }
@@ -306,20 +328,16 @@ export default function DataTableDemo() {
               {tableContracts
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -329,44 +347,30 @@ export default function DataTableDemo() {
           <TableHeader>
             {tableContracts.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {tableContracts.getRowModel().rows?.length ? (
               tableContracts.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columnsContracts.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columnsContracts.length} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
@@ -376,27 +380,23 @@ export default function DataTableDemo() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {tableContracts.getFilteredSelectedRowModel().rows.length} of{" "}
-          {tableContracts.getFilteredRowModel().rows.length} row(s) selected.
+          Page {tableContracts.getState().pagination.pageIndex + 1} of{" "}
+          {tableContracts.getPageCount()}
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => tableContracts.previousPage()}
-            disabled={!tableContracts.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => tableContracts.nextPage()}
-            disabled={!tableContracts.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={() => tableContracts.previousPage()}
+          disabled={!tableContracts.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => tableContracts.nextPage()}
+          disabled={!tableContracts.getCanNextPage()}
+        >
+          Next
+        </Button>
       </div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogPortal>
@@ -427,9 +427,9 @@ export default function DataTableDemo() {
                                     {header.isPlaceholder
                                       ? null
                                       : flexRender(
-                                          header.column.columnDef.header,
-                                          header.getContext()
-                                        )}
+                                        header.column.columnDef.header,
+                                        header.getContext()
+                                      )}
                                   </TableHead>
                                 );
                               })}
@@ -475,3 +475,5 @@ export default function DataTableDemo() {
     </div>
   );
 }
+
+

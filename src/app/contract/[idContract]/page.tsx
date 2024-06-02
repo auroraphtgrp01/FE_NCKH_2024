@@ -23,7 +23,9 @@ import {
   ContractData,
   EContractAttributeType,
   EFunctionCall,
+  ERolesOfParticipant,
   IContractAttribute,
+  IContractCreateParams,
   IContractParticipant,
   IDisableButton,
   IIndividual,
@@ -78,6 +80,9 @@ import {
   initDisableButton,
   initVisibleButton,
 } from "@/constants/initVariable.constants";
+import Dispute from "./(component)/Dispute";
+import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
+import { initContractAttribute } from "./(component)/(store)/storeContractData";
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<
@@ -319,29 +324,29 @@ export default function Dashboard() {
     setIsDeployContractAlert(false);
   }
 
-  async function handleConfirmStages() {
-    handleConfirmStagesFunc(
-      addressContract,
-      userInfo,
-      individual,
-      setIsDisableButton,
-      setIsVisibleButton
-    )
-      .then(() => {
-        toast({
-          title: "Confirm successfully !",
-          description: "You have confirmed the stage",
-          variant: "success",
-        });
-      })
-      .catch((error) => {
-        toast({
-          title: "Error occurred while confirming stage",
-          description: error,
-          variant: "destructive",
-        });
-      });
-  }
+  // async function handleConfirmStages() {
+  //   handleConfirmStagesFunc(
+  //     addressContract,
+  //     userInfo,
+  //     individual,
+  //     setIsDisableButton,
+  //     setIsVisibleButton
+  //   )
+  //     .then(() => {
+  //       toast({
+  //         title: "Confirm successfully !",
+  //         description: "You have confirmed the stage",
+  //         variant: "success",
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       toast({
+  //         title: "Error occurred while confirming stage",
+  //         description: error,
+  //         variant: "destructive",
+  //       });
+  //     });
+  // }
 
   async function handleCancelContract() {
     try {
@@ -359,6 +364,30 @@ export default function Dashboard() {
   }
 
   async function handleCompareContractInformation() {}
+
+  const getDataToOpenDisputeContract = (
+    participantContract: IContractParticipant[],
+    addressWallet: string
+  ): IContractCreateParams => {
+    const invitations = participantContract.map((item) => {
+      if (
+        item.permission?.ROLES === ERolesOfParticipant.SENDER ||
+        item.permission?.ROLES === ERolesOfParticipant.RECEIVER
+      )
+        return {
+          email: item.email,
+          permission: item.permission,
+          messages: "You have a invitation to join a dispute contract",
+        };
+    });
+    return {
+      addressWallet,
+      name: "Disputed Contract - Supply Chain Management",
+      type: "DISPUTE",
+      templateId: "ac321ca5-1393-4474-9f09-f8d09ab15b1d",
+      invitation: invitations as InvitationItem[],
+    };
+  };
 
   return (
     <div className="flex min-h-screen w-full flex-col ">
@@ -487,7 +516,14 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
-                  <Dispute isDisableButton={isDisableButton} isVisibleButton={isVisibleButton} payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)} />
+                  <Dispute
+                    isDisableButton={isDisableButton}
+                    isVisibleButton={isVisibleButton}
+                    payload={getDataToOpenDisputeContract(
+                      contractParticipants,
+                      userInfo?.data.addressWallet
+                    )}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -615,9 +651,11 @@ export default function Dashboard() {
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT)
-                        setPrivateKey('');
+                        setIsOpenEnterPrivateKey(true);
+                        setNameFunctionCall(
+                          EFunctionCall.CONFIRM_CONTRACT_SENDER
+                        );
+                        setPrivateKey("");
                       }}
                     >
                       Customer confirmation completed
@@ -629,9 +667,11 @@ export default function Dashboard() {
                       variant={"indigo"}
                       className="w-full mt-2"
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT)
-                        setPrivateKey('');
+                        setIsOpenEnterPrivateKey(true);
+                        setNameFunctionCall(
+                          EFunctionCall.CONFIRM_CONTRACT_RECEIVER
+                        );
+                        setPrivateKey("");
                       }}
                     >
                       Supplier confirmation completed

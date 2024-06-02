@@ -27,9 +27,12 @@ import BreadCrumbHeader from "@/components/BreadCrumbHeader";
 import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
 import InvitationArea from "@/components/InvitationArea";
 import Image from "next/image";
-import { ContractTemplate, ITemplateContract, InvitationItem } from "@/interface/contract.i";
+import {
+  ContractTemplate,
+  ITemplateContract,
+  InvitationItem,
+} from "@/interface/contract.i";
 import { onCreateANewContract } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
-
 
 export default function page() {
   const [template, setTemplate] = useState<ContractTemplate[]>([
@@ -76,7 +79,6 @@ export default function page() {
       .catch((error) => {
         console.error("Error fetching template contracts:", error);
       });
-
   }, []);
 
   const [api, setApi] = useState<CarouselApi>();
@@ -107,25 +109,23 @@ export default function page() {
 
   useEffect(() => {
     console.log(templateSelect);
-  }, [templateSelect])
+  }, [templateSelect]);
   async function onClickCreateContractButton() {
     const templateId = templateSelect ? templateSelect[0].id : undefined;
-    onCreateANewContract(
-      {
-        addressWallet: userInfo?.data?.addressWallet,
-        name: nameOfContractInput,
-        templateId,
-        invitation: invitation,
-        messagesForInvitation: messages,
-      }
-    ).then((res) => {
-      res.contractId ? Router.push(`/contract/${res?.contractId}`) : null
+    onCreateANewContract({
+      addressWallet: userInfo?.data?.addressWallet,
+      name: nameOfContractInput,
+      templateId,
+      invitation: invitation,
+      messagesForInvitation: messages,
+    }).then((res) => {
+      res.contractId ? Router.push(`/contract/${res?.contractId}`) : null;
       toast({
         title: res.message,
         description: res.description,
-        variant: res.status
-      })
-    })
+        variant: res.status,
+      });
+    });
   }
 
   return (

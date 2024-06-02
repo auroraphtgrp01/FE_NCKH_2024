@@ -1,5 +1,28 @@
 import { initResponseMessages } from "@/constants/initVariable.constants";
-import { ContractData, DynamicType, EContractAttributeType, EContractStatus, EFunctionCall, ERolesOfParticipant, IConfirmStageFunctionCallParams, IContractAttribute, IContractCreateParams, IContractParticipant, IDisableButton, IIndividual, IResponseFunction, ISignContractFunctionCallParams, IStage, ITransferMoneyFunctionCallParams, IVisibleButton, InvitationItem, RSAKey, UserInfoData } from "@/interface/contract.i";
+import {
+  ContractData,
+  DynamicType,
+  EContractAttributeType,
+  EContractStatus,
+  EFunctionCall,
+  ERolesOfParticipant,
+  IConfirmStageFunctionCallParams,
+  IContractAttribute,
+  IContractCreateParams,
+  IContractParticipant,
+  IDisableButton,
+  IIndividual,
+  IResponseFunction,
+  IResponseFunctionFetchData,
+  ISignContractFunctionCallParams,
+  IStage,
+  ITransferMoneyFunctionCallParams,
+  ITransferMoneytFunctionCallParams,
+  IVisibleButton,
+  InvitationItem,
+  RSAKey,
+  UserInfoData,
+} from "@/interface/contract.i";
 import { fetchAPI } from "@/utils/fetchAPI";
 import { handleInstanceWeb3 } from "@/utils/web3Instance";
 import NodeRSA from "node-rsa";
@@ -245,68 +268,44 @@ const transferMoneyFunc = async (
   }
 };
 
-
 const handleDateStringToUint = (date: string): number => {
   return new Date(date).getTime();
 };
 
 const handleConfirmStagesFunc = async (
-    dataParams: IConfirmStageFunctionCallParams
+  dataParams: IConfirmStageFunctionCallParams
 ): Promise<IResponseFunction> => {
-    try {
-        const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
-        const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(abi, dataParams.addressContract as string);
-        await contract.methods.confirmStage().send({
-            from: dataParams.userInfo?.data?.addressWallet,
-            gas: "1000000",
-        });
-        // if (userInfo?.data?.addressWallet === individual.senderInd) {
-        //     setIsDisableButton({ ...isDisableButton });
-        // } else {
-        //     setIsDisableButton({ ...isDisableButton });
-        // }
-        return {
-            message: "Confirm Successfully !",
-            description: "Stage has been confirmed successfully",
-            status: "success"
-        }
-    } catch (error) {
-        return {
-            message: "Confirm Failed !",
-            description: error?.toString(),
-            status: "destructive"
-        }
-    }
-}
-
-async function handleCompareContractInformationFunc(setIsCompareContractAlert: any) {
-    // try {
-    //     const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
-    //     const web3 = new Web3(window.ethereum);
-    //     const contract = new web3.eth.Contract(abi, addressContract as string);
-    //     const compare: string[] = await contract.methods.getContractInformation(privateKey)
-    //         .call({ from: userInfo?.data?.addressWallet });
-    //     const contractAttributesFromBlockchain = JSON.parse(compare[1]);
-    //     if (JSON.stringify(contractAttributesFromBlockchain) === JSON.stringify(contractAttribute)) {
-    //         toast({
-    //             title: "Contract is same",
-    //             variant: "success",
-    //         });
-    //     } else {
-    //         toast({
-    //             title: "Contract is different",
-    //             variant: "destructive",
-    //         });
-    //     }
-    //     setIsCompareContractAlert(false);
-    // } catch (error) {
-    //     console.error("Error occurred while comparing contract information:", error);
-    // }
-  } catch (error) {
-    throw new Error(
-      `Error occurred while handling confirmation stages: ${error}`
+  try {
+    const {
+      data: {
+        abi: { abi },
+      },
+    } = await fetchAPI("/smart-contracts/abi", "GET");
+    const web3 = new Web3(window.ethereum);
+    const contract = new web3.eth.Contract(
+      abi,
+      dataParams.addressContract as string
     );
+    await contract.methods.confirmStage().send({
+      from: dataParams.userInfo?.data?.addressWallet,
+      gas: "1000000",
+    });
+    // if (userInfo?.data?.addressWallet === individual.senderInd) {
+    //     setIsDisableButton({ ...isDisableButton });
+    // } else {
+    //     setIsDisableButton({ ...isDisableButton });
+    // }
+    return {
+      message: "Confirm Successfully !",
+      description: "Stage has been confirmed successfully",
+      status: "success",
+    };
+  } catch (error) {
+    return {
+      message: "Confirm Failed !",
+      description: error?.toString(),
+      status: "destructive",
+    };
   }
 };
 
@@ -682,52 +681,57 @@ const handleCallFunctionOfBlockchain = async (
   return responseMessages;
 };
 
-
 const onCreateANewContract = async (
-    dataParams: IContractCreateParams
+  dataParams: IContractCreateParams
 ): Promise<IResponseFunction> => {
-    try {
-        const res = await fetchAPI("/contracts", "POST", dataParams);
-        if (res.status === 201) {
-            return {
-                message: "Create contract successfully",
-                status: "success",
-                description: "Contract has been created successfully",
-                contractId: res.data.contract.id
-            };
-        } else {
-            return {
-                message: "Create contract failed",
-                status: "destructive",
-                description: "Error occurred while creating contract",
-            };
-        }
-    } catch (err) {
-        return {
-            message: "Create contract failed",
-            status: "destructive",
-            description: err?.toString(),
-        };
+  try {
+    const res = await fetchAPI("/contracts", "POST", dataParams);
+    if (res.status === 201) {
+      return {
+        message: "Create contract successfully",
+        status: "success",
+        description: "Contract has been created successfully",
+        contractId: res.data.contract.id,
+      };
+    } else {
+      return {
+        message: "Create contract failed",
+        status: "destructive",
+        description: "Error occurred while creating contract",
+      };
     }
+  } catch (err) {
+    return {
+      message: "Create contract failed",
+      status: "destructive",
+      description: err?.toString(),
+    };
+  }
 };
 
-const getDataToOpenDisputeContract = (participantContract: IContractParticipant[], addressWallet: string): IContractCreateParams => {
-    const invitations = participantContract.map((item) => {
-        if (item.permission?.ROLES === ERolesOfParticipant.SENDER || item.permission?.ROLES === ERolesOfParticipant.RECEIVER)
-            return {
-                email: item.email,
-                permission: item.permission,
-                messages: "You have a invitation to join a dispute contract"
-            }
-    })
-    return {
-        addressWallet,
-        name: "Disputed Contract - Supply Chain Management",
-        type: "DISPUTE",
-        templateId: "ac321ca5-1393-4474-9f09-f8d09ab15b1d",
-        invitation: invitations as InvitationItem[]
-    }
-}
+const getDataToOpenDisputeContract = (
+  participantContract: IContractParticipant[],
+  addressWallet: string
+): IContractCreateParams => {
+  const invitations = participantContract.map((item) => {
+    if (
+      item.permission?.ROLES === ERolesOfParticipant.SENDER ||
+      item.permission?.ROLES === ERolesOfParticipant.RECEIVER
+    )
+      return {
+        email: item.email,
+        permission: item.permission,
+        messages: "You have a invitation to join a dispute contract",
+      };
+  });
+  return {
+    addressWallet,
+    name: "Disputed Contract - Supply Chain Management",
+    type: "DISPUTE",
+    templateId: "ac321ca5-1393-4474-9f09-f8d09ab15b1d",
+    invitation: invitations as InvitationItem[],
+  };
+};
 export {
   updateStateButton,
   fetchDataWhenEntryPage,
@@ -743,5 +747,5 @@ export {
   signMessage,
   hashStringWithSHA512,
   handleCallFunctionOfBlockchain,
+  onCreateANewContract
 };
-

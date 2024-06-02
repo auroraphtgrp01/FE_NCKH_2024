@@ -1,4 +1,8 @@
-import { ERolesOfParticipant, IDisableButton, IPermission, IResponseFunction, IVisibleButton } from "@/interface/contract.i";
+import {
+  IDisableButton,
+  IResponseFunction,
+  IVisibleButton,
+} from "@/interface/contract.i";
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,

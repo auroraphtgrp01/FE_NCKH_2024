@@ -37,12 +37,15 @@ const updateStateButton = (
   dataIndividual: IIndividual,
   contractParticipants: any,
   userInfo: UserInfoData,
-  currentBalance: number
+  currentBalance: number,
+  setContractParticipants: Dispatch<SetStateAction<IContractParticipant[]>>
 ) => {
   const addressMatch = (type: any) =>
     (
       contractAttributes.find((item: any) => item.type === type)?.value || ""
     ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
+
+  // if(contractParticipants.length > 0 || )
 
   switch (status) {
     case "PENDING":
@@ -747,5 +750,5 @@ export {
   signMessage,
   hashStringWithSHA512,
   handleCallFunctionOfBlockchain,
-  onCreateANewContract
+  onCreateANewContract,
 };

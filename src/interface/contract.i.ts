@@ -64,7 +64,19 @@ export interface IContractParticipant {
   status: string;
   User: User;
   permission?: IPermission;
+  completedStages: IStageContract[];
 }
+
+export interface IStageContract {
+  id: string;
+  percent: number;
+  requestBy: string;
+  requestTo: string;
+  description?: string;
+  status: EStageStatus;
+  createdAt: Date;
+}
+
 export enum EContractStatus {
   PENDING = "PENDING",
   PARTICIPATED = "PARTICIPATED",

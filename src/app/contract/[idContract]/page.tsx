@@ -149,7 +149,8 @@ export default function Dashboard() {
         individual,
         response?.contractData.participants,
         userInfo,
-        response?.contractBallance ? response?.contractBallance : 0
+        response?.contractBallance ? response?.contractBallance : 0,
+        setContractParticipants
       );
       setContractStatus(response?.contractData.contract.status);
       // response?.contractData.participants.map((participant: any) => {

@@ -245,7 +245,7 @@ export default function Dashboard() {
 
   async function withdrawMoney() {
     withdrawMoneyFunc(addressContract, userInfo, individual)
-      .then(() => {})
+      .then(() => { })
       .catch((error) => {
         toast({
           title: "Error occurred while withdrawing money",
@@ -375,7 +375,7 @@ export default function Dashboard() {
     }
   }
 
-  async function handleCompareContractInformation() {}
+  async function handleCompareContractInformation() { }
 
   const getDataToOpenDisputeContract = (
     participantContract: IContractParticipant[],

@@ -38,7 +38,8 @@ const updateStateButton = (
   contractParticipants: IContractParticipant[],
   userInfo: UserInfoData,
   currentBalance: number,
-  stages: any[]
+  stages: any[],
+  contractData: ContractData
 ) => {
   const addressMatch = (type: any) =>
     (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() ===
@@ -87,6 +88,7 @@ const updateStateButton = (
         const receiver = contractParticipants.find(
           (item: any) => item?.permission.ROLES === ERolesOfParticipant.RECEIVER
         )
+
         const hasStagePending =
           receiver?.completedStages && receiver?.completedStages.length > 0
             ? receiver.completedStages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -104,7 +106,7 @@ const updateStateButton = (
           transferButton: currentBalance !== 0,
           cancelButton: true,
           fetchCompareButton: false,
-          confirmButtonReceiver: userInfo.data.role === 'Supplier' && hasStageNotStarted ? false : true,
+          confirmButtonReceiver: userInfo.data.role === 'Supplier' && hasStageNotStarted.length > 0 ? false : true,
           confirmButtonSender: userInfo.data.role === 'Customer' && hasStagePending !== undefined ? false : true
         }))
         break
@@ -262,7 +264,9 @@ const handleDateStringToUint = (date: string): number => {
   return new Date(date).getTime()
 }
 
-const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallParams): Promise<IResponseFunction> => {
+const handleConfirmStagesFuncOfSupplier = async (
+  dataParams: IConfirmStageFunctionCallParams
+): Promise<IResponseFunction> => {
   try {
     const {
       data: {
@@ -270,27 +274,20 @@ const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallPara
       }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
     const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(
-      abi,
-      dataParams.addressContract as string
-    )
+    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
 
     await contract.methods.confirmStage(dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
       gas: '1000000'
     })
 
-    //xxxxxxxxxxxxxxxxx
-    const participantsLogin = dataParams.contractParticipants?.find(
-      (participant: any) => {
-        return participant.userId === dataParams?.userInfo.data.id
-      }
-    )
+    const participantsLogin = dataParams.contractParticipants?.find((participant: any) => {
+      return participant.userId === dataParams?.userInfo.data.id
+    })
     const stageEnforce = dataParams.contractData?.stages.filter(
       (item: any) => item.status === EStageContractStatus.ENFORCE
     )
-    const stageChange =
-      stageEnforce && stageEnforce.length > 0 ? stageEnforce[0] : undefined
+    const stageChange = stageEnforce && stageEnforce.length > 0 ? stageEnforce[0] : undefined
     let stageUpdateParticipant = undefined
     if (stageChange !== undefined) {
       stageEnforce?.map((item: any) => {
@@ -298,24 +295,119 @@ const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallPara
       })
       const { id, ...rest } = stageChange
       stageUpdateParticipant = { ...rest }
-    }
-
-    await fetchAPI('/participants', 'PATCH', {
-      id: participantsLogin?.id,
-      stage: {
+      console.log({
         ...stageUpdateParticipant,
         status: EStageContractStatus.PENDING,
-      },
-    })
-    await fetchAPI('/contracts', 'PATCH', {
-      id: dataParams?.contractData?.id,
-      stage: { ...stageChange, status: EStageContractStatus.PENDING },
-    })
+        stageContractId: stageChange.id
+      })
+
+      await fetchAPI('/participants', 'PATCH', {
+        id: participantsLogin?.id,
+        stage: {
+          ...stageUpdateParticipant,
+          status: EStageContractStatus.PENDING,
+          stageContractId: stageChange.id
+        }
+      })
+      await fetchAPI('/contracts', 'PATCH', {
+        id: dataParams?.contractData?.id,
+        stage: { ...stageChange, status: EStageContractStatus.PENDING }
+      })
+    } else
+      return {
+        message: 'Confirm Failed !',
+        description: 'All stages have been completed',
+        status: 'destructive'
+      }
 
     dataParams.setIsDisableButton((prev: any) => ({
       ...prev,
-      confirmButtonReceiver: stageEnforce?.length === 0 ? true : false,
+      confirmButtonReceiver: stageEnforce?.length === 0 ? true : false
     }))
+    return {
+      message: 'Confirm Successfully !',
+      description: 'Stage has been confirmed successfully',
+      status: 'success'
+    }
+  } catch (error) {
+    return {
+      message: 'Confirm Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
+  }
+}
+
+const handleConfirmStagesFuncOfCustomer = async (
+  dataParams: IConfirmStageFunctionCallParams
+): Promise<IResponseFunction> => {
+  try {
+    // const {
+    //   data: {
+    //     abi: { abi }
+    //   }
+    // } = await fetchAPI('/smart-contracts/abi', 'GET')
+    // const web3 = new Web3(window.ethereum)
+    // const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+
+    // await contract.methods.confirmStage(dataParams.privateKey).send({
+    //   from: dataParams.userInfo?.data?.addressWallet,
+    //   gas: '1000000'
+    // })
+
+    const participantsLogin = dataParams.contractParticipants?.find((participant: any) => {
+      return participant.userId === dataParams?.userInfo.data.id
+    })
+    const receiver = dataParams.contractParticipants.find(
+      (item) => item?.permission?.ROLES === ERolesOfParticipant.RECEIVER
+    )
+    const hasStagePending =
+      receiver && receiver.completedStages.length > 0
+        ? receiver.completedStages.filter((item: any) => item.status === EStageContractStatus.PENDING)
+        : undefined
+
+    const stageChange = hasStagePending && hasStagePending.length > 0 ? hasStagePending[0] : undefined
+    if (stageChange !== undefined) {
+      hasStagePending?.map((item: any) => {
+        if (item === stageChange) hasStagePending.splice(item, 1)
+      })
+      console.log('stageChange', stageChange)
+      //       id
+      // :
+      // "9e2179e6-3e53-40be-a8db-a4a3c30ed5db"
+      // percent
+      // :
+      // 100
+      // requestBy
+      // :
+      // "aca0da6e-9f42-47c4-8af8-7ed8ffdc3341"
+      // requestTo
+      // :
+      // "e13fcf5f-5773-4913-9448-d9507319100f"
+      // stageContractId
+      // :
+      // "000f96fd-da29-4571-81e2-9019d596c62c"
+      // status
+      // :
+      // "PENDING"
+      dataParams
+      // await fetchAPI('/participants', 'PATCH', {
+      //   id: participantsLogin?.id,
+      //   stage: {
+      //     ...stageChange,
+      //     status: EStageContractStatus.APPROVED
+      //   }
+      // })
+      // await fetchAPI('/contracts', 'PATCH', {
+      //   id: dataParams?.contractData?.id,
+      //   stage: { ...stageChange, status: EStageContractStatus.APPROVED }
+      // })
+    }
+
+    // dataParams.setIsDisableButton((prev: any) => ({
+    //   ...prev,
+    //   confirmButtonReceiver: stageEnforce?.length === 0 ? true : false
+    // }))
 
     //  if (userInfo?.data?.addressWallet === individual.senderInd) {
     //      setIsDisableButton({ ...isDisableButton });
@@ -626,8 +718,6 @@ const handleCallFunctionOfBlockchain = async (
     confirmFunctionParams?: IConfirmStageFunctionCallParams
   }
 ): Promise<IResponseFunction> => {
-  console.log(dataFunctionCall.confirmFunctionParams)
-
   if (dataAuthentication.privateKey === '' && dataAuthentication.filePrivateKey === undefined) {
     return {
       description: 'Please fill your private key or upload your signature',
@@ -672,10 +762,14 @@ const handleCallFunctionOfBlockchain = async (
       break
     case EFunctionCall.CONFIRM_CONTRACT_SENDER:
       console.log('Confirm Contract Sender')
+      responseMessages = await handleConfirmStagesFuncOfCustomer({
+        ...dataFunctionCall.confirmFunctionParams,
+        privateKey
+      } as IConfirmStageFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
       console.log('Confirm Contract Receiver')
-      responseMessages = await handleConfirmStagesFunc({
+      responseMessages = await handleConfirmStagesFuncOfSupplier({
         ...dataFunctionCall.confirmFunctionParams,
         privateKey
       } as IConfirmStageFunctionCallParams)
@@ -754,7 +848,8 @@ export {
   withdrawMoneyFunc,
   transferMoneyFunc,
   handleDateStringToUint,
-  handleConfirmStagesFunc,
+  handleConfirmStagesFuncOfCustomer,
+  handleConfirmStagesFuncOfSupplier,
   handleCompareContractInformationFunc,
   handleSignContractFunc,
   handleOnDeployContractFunc,

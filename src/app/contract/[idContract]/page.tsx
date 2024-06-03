@@ -53,10 +53,8 @@ import InvitationArea from '@/components/InvitationArea'
 import {
   fetchDataWhenEntryPage,
   handleCallFunctionOfBlockchain,
-  handleConfirmStagesFunc,
   handleOnDeployContractFunc,
   inviteNewParticipant,
-  transferMoneyFunc,
   updateStateButton,
   withdrawMoneyFunc
 } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
@@ -133,7 +131,8 @@ export default function Dashboard() {
         response?.contractData.participants,
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,
-        response?.contractData.contract.stages
+        response?.contractData.contract.stages,
+        response?.contractData
       )
       setContractStatus(response?.contractData.contract.status)
       // response?.contractData.participants.map((participant: any) => {
@@ -271,8 +270,8 @@ export default function Dashboard() {
           setIsVisibleButton,
           privateKey,
           contractParticipants,
-          contractData,
-        },
+          contractData
+        }
       }
     )
     toast({

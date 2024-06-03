@@ -1,50 +1,52 @@
-'use client'
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+'use client';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+   Card,
+   CardContent,
+   CardDescription,
+   CardFooter,
+   CardHeader,
+   CardTitle,
+} from '@/components/ui/card';
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+   Table,
+   TableBody,
+   TableCaption,
+   TableCell,
+   TableHead,
+   TableHeader,
+   TableRow,
+} from '@/components/ui/table';
 
-import Web3 from 'web3'
-import GetContract from '@/app/contract/detail/[typeContract]/[address]/components/GetContract'
+import Web3 from 'web3';
+import GetContract from '@/app/contract/detail/[typeContract]/[address]/components/GetContract';
 export default function Dashboard() {
-    const [data, setData] = useState({})
-    const getData = (dataFromChild: any) => {
-        setData(dataFromChild);
-    };
-    const [balance, setBalance] = React.useState('')
-    useEffect(() => {
-        const web3 = new Web3(window.ethereum);
-        (web3.eth.getBalance(localStorage.getItem('address-wallet') as string)).then((bal) => {
-            setBalance(web3.utils.fromWei(bal, "ether"))
-        });
-    }, [])
-    return (
-        <div className="flex mt-6">
-            <div className="me-3">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className='text-2xl'>Smart Contract</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <GetContract />
-                    </CardContent>
-                </Card>
-            </div>
-            {/* <div className="me-3">
+   const [data, setData] = useState({});
+   const getData = (dataFromChild: any) => {
+      setData(dataFromChild);
+   };
+   const [balance, setBalance] = React.useState('');
+   useEffect(() => {
+      const web3 = new Web3(window.ethereum);
+      web3.eth
+         .getBalance(localStorage.getItem('address-wallet') as string)
+         .then((bal) => {
+            setBalance(web3.utils.fromWei(bal, 'ether'));
+         });
+   }, []);
+   return (
+      <div className='mt-6 flex'>
+         <div className='me-3'>
+            <Card>
+               <CardHeader>
+                  <CardTitle className='text-2xl'>Smart Contract</CardTitle>
+               </CardHeader>
+               <CardContent>
+                  <GetContract />
+               </CardContent>
+            </Card>
+         </div>
+         {/* <div className="me-3">
         <Card>
       <CardHeader>
       <CardTitle className='text-2xl'>Wallet</CardTitle>
@@ -55,7 +57,7 @@ export default function Dashboard() {
     </CardContent>
   </Card>
     </div> */}
-            {/* <div className='me-3'>
+         {/* <div className='me-3'>
                 <Card>
                     <CardHeader>
                         <CardTitle className='text-2xl'> Table of Contract Data </CardTitle>
@@ -81,6 +83,6 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
             </div> */}
-        </div>
-    )
+      </div>
+   );
 }

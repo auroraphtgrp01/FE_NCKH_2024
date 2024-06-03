@@ -1,40 +1,40 @@
-import { Executor, User, UserPermission } from "@/interface/base.i";
-import { Axios } from "axios";
-import { Dispatch, SetStateAction } from "react";
+import { Executor, User, UserPermission } from '@/interface/base.i';
+import { Axios } from 'axios';
+import { Dispatch, SetStateAction } from 'react';
 
 export enum EContractAttributeType {
-   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = "Contract Attribute Party Address Wallet Joined",
-   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE = "Contract Attribute Address Wallet Receive",
-   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND = "Contract Attribute Address Wallet Send",
-   CONTRACT_PARTY_INFO = "Contract Party Info",
-   TOTAL_AMOUNT = "Total Amount",
-   CONTRACT_HEADER = "Contract Header",
-   CONTRACT_HEADER_DATE = "Contract Header Date",
-   CONTRACT_TITLE = "Contract Title",
-   CONTRACT_NUMBER = "Contract Number",
-   CONTRACT_TEXT = "Contract Text",
-   CONTRACT_HEADING_1 = "Contract Heading 1",
-   CONTRACT_HEADING_2 = "Contract Heading 2",
-   CONTRACT_ATTRIBUTE = "Contract Attribute",
-   CONTRACT_SIGNATURE = "Contract Signature",
+   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = 'Contract Attribute Party Address Wallet Joined',
+   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE = 'Contract Attribute Address Wallet Receive',
+   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND = 'Contract Attribute Address Wallet Send',
+   CONTRACT_PARTY_INFO = 'Contract Party Info',
+   TOTAL_AMOUNT = 'Total Amount',
+   CONTRACT_HEADER = 'Contract Header',
+   CONTRACT_HEADER_DATE = 'Contract Header Date',
+   CONTRACT_TITLE = 'Contract Title',
+   CONTRACT_NUMBER = 'Contract Number',
+   CONTRACT_TEXT = 'Contract Text',
+   CONTRACT_HEADING_1 = 'Contract Heading 1',
+   CONTRACT_HEADING_2 = 'Contract Heading 2',
+   CONTRACT_ATTRIBUTE = 'Contract Attribute',
+   CONTRACT_SIGNATURE = 'Contract Signature',
 }
 export enum EContractAttributeTypeAdditional {
-   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = "Contract Attribute Party Address Wallet Joined",
-   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE = "Contract Attribute Address Wallet Receive",
-   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND = "Contract Attribute Address Wallet Send",
-   TOTAL_AMOUNT = "Total Amount",
-   CONTRACT_NUMBER = "Contract Number",
-   CONTRACT_TEXT = "Contract Text",
-   CONTRACT_PARTY_INFO = "Contract Party Info",
-   CONTRACT_HEADING_1 = "Contract Heading 1",
-   CONTRACT_HEADING_2 = "Contract Heading 2",
-   CONTRACT_ATTRIBUTE = "Contract Attribute",
-   CONTRACT_SIGNATURE = "Contract Signature",
+   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = 'Contract Attribute Party Address Wallet Joined',
+   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE = 'Contract Attribute Address Wallet Receive',
+   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND = 'Contract Attribute Address Wallet Send',
+   TOTAL_AMOUNT = 'Total Amount',
+   CONTRACT_NUMBER = 'Contract Number',
+   CONTRACT_TEXT = 'Contract Text',
+   CONTRACT_PARTY_INFO = 'Contract Party Info',
+   CONTRACT_HEADING_1 = 'Contract Heading 1',
+   CONTRACT_HEADING_2 = 'Contract Heading 2',
+   CONTRACT_ATTRIBUTE = 'Contract Attribute',
+   CONTRACT_SIGNATURE = 'Contract Signature',
 }
 export enum EContractAttributeTypeAdditionalHeader {
-   CONTRACT_HEADER = "Contract Header",
-   CONTRACT_HEADER_DATE = "Contract Header Date",
-   CONTRACT_TITLE = "Contract Title",
+   CONTRACT_HEADER = 'Contract Header',
+   CONTRACT_HEADER_DATE = 'Contract Header Date',
+   CONTRACT_TITLE = 'Contract Title',
 }
 export interface IContractAttribute {
    id?: string;
@@ -48,13 +48,13 @@ export interface IContractAttribute {
    updatedBy?: Executor | null;
 }
 export enum EStatusAttribute {
-   CREATE = "Create",
-   UPDATE = "Update",
-   PREPARE = "Prepare",
-   NOT_CHANGE = "Not Change",
+   CREATE = 'Create',
+   UPDATE = 'Update',
+   PREPARE = 'Prepare',
+   NOT_CHANGE = 'Not Change',
 }
 export interface IDefinitionContractAttribute
-   extends Omit<IContractAttribute, "id" | "value" | "property"> { }
+   extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {}
 export interface IContractParticipant {
    id: string;
    userId: string;
@@ -78,12 +78,12 @@ export interface IStageContract {
 }
 
 export enum EContractStatus {
-   PENDING = "PENDING",
-   PARTICIPATED = "PARTICIPATED",
-   ENFORCE = "ENFORCE",
-   SIGNED = "SIGNED",
-   COMPLETED = "COMPLETED",
-   FAILED = "FAILED",
+   PENDING = 'PENDING',
+   PARTICIPATED = 'PARTICIPATED',
+   ENFORCE = 'ENFORCE',
+   SIGNED = 'SIGNED',
+   COMPLETED = 'COMPLETED',
+   FAILED = 'FAILED',
 }
 export interface DynamicType {
    [key: string]: any;
@@ -181,10 +181,10 @@ export interface IPermission {
 }
 
 export enum ERolesOfParticipant {
-   SENDER = "Sender Users",
-   RECEIVER = "Receiver Users",
-   ARBITRATION = "Arbitration",
-   PARTICIPANT = "Participant",
+   SENDER = 'Sender Users',
+   RECEIVER = 'Receiver Users',
+   ARBITRATION = 'Arbitration',
+   PARTICIPANT = 'Participant',
 }
 export interface IAddPropertyAreaProps {
    propertiesCBX: string[];
@@ -195,13 +195,13 @@ export interface IAddPropertyAreaProps {
    setContractAttribute: (value: any) => void;
 }
 export enum EFunctionCall {
-   FETCH_COMPARE_CONTRACT = "FETCH_COMPARE_CONTRACT",
-   CANCEL_CONTRACT = "CANCEL_CONTRACT",
-   WITHDRAW_CONTRACT = "WITHDRAW_CONTRACT",
-   TRANSFER_CONTRACT = "TRANSFER_CONTRACT",
-   SIGN_CONTRACT = "SIGN_CONTRACT",
-   CONFIRM_CONTRACT_SENDER = "CONFIRM_CONTRACT_SENDER",
-   CONFIRM_CONTRACT_RECEIVER = "CONFIRM_CONTRACT_RECEIVER",
+   FETCH_COMPARE_CONTRACT = 'FETCH_COMPARE_CONTRACT',
+   CANCEL_CONTRACT = 'CANCEL_CONTRACT',
+   WITHDRAW_CONTRACT = 'WITHDRAW_CONTRACT',
+   TRANSFER_CONTRACT = 'TRANSFER_CONTRACT',
+   SIGN_CONTRACT = 'SIGN_CONTRACT',
+   CONFIRM_CONTRACT_SENDER = 'CONFIRM_CONTRACT_SENDER',
+   CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER',
 }
 
 export interface ISignContractFunctionCallParams {
@@ -238,7 +238,7 @@ export interface IConfirmStageFunctionCallParams {
    contractParticipants: IContractParticipant[];
 }
 export interface IResponseFunction {
-   status: "success" | "destructive";
+   status: 'success' | 'destructive';
    message: string;
    description?: string;
    [key: string]: any;
@@ -261,10 +261,10 @@ export interface IStagesContract {
 }
 
 export enum EStageStatus {
-   PENDING = "PENDING",
-   APPROVED = "APPROVED",
-   REJECTED = "REJECTED",
-   OUT_OF_DATE = "OUT_OF_DATE",
+   PENDING = 'PENDING',
+   APPROVED = 'APPROVED',
+   REJECTED = 'REJECTED',
+   OUT_OF_DATE = 'OUT_OF_DATE',
 }
 
 export interface ITemplateContract {
@@ -286,7 +286,7 @@ export interface IContractCreateParams {
    addressWallet: string;
    invitation?: InvitationItem[];
    messagesForInvitation?: string;
-   type?: "CONTRACT" | "DISPUTE";
+   type?: 'CONTRACT' | 'DISPUTE';
 }
 
 export interface IResponseFunctionFetchData {
@@ -295,9 +295,9 @@ export interface IResponseFunctionFetchData {
 }
 
 export enum EStageContractStatus {
-   PENDING = "PENDING",
-   APPROVED = "APPROVED",
-   REJECTED = "REJECTED",
-   ENFORCE = "ENFORCE",
-   WITHDRAWN = "WITHDRAWN",
+   PENDING = 'PENDING',
+   APPROVED = 'APPROVED',
+   REJECTED = 'REJECTED',
+   ENFORCE = 'ENFORCE',
+   WITHDRAWN = 'WITHDRAWN',
 }

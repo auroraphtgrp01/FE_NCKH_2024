@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-"use client";
-import { use, useEffect, useState } from "react";
+'use client';
+import { use, useEffect, useState } from 'react';
 import {
    Card,
    CardContent,
@@ -8,58 +8,61 @@ import {
    CardFooter,
    CardHeader,
    CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
    Carousel,
    CarouselApi,
    CarouselContent,
    CarouselItem,
-} from "@/components/ui/carousel";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { useAppContext } from "@/components/ThemeProvider";
-import { fetchAPI } from "@/utils/fetchAPI";
-import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
-import BreadCrumbHeader from "@/components/BreadCrumbHeader";
-import PreviewContract from "@/app/contract/[idContract]/(component)/PreviewContract";
-import InvitationArea from "@/components/InvitationArea";
-import Image from "next/image";
+} from '@/components/ui/carousel';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { useAppContext } from '@/components/ThemeProvider';
+import { fetchAPI } from '@/utils/fetchAPI';
+import { useToast } from '@/components/ui/use-toast';
+import { useRouter } from 'next/navigation';
+import BreadCrumbHeader from '@/components/BreadCrumbHeader';
+import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract';
+import InvitationArea from '@/components/InvitationArea';
+import Image from 'next/image';
 import {
    ContractTemplate,
    ITemplateContract,
    InvitationItem,
-} from "@/interface/contract.i";
-import { onCreateANewContract } from "@/app/contract/[idContract]/(functionHandler)/functionHandler";
+} from '@/interface/contract.i';
+import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler';
 
 export default function page() {
    const [template, setTemplate] = useState<ContractTemplate[]>([
       {
-         id: "",
-         name: "Empty Contract",
-         path: "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg",
+         id: '',
+         name: 'Empty Contract',
+         path: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
          contractAttributes: [],
       },
    ]);
    const { userInfo, setUserInfo }: any = useAppContext();
    const { dataCreateContract, setDataCreateContract }: any = useAppContext();
    const [invitation, setInvitation] = useState<InvitationItem[]>([]);
-   const [nameOfContractInput, setNameOfContractInput] = useState("");
+   const [nameOfContractInput, setNameOfContractInput] = useState('');
    const [templateSelect, setTemplateSelect] = useState<ITemplateContract[]>();
-   const [messages, setMessages] = useState("");
+   const [messages, setMessages] = useState('');
    const [contractAttribute, setContractAttribute] = useState<any[]>([]);
    const Router = useRouter();
    const { toast } = useToast();
    useEffect(() => {
-      fetchAPI("/template-contracts", "GET")
+      fetchAPI('/template-contracts', 'GET')
          .then((res) => {
             if (res.status === 200 || res.status === 201) {
                setTemplate([res?.data]);
                if (res.data.length > 0) {
                   const firstTemplateId = res.data[0]?.id;
-                  fetchAPI(`/template-contracts/${firstTemplateId}/attributes`, "GET")
+                  fetchAPI(
+                     `/template-contracts/${firstTemplateId}/attributes`,
+                     'GET'
+                  )
                      .then((res) => {
                         if (res.status === 200) {
                            setContractAttribute(res.data.contractAttributes);
@@ -68,7 +71,10 @@ export default function page() {
                         }
                      })
                      .catch((error) => {
-                        console.error("Error fetching contract attributes:", error);
+                        console.error(
+                           'Error fetching contract attributes:',
+                           error
+                        );
                         setContractAttribute([]);
                      });
                } else {
@@ -77,7 +83,7 @@ export default function page() {
             }
          })
          .catch((error) => {
-            console.error("Error fetching template contracts:", error);
+            console.error('Error fetching template contracts:', error);
          });
    }, []);
 
@@ -87,7 +93,7 @@ export default function page() {
       if (!api) {
          return;
       }
-      api.on("select", () => {
+      api.on('select', () => {
          setCurrent(api.selectedScrollSnap());
       });
    }, [api]);
@@ -95,7 +101,7 @@ export default function page() {
       if (current !== 0) {
          fetchAPI(
             `/template-contracts/${template[current]?.id}/attributes`,
-            "GET"
+            'GET'
          ).then((res) => {
             if (res.status === 200) {
                console.log(res.data);
@@ -130,22 +136,22 @@ export default function page() {
 
    return (
       <div>
-         <header className="sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background">
-            <div className="relative ml-auto flex-1 md:grow-0 mb-3 flex">
-               <div className="flex translate-x-[-35px]">
+         <header className='sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background'>
+            <div className='relative mb-3 ml-auto flex flex-1 md:grow-0'>
+               <div className='flex translate-x-[-35px]'>
                   <BreadCrumbHeader />
                </div>
             </div>
          </header>
-         <div className="w-full flex container">
-            <div className="flex py-4">
-               <Card className="min-w-[320px]">
+         <div className='container flex w-full'>
+            <div className='flex py-4'>
+               <Card className='min-w-[320px]'>
                   <CardHeader>
                      <CardTitle>Create a new Contract</CardTitle>
                      <CardDescription>Please fill to continue</CardDescription>
                   </CardHeader>
                   <CardContent>
-                     <div className="flex flex-col space-y-2 mt-2">
+                     <div className='mt-2 flex flex-col space-y-2'>
                         <Label>Address Wallet: </Label>
                         <Input
                            disabled
@@ -153,24 +159,26 @@ export default function page() {
                            defaultValue={userInfo?.data?.addressWallet}
                         />
                      </div>
-                     <div className="flex flex-col space-y-2 mt-2">
+                     <div className='mt-2 flex flex-col space-y-2'>
                         <Label>Name of Contract: </Label>
                         <Input
                            defaultValue={nameOfContractInput}
-                           onChange={(e) => setNameOfContractInput(e.target.value)}
+                           onChange={(e) =>
+                              setNameOfContractInput(e.target.value)
+                           }
                         />
                      </div>
-                     <div className="flex flex-col space-y-2 mt-2">
+                     <div className='mt-2 flex flex-col space-y-2'>
                         <Label>Template Contract: </Label>
                         <Carousel
                            opts={{
-                              align: "start",
+                              align: 'start',
                            }}
-                           orientation="vertical"
-                           className="w-full max-w-xs"
+                           orientation='vertical'
+                           className='w-full max-w-xs'
                            setApi={setApi}
                         >
-                           <CarouselContent className="-mt-1 h-[300px]">
+                           <CarouselContent className='-mt-1 h-[300px]'>
                               {template.map((item, index) => (
                                  // <CarouselItem key={index} className="pt-1 md:basis-1/2">
                                  //   <div className="p-1">
@@ -191,20 +199,23 @@ export default function page() {
                                  //     </Card>
                                  //   </div>
                                  // </CarouselItem>
-                                 <CarouselItem key={index} className="pt-1 md:basis-1/2">
-                                    <div className="p-1">
+                                 <CarouselItem
+                                    key={index}
+                                    className='pt-1 md:basis-1/2'
+                                 >
+                                    <div className='p-1'>
                                        <Card>
-                                          <CardContent className="flex flex-col items-center p-6">
-                                             <div className="h-[150px] w-[220px] relative">
+                                          <CardContent className='flex flex-col items-center p-6'>
+                                             <div className='relative h-[150px] w-[220px]'>
                                                 <Image
                                                    alt={item.name}
                                                    src={item.path}
-                                                   layout="fill"
-                                                   objectFit="contain"
-                                                   className="rounded"
+                                                   layout='fill'
+                                                   objectFit='contain'
+                                                   className='rounded'
                                                 />
                                              </div>
-                                             <div className="text-center mt-2">
+                                             <div className='mt-2 text-center'>
                                                 {item.name}
                                              </div>
                                           </CardContent>
@@ -218,8 +229,8 @@ export default function page() {
                   </CardContent>
                   <CardFooter>
                      <Button
-                        className="w-full me-2"
-                        variant={"destructive"}
+                        className='me-2 w-full'
+                        variant={'destructive'}
                         onClick={() => {
                            setTemplateSelect(template[current] as any);
                         }}
@@ -229,11 +240,13 @@ export default function page() {
                   </CardFooter>
                </Card>
             </div>
-            <div className="flex py-4 ms-4">
-               <Card className="min-w-[450px]">
+            <div className='ms-4 flex py-4'>
+               <Card className='min-w-[450px]'>
                   <CardHeader>
                      <CardTitle>Information of Contract</CardTitle>
-                     <CardDescription>Please fill in all to continue</CardDescription>
+                     <CardDescription>
+                        Please fill in all to continue
+                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                      <InvitationArea
@@ -245,28 +258,28 @@ export default function page() {
                   </CardContent>
                   <CardFooter>
                      <Button
-                        className="w-full me-2"
+                        className='me-2 w-full'
                         onClick={onClickCreateContractButton}
                      >
                         Create Contract
                      </Button>
-                     <Button className="w=full" variant={"destructive"}>
+                     <Button className='w=full' variant={'destructive'}>
                         Cancel
                      </Button>
                   </CardFooter>
                </Card>
             </div>
-            <div className="flex py-4 ms-4 ">
-               <Card className="min-w-[600px]">
+            <div className='ms-4 flex py-4'>
+               <Card className='min-w-[600px]'>
                   <CardHeader>
-                     <CardTitle className="text-center font-semibold text-lg ">
+                     <CardTitle className='text-center text-lg font-semibold'>
                         {template[current]?.name}
                      </CardTitle>
                      <CardDescription>
                         Preview the contract here - Please choose a template
                      </CardDescription>
                   </CardHeader>
-                  <ScrollArea className="h-[600px] ">
+                  <ScrollArea className='h-[600px]'>
                      <CardContent>
                         <PreviewContract
                            contractAttribute={contractAttribute}

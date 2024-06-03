@@ -1,7 +1,6 @@
 // 'use client'
 // import React, { useState } from "react"
 
-
 // const initContractAttribute: IContractAttribute = {
 //     city: '',
 //     date: new Date(),

@@ -646,7 +646,7 @@ const handleCallFunctionOfBlockchain = async (
 
 const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
   try {
-    const res = await fetchAPI('/contracts', 'POST', dataParams)
+    const res = await fetchAPI('/contracts', 'POST', (dataParams.templateId === '' ? (({ templateId, ...rest }) => rest)(dataParams) : dataParams))
     if (res.status === 201) {
       return {
         message: 'Create contract successfully',

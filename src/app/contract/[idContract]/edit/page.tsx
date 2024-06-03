@@ -9,6 +9,7 @@ import {
   EContractAttributeType,
   EStatusAttribute,
   IContractAttribute,
+  IContractParticipant,
   IDefinitionContractAttribute
 } from '@/interface/contract.i'
 import { InputWithTooltip } from '@/components/InputWithTooltip'
@@ -27,6 +28,7 @@ export default function DialogEditContract() {
   const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false)
   const [infoOfContractAttribute, setInfoOfContractAttribute] = useState()
   const [deleteArray, setDeleteArray] = useState<any[]>([])
+  const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([])
   const { toast } = useToast()
   const Router = useRouter()
   const getData = React.useCallback(
@@ -35,6 +37,7 @@ export default function DialogEditContract() {
         .then((response) => {
           setContractAttribute(response.data.contractAttributes)
           setContractAttributeRaw(response.data.contractAttributes)
+          setContractParticipants(response.data.participants)
         })
         .catch((error) => {})
     },
@@ -306,6 +309,7 @@ export default function DialogEditContract() {
                           {item.statusAttribute === EStatusAttribute.PREPARE && (
                             <div>
                               <AddAttributeArea
+                                participant={contractParticipants}
                                 setContractAttribute={setContractAttribute}
                                 contractAttribute={contractAttribute}
                                 index={index}
@@ -316,6 +320,7 @@ export default function DialogEditContract() {
                       ))}
                     </div>
                     <AddAttributeArea
+                      participant={contractParticipants}
                       setContractAttribute={setContractAttribute}
                       contractAttribute={contractAttribute}
                     />

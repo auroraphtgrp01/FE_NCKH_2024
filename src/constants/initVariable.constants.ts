@@ -43,7 +43,7 @@ export const initPermission: IPermission = {
   INVITE_PARTICIPANT: false,
   CHANGE_STATUS_CONTRACT: false,
   SET_OWNER_PARTY: false,
-  ROLES: ERolesOfParticipant.PARTICIPANT
+  ROLES: 'PARTICIPANT' as ERolesOfParticipant
 }
 
 export const rolesTypeParticipant: { key: string; value: string }[] = Object.keys(ERolesOfParticipant).map((key) => ({

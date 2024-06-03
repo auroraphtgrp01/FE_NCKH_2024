@@ -6,6 +6,7 @@ import {
   EContractStatus,
   EFunctionCall,
   ERolesOfParticipant,
+  EStageContractStatus,
   IConfirmStageFunctionCallParams,
   IContractAttribute,
   IContractCreateParams,
@@ -17,7 +18,6 @@ import {
   ISignContractFunctionCallParams,
   IStage,
   ITransferMoneyFunctionCallParams,
-  ITransferMoneytFunctionCallParams,
   IVisibleButton,
   InvitationItem,
   RSAKey,
@@ -35,67 +35,87 @@ const updateStateButton = (
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
   dataIndividual: IIndividual,
-  contractParticipants: any,
+  contractParticipants: IContractParticipant[],
   userInfo: UserInfoData,
   currentBalance: number,
-  setContractParticipants: Dispatch<SetStateAction<IContractParticipant[]>>
+  stages: any[]
 ) => {
   const addressMatch = (type: any) =>
     (
       contractAttributes.find((item: any) => item.type === type)?.value || ""
     ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
 
-  // if(contractParticipants.length > 0 || )
-
-  switch (status) {
-    case "PENDING":
-      setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
-      setIsDisableButton((prev: any) => ({ ...prev }));
-      break;
-    case "PARTICIPATED":
-      setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
-      setIsDisableButton((prev: any) => ({
-        ...prev,
-        cancelButton: false,
-      }));
-      break;
-    case "ENFORCE":
-      setIsVisibleButton((prev: any) => ({
-        ...prev,
-        deployButton: false,
-        signButton: true,
-      }));
-      const participantsLogin = contractParticipants?.find(
-        (participant: any) => {
-          return participant.userId === userInfo.data.id;
-        }
-      );
-      if (participantsLogin?.status !== "SIGNED") {
+  // let isHave
+  if (contractParticipants.length > 0) {
+    const participantsLogin = contractParticipants?.find((participant: any) => {
+      return participant.userId === userInfo.data.id;
+    });
+    switch (status) {
+      case "PENDING":
+        setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
+        setIsDisableButton((prev: any) => ({ ...prev }));
+        break;
+      case "PARTICIPATED":
+        setIsVisibleButton((prev: any) => ({ ...prev, deployButton: true }));
         setIsDisableButton((prev: any) => ({
           ...prev,
-          signButton: false,
-          fetchCompareButton: false,
+          cancelButton: false,
         }));
-      }
-      break;
-    case "SIGNED":
-      setIsVisibleButton((prev: any) => ({
-        ...prev,
-        signButton: false,
-        confirmButtonSender: userInfo.data.role === "Customer",
-        confirmButtonReceiver: userInfo.data.role === "Supplier",
-        transferButton: userInfo.data.role === "Customer",
-        withdrawButton: userInfo.data.role === "Supplier",
-      }));
-      setIsDisableButton((prev: any) => ({
-        ...prev,
-        transferButton: currentBalance !== 0,
-        cancelButton: true,
-        fetchCompareButton: false,
-      }));
-      break;
-    default:
-      break;
+        break;
+      case "ENFORCE":
+        setIsVisibleButton((prev: any) => ({
+          ...prev,
+          deployButton: false,
+          signButton: true,
+        }));
+
+        if (participantsLogin?.status !== "SIGNED") {
+          setIsDisableButton((prev: any) => ({
+            ...prev,
+            signButton: false,
+            fetchCompareButton: false,
+          }));
+        }
+        break;
+      case "SIGNED":
+        const hasStageNotStarted = stages.filter(
+          (item: any) => item.status === EStageContractStatus.ENFORCE
+        );
+        const receiver = contractParticipants.find(
+          (item: any) => item?.permission.ROLES === ERolesOfParticipant.RECEIVER
+        );
+        const hasStagePending =
+          receiver?.completedStages && receiver?.completedStages.length > 0
+            ? receiver.completedStages.filter(
+                (item: any) => item.status === EStageContractStatus.PENDING
+              )
+            : undefined;
+        setIsVisibleButton((prev: any) => ({
+          ...prev,
+          signButton: false,
+          confirmButtonSender: userInfo.data.role === "Customer",
+          confirmButtonReceiver: userInfo.data.role === "Supplier",
+          transferButton: userInfo.data.role === "Customer",
+          withdrawButton: userInfo.data.role === "Supplier",
+        }));
+        setIsDisableButton((prev: any) => ({
+          ...prev,
+          transferButton: currentBalance !== 0,
+          cancelButton: true,
+          fetchCompareButton: false,
+          confirmButtonReceiver:
+            userInfo.data.role === "Supplier" && hasStageNotStarted
+              ? false
+              : true,
+          confirmButtonSender:
+            userInfo.data.role === "Customer" && hasStagePending !== undefined
+              ? false
+              : true,
+        }));
+        break;
+      default:
+        break;
+    }
   }
 };
 
@@ -228,7 +248,7 @@ const withdrawMoneyFunc = async (
 };
 
 const transferMoneyFunc = async (
-  dataParams: ITransferMoneytFunctionCallParams
+  dataParams: ITransferMoneyFunctionCallParams
 ): Promise<IResponseFunction> => {
   try {
     const privateCode = await fetchAPI("/smart-contracts/abi", "GET");
@@ -289,10 +309,12 @@ const handleConfirmStagesFunc = async (
       abi,
       dataParams.addressContract as string
     );
-    await contract.methods.confirmStage().send({
+    await contract.methods.confirmStage(dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
       gas: "1000000",
     });
+    //xxxxxxxxxxxxxxxxx
+
     // if (userInfo?.data?.addressWallet === individual.senderInd) {
     //     setIsDisableButton({ ...isDisableButton });
     // } else {
@@ -456,12 +478,17 @@ const handleOnDeployContractFunc = async (
     const _privateKey = await hashStringWithSHA512(privateKey);
 
     const _stages: IStage[] = await Promise.all(
-      stages.map(async (stage: any) => ({
-        percent: stage.percent,
-        deliveryAt: handleDateStringToUint(stage.deliveryAt),
-        description: stage.description || "",
-      }))
+      stages.map(async (stage: any) => {
+        stage.status = "ENFORCE";
+        return {
+          percent: stage.percent,
+          deliveryAt: handleDateStringToUint(stage.deliveryAt),
+          description: stage.description || "",
+          status: "ENFORCE",
+        };
+      })
     );
+
     const deployTransaction = await contract
       .deploy({
         data: byteCode,
@@ -622,9 +649,12 @@ const handleCallFunctionOfBlockchain = async (
   dataFunctionCall: {
     nameFunctionCall: EFunctionCall | undefined;
     signContractParams?: ISignContractFunctionCallParams;
-    transferFunctionParams?: ITransferMoneytFunctionCallParams;
+    transferFunctionParams?: ITransferMoneyFunctionCallParams;
+    confirmFunctionParams?: IConfirmStageFunctionCallParams;
   }
 ): Promise<IResponseFunction> => {
+  console.log(dataFunctionCall.confirmFunctionParams);
+
   if (
     dataAuthentication.privateKey === "" &&
     dataAuthentication.filePrivateKey === undefined
@@ -666,7 +696,7 @@ const handleCallFunctionOfBlockchain = async (
       responseMessages = await transferMoneyFunc({
         ...dataFunctionCall.transferFunctionParams,
         privateKey,
-      } as ITransferMoneytFunctionCallParams);
+      } as ITransferMoneyFunctionCallParams);
       break;
     case EFunctionCall.SIGN_CONTRACT:
       responseMessages = await handleSignContractFunc({
@@ -679,6 +709,10 @@ const handleCallFunctionOfBlockchain = async (
       break;
     case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
       console.log("Confirm Contract Receiver");
+      responseMessages = await handleConfirmStagesFunc({
+        ...dataFunctionCall.confirmFunctionParams,
+        privateKey,
+      } as IConfirmStageFunctionCallParams);
       break;
   }
   return responseMessages;

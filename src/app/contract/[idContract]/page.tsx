@@ -150,7 +150,7 @@ export default function Dashboard() {
         response?.contractData.participants,
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,
-        setContractParticipants
+        response?.contractData.contract.stages
       );
       setContractStatus(response?.contractData.contract.status);
       // response?.contractData.participants.map((participant: any) => {
@@ -279,9 +279,20 @@ export default function Dashboard() {
           addressContract,
           setCurrentBalance,
           individual,
+          setUserInfo,
           userInfo,
           setIsVisibleButton,
           setIsDisableButton,
+        },
+        confirmFunctionParams: {
+          addressContract,
+          userInfo,
+          setUserInfo,
+          individual,
+          setIsDisableButton,
+          setIsVisibleButton,
+          privateKey,
+          contractParticipants,
         },
       }
     );

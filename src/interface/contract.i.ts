@@ -141,6 +141,7 @@ export interface IStage {
   percent: number;
   deliveryAt: number;
   description?: string;
+  status: string;
 }
 export interface RSAKey {
   publicKey: string;
@@ -176,7 +177,7 @@ export interface IPermission {
   INVITE_PARTICIPANT: boolean;
   CHANGE_STATUS_CONTRACT: boolean;
   SET_OWNER_PARTY: boolean;
-  ROLES: ERolesOfParticipant;
+  ROLES?: ERolesOfParticipant;
 }
 
 export enum ERolesOfParticipant {
@@ -215,21 +216,14 @@ export interface ISignContractFunctionCallParams {
   privateKey?: string;
 }
 
-export interface ITransferMoneytFunctionCallParams {
+export interface ITransferMoneyFunctionCallParams {
   addressContract: string;
   setCurrentBalance: Dispatch<SetStateAction<number>>;
   individual: IIndividual;
   userInfo: UserInfoData;
+  setUserInfo: Dispatch<SetStateAction<UserInfoData>>;
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>;
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>;
-  privateKey?: string;
-}
-
-export interface ITransferMoneyFunctionCallParams {
-  addressContract: string;
-  individual: IIndividual;
-  userInfo: UserInfoData;
-  setUserInfo: Dispatch<SetStateAction<UserInfoData>>;
   privateKey?: string;
 }
 
@@ -241,6 +235,7 @@ export interface IConfirmStageFunctionCallParams {
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>;
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>;
   privateKey?: string;
+  contractParticipants: IContractParticipant[];
 }
 export interface IResponseFunction {
   status: "success" | "destructive";
@@ -297,4 +292,12 @@ export interface IContractCreateParams {
 export interface IResponseFunctionFetchData {
   contractData: any;
   contractBallance?: number;
+}
+
+export enum EStageContractStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  ENFORCE = "ENFORCE",
+  WITHDRAWN = "WITHDRAWN",
 }

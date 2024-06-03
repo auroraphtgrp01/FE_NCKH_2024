@@ -273,8 +273,6 @@ export default function DialogEditContract() {
                           )}
                           {(item.type === EContractAttributeType.CONTRACT_ATTRIBUTE ||
                             item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
-                            item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
-                            item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
                             item.type === EContractAttributeType.TOTAL_AMOUNT) && (
                             <div>
                               <h2 className='mt-2 flex w-full text-[14px]'>
@@ -302,6 +300,32 @@ export default function DialogEditContract() {
                                     className='mr-auto'
                                     defaultValue={item.value}
                                   />
+                                </span>
+                              </h2>
+                            </div>
+                          )}
+                          {(item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+                            item.type === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND) && (
+                            <div>
+                              <h2 className='mt-2 flex w-full text-[14px]'>
+                                <b className=''>
+                                  <InputWithTooltip
+                                    deleteArray={deleteArray}
+                                    setDeleteArray={setDeleteArray}
+                                    setInfoOfContractAttribute={setInfoOfContractAttribute}
+                                    setIsDetailOpen={setIsDetailAttributeDialog}
+                                    setContractAttribute={setContractAttribute}
+                                    contractAttribute={contractAttribute}
+                                    index={index}
+                                    defaultValue={item.property}
+                                    description={''}
+                                    onBlur={(e) => {
+                                      handleChangeAttributeInput(e, index)
+                                    }}
+                                  />
+                                </b>
+                                <span className='ms-2 w-[80%] text-wrap'>
+                                  <Input className='mr-auto' defaultValue={item.value} disabled />
                                 </span>
                               </h2>
                             </div>

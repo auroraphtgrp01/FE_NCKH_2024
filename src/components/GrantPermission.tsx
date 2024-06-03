@@ -48,7 +48,7 @@ export default function GrantPermission({
     setPermissionClone(permission)
   }, [isOpen])
   useEffect(() => {
-    console.log(permissionClone)
+    console.log('>>>', permissionClone)
   }, [permissionClone])
   return (
     <div>
@@ -69,6 +69,7 @@ export default function GrantPermission({
                           <td className='px-1 pb-4 pt-2' colSpan={3}>
                             <Label className='mb-2 mt-2'>Set Roles</Label>
                             <Select
+                              defaultValue={permissionClone?.ROLES}
                               onValueChange={(e) => {
                                 onCheckedChange(e, 'ROLES')
                               }}

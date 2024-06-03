@@ -15,7 +15,6 @@ import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import { fetchAPI } from '@/utils/fetchAPI'
 import {
   ContractData,
-  EContractAttributeType,
   EFunctionCall,
   ERolesOfParticipant,
   IContractAttribute,
@@ -79,7 +78,6 @@ export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute)
   const [currentBalance, setCurrentBalance] = useState<number>(0)
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([])
-  const [contractUsers, setContractUsers] = useState<any[]>([])
 
   const [contractData, setContractData] = useState<ContractData>()
   const [individual, setIndividual] = useState<IIndividual>({

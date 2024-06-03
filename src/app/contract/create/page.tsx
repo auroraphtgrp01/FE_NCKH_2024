@@ -36,7 +36,7 @@ export default function page() {
   const [templateSelect, setTemplateSelect] = useState<ITemplateContract>()
   const [messages, setMessages] = useState('')
   const [contractAttribute, setContractAttribute] = useState<any[]>([])
-  const [rolesOfCreator, setRolesOfCreator] = useState<ERolesOfParticipant>()
+  const [rolesOfCreator, setRolesOfCreator] = useState<ERolesOfParticipant>('SENDER' as ERolesOfParticipant)
   const [rolesType, setRolesType] = useState<
     {
       key: string

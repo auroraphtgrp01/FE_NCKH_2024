@@ -272,8 +272,9 @@ export default function Dashboard() {
           setIsDisableButton,
           setIsVisibleButton,
           privateKey,
-          contractParticipants
-        }
+          contractParticipants,
+          contractData,
+        },
       }
     )
     toast({

@@ -270,18 +270,58 @@ const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallPara
       }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
     const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+    const contract = new web3.eth.Contract(
+      abi,
+      dataParams.addressContract as string
+    )
+
     await contract.methods.confirmStage(dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
       gas: '1000000'
     })
-    //xxxxxxxxxxxxxxxxx
 
-    // if (userInfo?.data?.addressWallet === individual.senderInd) {
-    //     setIsDisableButton({ ...isDisableButton });
-    // } else {
-    //     setIsDisableButton({ ...isDisableButton });
-    // }
+    //xxxxxxxxxxxxxxxxx
+    const participantsLogin = dataParams.contractParticipants?.find(
+      (participant: any) => {
+        return participant.userId === dataParams?.userInfo.data.id
+      }
+    )
+    const stageEnforce = dataParams.contractData?.stages.filter(
+      (item: any) => item.status === EStageContractStatus.ENFORCE
+    )
+    const stageChange =
+      stageEnforce && stageEnforce.length > 0 ? stageEnforce[0] : undefined
+    let stageUpdateParticipant = undefined
+    if (stageChange !== undefined) {
+      stageEnforce?.map((item: any) => {
+        if (item === stageChange) stageEnforce.splice(item, 1)
+      })
+      const { id, ...rest } = stageChange
+      stageUpdateParticipant = { ...rest }
+    }
+
+    await fetchAPI('/participants', 'PATCH', {
+      id: participantsLogin?.id,
+      stage: {
+        ...stageUpdateParticipant,
+        status: EStageContractStatus.PENDING,
+      },
+    })
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams?.contractData?.id,
+      stage: { ...stageChange, status: EStageContractStatus.PENDING },
+    })
+
+    dataParams.setIsDisableButton((prev: any) => ({
+      ...prev,
+      confirmButtonReceiver: stageEnforce?.length === 0 ? true : false,
+    }))
+
+    //  if (userInfo?.data?.addressWallet === individual.senderInd) {
+    //      setIsDisableButton({ ...isDisableButton });
+    //  } else {
+    //      setIsDisableButton({ ...isDisableButton });
+    //  }
     return {
       message: 'Confirm Successfully !',
       description: 'Stage has been confirmed successfully',
@@ -425,9 +465,9 @@ const handleOnDeployContractFunc = async (
     const byteCode = privateCode.data.abi.bytecode
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi)
-    const _user = [individual.senderInd]
+    const _user = [individual.senderInd.trim().toLowerCase()]
     const _total = individual.totalAmount
-    const _supplier = individual.receiverInd
+    const _supplier = individual.receiverInd.trim().toLowerCase()
     const { publicKey } = signMessage(privateKey)
     const _privateKey = await hashStringWithSHA512(privateKey)
 

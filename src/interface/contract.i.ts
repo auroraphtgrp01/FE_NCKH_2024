@@ -107,6 +107,7 @@ export interface ContractData {
   deletedAt: string | null
   deletedBy: string | null
   User: User
+  stages: IStage[]
 }
 export interface IIndividual {
   receiverInd: string
@@ -137,6 +138,7 @@ export interface IDisableButton extends DynamicType {
   openDisputedButton: boolean
 }
 export interface IStage {
+  id?: string
   percent: number
   deliveryAt: number
   description?: string
@@ -235,6 +237,7 @@ export interface IConfirmStageFunctionCallParams {
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
   privateKey?: string
   contractParticipants: IContractParticipant[]
+  contractData: ContractData | undefined
 }
 export interface IResponseFunction {
   status: 'success' | 'destructive'

@@ -167,7 +167,7 @@ export interface InvitationItem {
 export interface ContractTemplate {
   id: string
   name: string
-  path: string
+  path?: string
   contractAttributes: any[]
 }
 export interface IPermission {

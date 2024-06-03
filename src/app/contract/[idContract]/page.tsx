@@ -194,12 +194,12 @@ export default function Dashboard() {
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   function handleBadgeColor(status: string) {
     switch (status) {
-      case 'JOINED':
-        return `default`
       case 'PENDING':
         return `blue`
-      case 'REFUSED':
-        return `destructive`
+      case 'ACCEPTED':
+        return `default`
+      case 'SIGNED':
+        return `default`
       default:
         return `blue`
     }
@@ -537,7 +537,7 @@ export default function Dashboard() {
                         readOnly
                         className='w-[180px]'
                         placeholder='Total Amount of Money'
-                        defaultValue={individual?.totalAmount}
+                        defaultValue={`${individual?.totalAmount ? individual?.totalAmount + ' ETH' : ''}`}
                       />
                     </div>
                   </div>
@@ -688,7 +688,7 @@ export default function Dashboard() {
                       </div>
                       <Separator className='mb-2' />
                     </CardHeader>
-                    <ScrollArea className='h-full max-h-[300px]'>
+                    <ScrollArea className='h-[300px]'>
                       <CardContent className='grid gap-8 p-5'>
                         {contractParticipants.map((participant, index) => (
                           <div className='flex items-center' key={index}>
@@ -699,10 +699,7 @@ export default function Dashboard() {
                               <p className='text-sm text-muted-foreground'>{participant.email}</p>
                             </div>
                             <div className='ml-auto font-medium'>
-                              <Badge
-                                variant={handleBadgeColor(participant.status) as any}
-                                className='me-1 translate-y-[-5px]'
-                              >
+                              <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>
                                 {participant.status}
                               </Badge>
                               <Button className='px-2' variant={'destructive'}>
@@ -744,6 +741,7 @@ export default function Dashboard() {
               <Input
                 placeholder='Fill your private key'
                 className='w-full'
+                type='password'
                 onChange={(e) => {
                   setPrivateKey(e.target.value)
                 }}

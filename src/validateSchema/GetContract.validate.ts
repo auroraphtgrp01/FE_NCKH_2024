@@ -6,7 +6,7 @@ export const GetSmartContract = z
     abi: z.optional(z.string()),
     typeContract: z.string(),
     addressWallet: z.optional(z.string()),
-    methodCall: z.optional(z.string()),
+    methodCall: z.optional(z.string())
   })
   .strict()
 

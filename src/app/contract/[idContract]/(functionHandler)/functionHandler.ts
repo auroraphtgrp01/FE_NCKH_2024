@@ -21,7 +21,7 @@ import {
   IVisibleButton,
   InvitationItem,
   RSAKey,
-  UserInfoData,
+  UserInfoData
 } from '@/interface/contract.i'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { handleInstanceWeb3 } from '@/utils/web3Instance'
@@ -41,9 +41,8 @@ const updateStateButton = (
   stages: any[]
 ) => {
   const addressMatch = (type: any) =>
-    (
-      contractAttributes.find((item: any) => item.type === type)?.value || ''
-    ).toLowerCase() === userInfo.data.addressWallet.toLowerCase()
+    (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() ===
+    userInfo.data.addressWallet.toLowerCase()
 
   // let isHave
   if (contractParticipants.length > 0) {
@@ -54,47 +53,43 @@ const updateStateButton = (
       case 'PENDING':
         setIsVisibleButton((prev: any) => ({
           ...prev,
-          deployButton: true,
+          deployButton: true
         }))
         setIsDisableButton((prev: any) => ({ ...prev }))
         break
       case 'PARTICIPATED':
         setIsVisibleButton((prev: any) => ({
           ...prev,
-          deployButton: true,
+          deployButton: true
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
-          cancelButton: false,
+          cancelButton: false
         }))
         break
       case 'ENFORCE':
         setIsVisibleButton((prev: any) => ({
           ...prev,
           deployButton: false,
-          signButton: true,
+          signButton: true
         }))
 
         if (participantsLogin?.status !== 'SIGNED') {
           setIsDisableButton((prev: any) => ({
             ...prev,
             signButton: false,
-            fetchCompareButton: false,
+            fetchCompareButton: false
           }))
         }
         break
       case 'SIGNED':
-        const hasStageNotStarted = stages.filter(
-          (item: any) => item.status === EStageContractStatus.ENFORCE
-        )
+        const hasStageNotStarted = stages.filter((item: any) => item.status === EStageContractStatus.ENFORCE)
         const receiver = contractParticipants.find(
           (item: any) => item?.permission.ROLES === ERolesOfParticipant.RECEIVER
         )
         const hasStagePending =
           receiver?.completedStages && receiver?.completedStages.length > 0
-            ? receiver.completedStages.filter(
-                (item: any) => item.status === EStageContractStatus.PENDING
-              )
+            ? receiver.completedStages.filter((item: any) => item.status === EStageContractStatus.PENDING)
             : undefined
         setIsVisibleButton((prev: any) => ({
           ...prev,
@@ -102,21 +97,15 @@ const updateStateButton = (
           confirmButtonSender: userInfo.data.role === 'Customer',
           confirmButtonReceiver: userInfo.data.role === 'Supplier',
           transferButton: userInfo.data.role === 'Customer',
-          withdrawButton: userInfo.data.role === 'Supplier',
+          withdrawButton: userInfo.data.role === 'Supplier'
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
           transferButton: currentBalance !== 0,
           cancelButton: true,
           fetchCompareButton: false,
-          confirmButtonReceiver:
-            userInfo.data.role === 'Supplier' && hasStageNotStarted
-              ? false
-              : true,
-          confirmButtonSender:
-            userInfo.data.role === 'Customer' && hasStagePending !== undefined
-              ? false
-              : true,
+          confirmButtonReceiver: userInfo.data.role === 'Supplier' && hasStageNotStarted ? false : true,
+          confirmButtonSender: userInfo.data.role === 'Customer' && hasStagePending !== undefined ? false : true
         }))
         break
       default:
@@ -135,47 +124,35 @@ const fetchDataWhenEntryPage = async (
   setCurrentBalance: Dispatch<SetStateAction<number>>
 ): Promise<IResponseFunctionFetchData | undefined> => {
   try {
-    const res = await fetchAPI(
-      `/contracts/get-contract-details/${idContract}`,
-      'GET'
-    )
+    const res = await fetchAPI(`/contracts/get-contract-details/${idContract}`, 'GET')
     const response: IResponseFunctionFetchData = { contractData: res.data }
     const { contract, participants, contractAttributes } = res.data
     if (contract.contractAddress !== null) {
       const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
       const abi = privateCode.data.abi.abi
       const web3 = new Web3(window.ethereum)
-      const contractInstance = new web3.eth.Contract(
-        abi,
-        contract.contractAddress
-      )
+      const contractInstance = new web3.eth.Contract(abi, contract.contractAddress)
       const contractBallance: number = parseFloat(
-        web3.utils.fromWei(
-          await contractInstance.methods.getBalance().call(),
-          'ether'
-        )
+        web3.utils.fromWei(await contractInstance.methods.getBalance().call(), 'ether')
       )
       setCurrentBalance(contractBallance)
       response.contractBallance = contractBallance
     }
 
-    const dataIndividual = res.data.contractAttributes.reduce(
-      (acc: any, item: any) => {
-        switch (item.type) {
-          case EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND:
-            return { ...acc, senderInd: item.value as string }
-          case EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE:
-            return { ...acc, receiverInd: item.value as string }
-          case EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED:
-            return { ...acc, joined: item.value }
-          case EContractAttributeType.TOTAL_AMOUNT:
-            return { ...acc, totalAmount: item.value as number }
-          default:
-            return acc
-        }
-      },
-      {} as any
-    )
+    const dataIndividual = res.data.contractAttributes.reduce((acc: any, item: any) => {
+      switch (item.type) {
+        case EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND:
+          return { ...acc, senderInd: item.value as string }
+        case EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE:
+          return { ...acc, receiverInd: item.value as string }
+        case EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED:
+          return { ...acc, joined: item.value }
+        case EContractAttributeType.TOTAL_AMOUNT:
+          return { ...acc, totalAmount: item.value as number }
+        default:
+          return acc
+      }
+    }, {} as any)
     setAddressContract(contract.contractAddress)
     setContractParticipants(participants)
     setIndividual(dataIndividual)
@@ -199,40 +176,33 @@ const inviteNewParticipant = async (
     invitation: invitation.map((item) => {
       return {
         ...item,
-        messages,
+        messages
       }
-    }),
+    })
   }
   try {
     await fetchAPI('/participants/send-invitation', 'POST', payload)
     const newParticipants = invitation.map((item) => {
       return {
         status: 'PENDING',
-        email: item.email,
+        email: item.email
       }
     })
-    setContractParticipants((prevParticipants: any) => [
-      ...prevParticipants,
-      ...newParticipants,
-    ])
+    setContractParticipants((prevParticipants: any) => [...prevParticipants, ...newParticipants])
     return {
-      message: 'Invitation has been sent successfully!',
+      message: 'Invitation has been sent successfully!'
     }
   } catch (error) {
     throw error
   }
 }
 
-const withdrawMoneyFunc = async (
-  addressContract: string,
-  userInfo: UserInfoData,
-  individual: IIndividual
-) => {
+const withdrawMoneyFunc = async (addressContract: string, userInfo: UserInfoData, individual: IIndividual) => {
   try {
     const {
       data: {
-        abi: { abi },
-      },
+        abi: { abi }
+      }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
     const web3 = new Web3(window.ethereum)
     const contract = new web3.eth.Contract(abi, addressContract as string)
@@ -242,57 +212,48 @@ const withdrawMoneyFunc = async (
     const transactionOptions = {
       from: fromAddress,
       gas: gasLimit,
-      gasPrice: gasPrice,
+      gasPrice: gasPrice
     }
-    await contract.methods
-      .withDrawByPercent(individual.receiverInd, 100)
-      .send(transactionOptions)
+    await contract.methods.withDrawByPercent(individual.receiverInd, 100).send(transactionOptions)
     // const balance = await contract.methods.getBalance().call();
   } catch (error) {
     throw error
   }
 }
 
-const transferMoneyFunc = async (
-  dataParams: ITransferMoneyFunctionCallParams
-): Promise<IResponseFunction> => {
+const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): Promise<IResponseFunction> => {
   try {
     const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
     const abi = privateCode.data.abi.abi
     const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(
-      abi,
-      dataParams.addressContract as string
-    )
+    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
     await contract.methods.sendToSmartContract(dataParams.privateKey).send({
       from: dataParams.userInfo.data.addressWallet,
       value: web3.utils.toWei(dataParams.individual.totalAmount, 'ether'),
-      gas: '1000000',
+      gas: '1000000'
     })
 
     const balance: string = await contract.methods.getBalance().call()
-    dataParams.setCurrentBalance(
-      parseFloat(web3.utils.fromWei(balance, 'ether'))
-    )
+    dataParams.setCurrentBalance(parseFloat(web3.utils.fromWei(balance, 'ether')))
     dataParams.setIsVisibleButton((prevState: any) => ({
       ...prevState,
-      transferButton: false,
+      transferButton: false
     }))
     dataParams.setIsDisableButton((prev: any) => ({
       ...prev,
-      confirmButtonSender: false,
+      confirmButtonSender: false
     }))
 
     return {
       message: 'Transfer money to contract Successfully !',
       description: 'The contract was successfully received',
-      status: 'success',
+      status: 'success'
     }
   } catch (error) {
     return {
       message: 'Transfer monye to contract Failed !',
       description: error?.toString(),
-      status: 'destructive',
+      status: 'destructive'
     }
   }
 }
@@ -301,23 +262,18 @@ const handleDateStringToUint = (date: string): number => {
   return new Date(date).getTime()
 }
 
-const handleConfirmStagesFunc = async (
-  dataParams: IConfirmStageFunctionCallParams
-): Promise<IResponseFunction> => {
+const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallParams): Promise<IResponseFunction> => {
   try {
     const {
       data: {
-        abi: { abi },
-      },
+        abi: { abi }
+      }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
     const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(
-      abi,
-      dataParams.addressContract as string
-    )
+    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
     await contract.methods.confirmStage(dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
-      gas: '1000000',
+      gas: '1000000'
     })
     //xxxxxxxxxxxxxxxxx
 
@@ -329,20 +285,18 @@ const handleConfirmStagesFunc = async (
     return {
       message: 'Confirm Successfully !',
       description: 'Stage has been confirmed successfully',
-      status: 'success',
+      status: 'success'
     }
   } catch (error) {
     return {
       message: 'Confirm Failed !',
       description: error?.toString(),
-      status: 'destructive',
+      status: 'destructive'
     }
   }
 }
 
-async function handleCompareContractInformationFunc(
-  setIsCompareContractAlert: any
-) {
+async function handleCompareContractInformationFunc(setIsCompareContractAlert: any) {
   // try {
   //     const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
   //     const web3 = new Web3(window.ethereum);
@@ -366,87 +320,78 @@ async function handleCompareContractInformationFunc(
   //     console.error("Error occurred while comparing contract information:", error);
   // }
 }
-const handleSignContractFunc = async (
-  dataParams: ISignContractFunctionCallParams
-): Promise<IResponseFunction> => {
+const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParams): Promise<IResponseFunction> => {
   try {
     const {
       data: {
-        abi: { abi },
-      },
+        abi: { abi }
+      }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
     const web3 = new Web3(window.ethereum)
     const contract = new web3.eth.Contract(abi, dataParams.addressContract)
-    await contract.methods
-      .sign(
-        dataParams.userInfo?.data?.addressWallet.toString(),
-        dataParams.privateKey
-      )
-      .send({
-        from: dataParams.userInfo?.data?.addressWallet,
-        gas: '1000000',
-      })
+    await contract.methods.sign(dataParams.userInfo?.data?.addressWallet.toString(), dataParams.privateKey).send({
+      from: dataParams.userInfo?.data?.addressWallet,
+      gas: '1000000'
+    })
     const findParticipant = dataParams.contractParticipants.find(
       (item: any) => item.userId === dataParams.userInfo?.data?.id
     )
     const response = await fetchAPI('/participants', 'PATCH', {
       id: findParticipant?.id,
-      status: 'SIGNED',
+      status: 'SIGNED'
     })
-    const indexChanged = dataParams.contractParticipants.findIndex(
-      (item: any) => item === findParticipant
-    )
+    const indexChanged = dataParams.contractParticipants.findIndex((item: any) => item === findParticipant)
     dataParams.contractParticipants[indexChanged] = {
       ...dataParams.contractParticipants[indexChanged],
-      status: 'SIGNED',
+      status: 'SIGNED'
     }
     dataParams.setContractParticipants(dataParams.contractParticipants)
     const { balance } = await handleInstanceWeb3()
     dataParams.setUserInfo((prev: any) => ({ ...prev, balance }))
     if (response.data.contractStatus === 'SIGNED') {
       const isCondition =
-        (dataParams.userInfo?.data?.addressWallet?.trim().toLowerCase() ||
-          '') === (dataParams.individual.senderInd?.trim().toLowerCase() || '')
+        (dataParams.userInfo?.data?.addressWallet?.trim().toLowerCase() || '') ===
+        (dataParams.individual.senderInd?.trim().toLowerCase() || '')
 
       if (isCondition) {
         dataParams.setIsVisibleButton((prevState: any) => ({
           ...prevState,
           signButton: false,
           transferButton: true,
-          confirmButtonSender: true,
+          confirmButtonSender: true
         }))
         dataParams.setIsDisableButton((prevState: any) => ({
           ...prevState,
-          transferButton: false,
+          transferButton: false
         }))
       } else {
         dataParams.setIsVisibleButton((prevState: any) => ({
           ...prevState,
           signButton: false,
           withdrawButton: true,
-          confirmButtonReceiver: true,
+          confirmButtonReceiver: true
         }))
         dataParams.setIsDisableButton((prevState: any) => ({
           ...prevState,
-          withdrawButton: true,
+          withdrawButton: true
         }))
       }
     } else {
       dataParams.setIsDisableButton((prevState: any) => ({
         ...prevState,
-        signButton: true,
+        signButton: true
       }))
     }
     return {
       message: 'Sign Successfully !',
       description: 'Contract has been signed successfully',
-      status: 'success',
+      status: 'success'
     }
   } catch (error) {
     return {
       message: 'Sign Failed !',
       description: error?.toString(),
-      status: 'destructive',
+      status: 'destructive'
     }
   }
 }
@@ -465,13 +410,13 @@ const handleOnDeployContractFunc = async (
   if (!individual.totalAmount || individual.totalAmount === '0') {
     return {
       message: 'Total amount of money must be greater than 0',
-      status: 'destructive',
+      status: 'destructive'
     }
   }
   if (!privateKey) {
     return {
       message: 'Private key is required to deploy contract',
-      status: 'destructive',
+      status: 'destructive'
     }
   }
   try {
@@ -493,7 +438,7 @@ const handleOnDeployContractFunc = async (
           percent: stage.percent,
           deliveryAt: handleDateStringToUint(stage.deliveryAt),
           description: stage.description || '',
-          status: 'ENFORCE',
+          status: 'ENFORCE'
         }
       })
     )
@@ -501,10 +446,10 @@ const handleOnDeployContractFunc = async (
     const deployTransaction = await contract
       .deploy({
         data: byteCode,
-        arguments: [_user, _supplier, _total, _stages, _privateKey],
+        arguments: [_user, _supplier, _total, _stages, _privateKey]
       })
       .send({
-        from: userInfo?.data?.addressWallet,
+        from: userInfo?.data?.addressWallet
       })
     const { balance } = await handleInstanceWeb3()
     setUserInfo((prev: any) => ({ ...prev, balance }))
@@ -512,30 +457,30 @@ const handleOnDeployContractFunc = async (
     setIsVisibleButton((prevState: any) => ({
       ...prevState,
       deployButton: false,
-      signButton: true,
+      signButton: true
     }))
     setIsDisableButton((prevState: any) => ({
       ...prevState,
       transferButton: true,
       deployButton: true,
-      signButton: false,
+      signButton: false
     }))
     await Promise.all([
       fetchAPI('/contracts', 'PATCH', {
         id: idContract,
         contractAddress: deployTransaction?.options?.address as string,
         status: 'ENFORCE',
-        stages: stages,
+        stages: stages
       }),
       fetchAPI('/contracts/handle-deploy', 'POST', {
-        contractId: idContract,
-      }),
+        contractId: idContract
+      })
     ])
     isExportPrivateKey(idContract, _privateKey, publicKey)
     return {
       messages: 'Deploy Successfully',
       description: `Contract address: ${deployTransaction.options.address}`,
-      status: 'success',
+      status: 'success'
     }
   } catch (error) {
     console.log('error', error)
@@ -543,22 +488,15 @@ const handleOnDeployContractFunc = async (
     return {
       message: 'Deploy Failed',
       description: error,
-      status: 'destructive',
+      status: 'destructive'
     }
   }
 }
 
-const isExportPrivateKey = (
-  contractId: string | string[],
-  signature: string,
-  publicKey: string
-) => {
-  let data = new Blob(
-    [
-      `${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`,
-    ],
-    { type: 'text/csv' }
-  )
+const isExportPrivateKey = (contractId: string | string[], signature: string, publicKey: string) => {
+  let data = new Blob([`${publicKey}\n\n\n-----BEGIN PRIVATE KEY-----\n${signature}\n -----END PRIVATE KEY-----`], {
+    type: 'text/csv'
+  })
   let csvURL = window.URL.createObjectURL(data)
   const tempLink = document.createElement('a')
   tempLink.href = csvURL
@@ -573,15 +511,11 @@ function signMessage(message: string) {
   const signer = new NodeRSA(rsaKeyPair.exportKey('private'))
   return {
     signature: signer.sign(message, 'base64'),
-    publicKey,
+    publicKey
   }
 }
 
-function verifySignature(
-  message: string,
-  signature: string,
-  publicKey: string
-): boolean {
+function verifySignature(message: string, signature: string, publicKey: string): boolean {
   const verifier = new NodeRSA()
   verifier.importKey(publicKey, 'public')
   return verifier.verify(Buffer.from(message), Buffer.from(signature, 'base64'))
@@ -613,16 +547,13 @@ export const getContentFromFile = async (
 }
 
 const extractKeys = (keyString: string) => {
-  const publicKeyRegex =
-    /-----BEGIN PUBLIC KEY-----(.|\n)*?-----END PUBLIC KEY-----/
-  const privateKeyRegex =
-    /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/
+  const publicKeyRegex = /-----BEGIN PUBLIC KEY-----(.|\n)*?-----END PUBLIC KEY-----/
+  const privateKeyRegex = /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/
   const publicKeyMatch = keyString.match(publicKeyRegex)
   const privateKeyMatch = keyString.match(privateKeyRegex)
   const publicKey = publicKeyMatch ? publicKeyMatch[0] : ''
   const privateKeyEx = privateKeyMatch ? privateKeyMatch[0] : ''
-  const headerFooterRegex =
-    /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/
+  const headerFooterRegex = /-----BEGIN PRIVATE KEY-----(.|\n)*?-----END PRIVATE KEY-----/
   const match = privateKeyEx.match(headerFooterRegex)
   const privateKeyContent = match ? match[0] : ''
   const privateKey = privateKeyContent
@@ -632,17 +563,13 @@ const extractKeys = (keyString: string) => {
   return { publicKey, privateKey }
 }
 
-async function hashStringWithSHA512(
-  input: string | undefined
-): Promise<string> {
+async function hashStringWithSHA512(input: string | undefined): Promise<string> {
   if (!input) return ''
   const encoder = new TextEncoder()
   const data = encoder.encode(input)
   const hashBuffer = await crypto.subtle.digest('SHA-512', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const hashHex = hashArray
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
+  const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('')
   return hashHex
 }
 
@@ -661,28 +588,21 @@ const handleCallFunctionOfBlockchain = async (
 ): Promise<IResponseFunction> => {
   console.log(dataFunctionCall.confirmFunctionParams)
 
-  if (
-    dataAuthentication.privateKey === '' &&
-    dataAuthentication.filePrivateKey === undefined
-  ) {
+  if (dataAuthentication.privateKey === '' && dataAuthentication.filePrivateKey === undefined) {
     return {
       description: 'Please fill your private key or upload your signature',
       message: 'Private key or signature is required',
-      status: 'destructive',
+      status: 'destructive'
     }
   }
   let privateKey: string = ''
   switch (dataAuthentication.typeAuthentication) {
     case 0:
-      const privateKeyGen = await hashStringWithSHA512(
-        dataAuthentication.privateKey
-      )
+      const privateKeyGen = await hashStringWithSHA512(dataAuthentication.privateKey)
       privateKey = privateKeyGen
       break
     case 1:
-      const privateMessage = await getContentFromFile(
-        dataAuthentication.filePrivateKey
-      )
+      const privateMessage = await getContentFromFile(dataAuthentication.filePrivateKey)
       privateKey = privateMessage?.privateKey || ''
       break
   }
@@ -701,13 +621,13 @@ const handleCallFunctionOfBlockchain = async (
       console.log('Transfer Contract')
       responseMessages = await transferMoneyFunc({
         ...dataFunctionCall.transferFunctionParams,
-        privateKey,
+        privateKey
       } as ITransferMoneyFunctionCallParams)
       break
     case EFunctionCall.SIGN_CONTRACT:
       responseMessages = await handleSignContractFunc({
         ...dataFunctionCall.signContractParams,
-        privateKey,
+        privateKey
       } as ISignContractFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_SENDER:
@@ -717,16 +637,14 @@ const handleCallFunctionOfBlockchain = async (
       console.log('Confirm Contract Receiver')
       responseMessages = await handleConfirmStagesFunc({
         ...dataFunctionCall.confirmFunctionParams,
-        privateKey,
+        privateKey
       } as IConfirmStageFunctionCallParams)
       break
   }
   return responseMessages
 }
 
-const onCreateANewContract = async (
-  dataParams: IContractCreateParams
-): Promise<IResponseFunction> => {
+const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
   try {
     const res = await fetchAPI('/contracts', 'POST', dataParams)
     if (res.status === 201) {
@@ -734,20 +652,20 @@ const onCreateANewContract = async (
         message: 'Create contract successfully',
         status: 'success',
         description: 'Contract has been created successfully',
-        contractId: res.data.contract.id,
+        contractId: res.data.contract.id
       }
     } else {
       return {
         message: 'Create contract failed',
         status: 'destructive',
-        description: 'Error occurred while creating contract',
+        description: 'Error occurred while creating contract'
       }
     }
   } catch (err) {
     return {
       message: 'Create contract failed',
       status: 'destructive',
-      description: err?.toString(),
+      description: err?.toString()
     }
   }
 }
@@ -764,7 +682,7 @@ const getDataToOpenDisputeContract = (
       return {
         email: item.email,
         permission: item.permission,
-        messages: 'You have a invitation to join a dispute contract',
+        messages: 'You have a invitation to join a dispute contract'
       }
   })
   return {
@@ -772,7 +690,7 @@ const getDataToOpenDisputeContract = (
     name: 'Disputed Contract - Supply Chain Management',
     type: 'DISPUTE',
     templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d',
-    invitation: invitations as InvitationItem[],
+    invitation: invitations as InvitationItem[]
   }
 }
 export {
@@ -790,5 +708,5 @@ export {
   signMessage,
   hashStringWithSHA512,
   handleCallFunctionOfBlockchain,
-  onCreateANewContract,
+  onCreateANewContract
 }

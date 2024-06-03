@@ -1,22 +1,7 @@
 'use client'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import Web3 from 'web3'
 import GetContract from '@/app/contract/detail/[typeContract]/[address]/components/GetContract'
@@ -28,11 +13,9 @@ export default function Dashboard() {
   const [balance, setBalance] = React.useState('')
   useEffect(() => {
     const web3 = new Web3(window.ethereum)
-    web3.eth
-      .getBalance(localStorage.getItem('address-wallet') as string)
-      .then((bal) => {
-        setBalance(web3.utils.fromWei(bal, 'ether'))
-      })
+    web3.eth.getBalance(localStorage.getItem('address-wallet') as string).then((bal) => {
+      setBalance(web3.utils.fromWei(bal, 'ether'))
+    })
   }, [])
   return (
     <div className='mt-6 flex'>

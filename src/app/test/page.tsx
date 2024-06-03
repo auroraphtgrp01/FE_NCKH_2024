@@ -18,7 +18,7 @@ import {
   Settings,
   ShoppingCart,
   Truck,
-  Users2,
+  Users2
 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +28,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
+  BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
 import {
@@ -38,7 +38,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 
@@ -75,11 +75,7 @@ export default function BreadCrumbHeader() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant='outline'
-              size='icon'
-              className='overflow-hidden rounded-full'
-            >
+            <Button variant='outline' size='icon' className='overflow-hidden rounded-full'>
               <Image
                 src='/placeholder-user.jpg'
                 width={36}

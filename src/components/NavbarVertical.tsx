@@ -4,11 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Icons } from '@/components/ui/icons'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ModeToggle } from './DarkModeToggle'
 import { useRouter } from 'next/navigation'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -36,7 +32,7 @@ export default function NavbarVertical() {
     toast({
       title: 'Logout Successful',
       description: 'You have been logged out successfully!',
-      variant: 'success',
+      variant: 'success'
     })
   }
   return (
@@ -53,10 +49,7 @@ export default function NavbarVertical() {
             <TooltipProvider>
               <Tooltip delayDuration={50}>
                 <TooltipTrigger asChild>
-                  <Link
-                    href='/contract'
-                    className='mt-4 flex h-9 w-9 items-center justify-center rounded-lg'
-                  >
+                  <Link href='/contract' className='mt-4 flex h-9 w-9 items-center justify-center rounded-lg'>
                     <Button
                       className={`mt-2 flex w-full justify-start rounded-lg px-2 transition-colors hover:bg-black hover:text-white ${containsContract ? 'bg-black text-white' : ''}`}
                       variant={'outline'}
@@ -73,10 +66,7 @@ export default function NavbarVertical() {
             <TooltipProvider>
               <Tooltip delayDuration={50}>
                 <TooltipTrigger asChild>
-                  <Link
-                    href='/supplier'
-                    className='mt-2 flex h-9 w-9 items-center justify-center rounded-lg'
-                  >
+                  <Link href='/supplier' className='mt-2 flex h-9 w-9 items-center justify-center rounded-lg'>
                     <Button
                       className={`mt-2 flex w-full justify-start rounded-lg px-2 transition-colors hover:bg-black hover:text-white ${containsSupplier ? 'bg-black text-white' : ''}`}
                       variant={'outline'}
@@ -93,10 +83,7 @@ export default function NavbarVertical() {
             <TooltipProvider>
               <Tooltip delayDuration={50}>
                 <TooltipTrigger asChild>
-                  <Link
-                    href='#'
-                    className='mt-2 flex h-9 w-9 items-center justify-center rounded-lg'
-                  >
+                  <Link href='#' className='mt-2 flex h-9 w-9 items-center justify-center rounded-lg'>
                     <Button
                       className='mt-2 flex w-full justify-start rounded-lg px-2 transition-colors'
                       variant={'outline'}

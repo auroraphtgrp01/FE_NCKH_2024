@@ -2,18 +2,11 @@ import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { SendHorizontal } from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ChatBox({
   showChat,
-  setShowChat,
+  setShowChat
 }: {
   showChat: boolean
   setShowChat: (showChat: boolean) => void

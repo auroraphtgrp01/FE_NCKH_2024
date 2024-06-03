@@ -3,7 +3,7 @@ import {
   IDisableButton,
   IPermission,
   IResponseFunction,
-  IVisibleButton,
+  IVisibleButton
 } from '@/interface/contract.i'
 
 export const initDisableButton: IDisableButton = {
@@ -16,7 +16,7 @@ export const initDisableButton: IDisableButton = {
   signButton: true,
   confirmButtonSender: true,
   confirmButtonReceiver: true,
-  openDisputedButton: false,
+  openDisputedButton: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -28,13 +28,13 @@ export const initVisibleButton: IVisibleButton = {
   signButton: false,
   confirmButtonSender: false,
   confirmButtonReceiver: false,
-  openDisputedButton: true,
+  openDisputedButton: true
 }
 
 export const initResponseMessages: IResponseFunction = {
   message: '',
   status: 'destructive',
-  description: '',
+  description: ''
 }
 
 export const initPermission: IPermission = {
@@ -43,11 +43,10 @@ export const initPermission: IPermission = {
   INVITE_PARTICIPANT: false,
   CHANGE_STATUS_CONTRACT: false,
   SET_OWNER_PARTY: false,
-  ROLES: ERolesOfParticipant.PARTICIPANT,
+  ROLES: ERolesOfParticipant.PARTICIPANT
 }
 
-export const rolesTypeParticipant: { key: string; value: string }[] =
-  Object.keys(ERolesOfParticipant).map((key) => ({
-    key,
-    value: ERolesOfParticipant[key as keyof typeof ERolesOfParticipant],
-  }))
+export const rolesTypeParticipant: { key: string; value: string }[] = Object.keys(ERolesOfParticipant).map((key) => ({
+  key,
+  value: ERolesOfParticipant[key as keyof typeof ERolesOfParticipant]
+}))

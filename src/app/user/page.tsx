@@ -11,7 +11,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
 import {
   ArrowUpDown,
@@ -23,7 +23,7 @@ import {
   RefreshCw,
   Trash2,
   UserCog,
-  X,
+  X
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -35,17 +35,10 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
   Dialog,
   DialogContent,
@@ -53,16 +46,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from '@/components/ui/dialog'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Menubar,
   MenubarContent,
@@ -70,15 +56,9 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarShortcut,
-  MenubarTrigger,
+  MenubarTrigger
 } from '@/components/ui/menubar'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
@@ -94,7 +74,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 
 export interface User {
@@ -121,8 +101,8 @@ const data: Contract[] = [
     dateOfBirth: 'stringstring',
     role: 'stringstring',
     status: 'stringstring',
-    suppliers: 'stringstring',
-  },
+    suppliers: 'stringstring'
+  }
 ]
 
 export type Contract = {
@@ -150,20 +130,16 @@ const initParticipants: User[] = [
     dateOfBirth: '',
     role: '',
     status: '',
-    suppliers: '',
-  },
+    suppliers: ''
+  }
 ]
 
 export default function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [participants, setParticipants] =
-    React.useState<User[]>(initParticipants)
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+  const [participants, setParticipants] = React.useState<User[]>(initParticipants)
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [isOpen, setIsOpen] = React.useState(false)
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const columns: ColumnDef<Contract>[] = [
@@ -171,10 +147,7 @@ export default function DataTableDemo() {
       id: 'select',
       header: ({ table }) => (
         <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label='Select all'
         />
@@ -187,16 +160,14 @@ export default function DataTableDemo() {
         />
       ),
       enableSorting: false,
-      enableHiding: false,
+      enableHiding: false
     },
     {
       accessorKey: 'name',
       header: ({ column }) => {
         return <div className='font-semibold'>Name</div>
       },
-      cell: ({ row }) => (
-        <div className='text-start lowercase'>{row.getValue('name')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start lowercase'>{row.getValue('name')}</div>
     },
     {
       accessorKey: 'phoneNumber',
@@ -204,11 +175,7 @@ export default function DataTableDemo() {
       header: ({ column }) => {
         return <div className='font-semibold'>Phone Number</div>
       },
-      cell: ({ row }) => (
-        <div className='text-center lowercase'>
-          {row.getValue('phoneNumber')}
-        </div>
-      ),
+      cell: ({ row }) => <div className='text-center lowercase'>{row.getValue('phoneNumber')}</div>
     },
     {
       accessorKey: 'email',
@@ -216,78 +183,56 @@ export default function DataTableDemo() {
       header: ({ column }) => {
         return <div className='font-semibold'>Email</div>
       },
-      cell: ({ row }) => (
-        <div className='text-start lowercase'>{row.getValue('email')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start lowercase'>{row.getValue('email')}</div>
     },
     {
       accessorKey: 'indentifyNumber',
       header: () => {
         return <div className='text-center font-semibold'>Indentify Number</div>
       },
-      cell: ({ row }) => (
-        <div className='text-center lowercase'>
-          {row.getValue('indentifyNumber')}
-        </div>
-      ),
+      cell: ({ row }) => <div className='text-center lowercase'>{row.getValue('indentifyNumber')}</div>
     },
     {
       accessorKey: 'addressWallet',
       header: () => {
         return <div className='text-center font-semibold'>Address Wallet</div>
       },
-      cell: ({ row }) => (
-        <div className='text-start lowercase'>
-          {row.getValue('addressWallet')}
-        </div>
-      ),
+      cell: ({ row }) => <div className='text-start lowercase'>{row.getValue('addressWallet')}</div>
     },
     {
       accessorKey: 'gender',
       header: () => {
         return <div className='text-center font-semibold'>Gender</div>
       },
-      cell: ({ row }) => (
-        <div className='text-center lowercase'>{row.getValue('gender')}</div>
-      ),
+      cell: ({ row }) => <div className='text-center lowercase'>{row.getValue('gender')}</div>
     },
     {
       accessorKey: 'dateOfBirth',
       header: () => {
         return <div className='text-center font-semibold'>Date Of Birth</div>
       },
-      cell: ({ row }) => (
-        <div className='text-center lowercase'>
-          {row.getValue('dateOfBirth')}
-        </div>
-      ),
+      cell: ({ row }) => <div className='text-center lowercase'>{row.getValue('dateOfBirth')}</div>
     },
     {
       accessorKey: 'role',
       header: ({ column }) => {
         return <div className='font-semibold'>Role</div>
       },
-      cell: ({ row }) => (
-        <div className='text-start lowercase'>{row.getValue('role')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start lowercase'>{row.getValue('role')}</div>
     },
     {
       accessorKey: 'status',
       header: ({ column }) => {
         return <div className='font-semibold'>Status</div>
       },
-      cell: ({ row }) => (
-        <div className='text-start lowercase'>{row.getValue('status')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start lowercase'>{row.getValue('status')}</div>
     },
     {
       accessorKey: 'suppliers',
       header: ({ column }) => {
         return <div className='font-semibold'>Suppliers</div>
       },
-      cell: ({ row }) => (
-        <div className='text-start lowercase'>{row.getValue('suppliers')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start lowercase'>{row.getValue('suppliers')}</div>
     },
     {
       accessorKey: 'action',
@@ -298,11 +243,7 @@ export default function DataTableDemo() {
             <AlertDialog>
               <AlertDialogTrigger>
                 <Button>
-                  <FilePen
-                    size={17}
-                    strokeWidth={2.4}
-                    className='dark:text-white'
-                  />
+                  <FilePen size={17} strokeWidth={2.4} className='dark:text-white' />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -372,9 +313,7 @@ export default function DataTableDemo() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className='dark:text-white'>
-                    Continue
-                  </AlertDialogAction>
+                  <AlertDialogAction className='dark:text-white'>Continue</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -394,16 +333,14 @@ export default function DataTableDemo() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className='dark:text-white'>
-                    Continue
-                  </AlertDialogAction>
+                  <AlertDialogAction className='dark:text-white'>Continue</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           </div>
         )
-      },
-    },
+      }
+    }
   ]
 
   const table = useReactTable({
@@ -421,8 +358,8 @@ export default function DataTableDemo() {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
-    },
+      rowSelection
+    }
   })
 
   return (
@@ -445,9 +382,7 @@ export default function DataTableDemo() {
         <Input
           placeholder='Filter emails...'
           value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('email')?.setFilterValue(event.target.value)
-          }
+          onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
           className='mb-4 max-w-sm'
         />
         <div className='ml-auto'>
@@ -472,9 +407,7 @@ export default function DataTableDemo() {
                       key={column.id}
                       className='capitalize'
                       checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
@@ -492,12 +425,7 @@ export default function DataTableDemo() {
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
                 })}
@@ -507,26 +435,15 @@ export default function DataTableDemo() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
+                <TableCell colSpan={columns.length} className='h-24 text-center'>
                   No results.
                 </TableCell>
               </TableRow>
@@ -536,8 +453,8 @@ export default function DataTableDemo() {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+          selected.
         </div>
         <div className='space-x-2'>
           <Button
@@ -548,12 +465,7 @@ export default function DataTableDemo() {
           >
             Previous
           </Button>
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
+          <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
             Next
           </Button>
         </div>
@@ -572,8 +484,7 @@ export default function DataTableDemo() {
               <DialogHeader>
                 <DialogTitle>Individuals involved in the contract</DialogTitle>
                 <DialogDescription>
-                  The information here is extracted from the database. You can
-                  re-fetch it from the chain-network
+                  The information here is extracted from the database. You can re-fetch it from the chain-network
                 </DialogDescription>
               </DialogHeader>
             </DialogContent>

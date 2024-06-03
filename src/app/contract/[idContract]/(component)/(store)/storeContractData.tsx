@@ -1,18 +1,13 @@
 'use client'
 
-import {
-  EContractAttributeType,
-  IContractAttribute,
-} from '@/interface/contract.i'
+import { EContractAttributeType, IContractAttribute } from '@/interface/contract.i'
 import { useState } from 'react'
 
 export const ContractState = () => {
-  const [contractAttribute, setContractAttribute] = useState(
-    initContractAttribute
-  )
+  const [contractAttribute, setContractAttribute] = useState(initContractAttribute)
   return {
     contractAttribute,
-    setContractAttribute,
+    setContractAttribute
   }
 }
 
@@ -24,12 +19,12 @@ export const initContractAttribute: any[] = [
     createdBy: {
       id: 'be5d31d0-4c37-4814-953c-a34d4ed9bef5',
       name: 'Le Minh Tuan',
-      email: 'sliverknight4869@gmail.com',
+      email: 'sliverknight4869@gmail.com'
     },
     updatedBy: {
       id: 'be5d31d0-4c37-4814-953c-a34d4ed9bef5',
       name: 'Le Minh Tuan',
-      email: 'sliverknight4869@gmail.com',
-    },
-  },
+      email: 'sliverknight4869@gmail.com'
+    }
+  }
 ]

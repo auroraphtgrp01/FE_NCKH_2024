@@ -17,15 +17,10 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { fetchAPI } from '@/utils/fetchAPI'
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from '@/components/ui/input-otp'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
 
 export default function Header() {
@@ -50,7 +45,7 @@ export default function Header() {
     try {
       const login = await fetchAPI('/auth/login', 'POST', {
         addressWallet: wallet.accounts[0],
-        PIN: pin,
+        PIN: pin
       })
       if (login.status == 201) {
         localStorage.setItem('user-info', JSON.stringify(login.data))
@@ -60,14 +55,14 @@ export default function Header() {
           title: 'Login success',
           description: 'You have successfully logged in',
           variant: 'default',
-          duration: 2000,
+          duration: 2000
         })
       } else {
         toast({
           title: 'Login failed',
           description: 'Please check your PIN code',
           variant: 'destructive',
-          duration: 2000,
+          duration: 2000
         })
       }
     } catch (error) {}
@@ -81,7 +76,7 @@ export default function Header() {
   }
   const handleConnect = async () => {
     let accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts',
+      method: 'eth_requestAccounts'
     })
     console.log(accounts)
 
@@ -96,7 +91,7 @@ export default function Header() {
           title: 'Account not found',
           description: 'Please register to create an account',
           variant: 'destructive',
-          duration: 2000,
+          duration: 2000
         })
         Router.push('/register')
       }
@@ -113,21 +108,18 @@ export default function Header() {
             {checkLogin() && (
               <div>
                 <Button variant={'outline'} type='button'>
-                  <Icons.login className='me-2 h-5 w-5' />{' '}
-                  {userInfo?.addressWallet}
+                  <Icons.login className='me-2 h-5 w-5' /> {userInfo?.addressWallet}
                 </Button>
               </div>
             )}
             {!checkLogin() && (
               <div>
                 <Button variant={'outline'} onClick={handleConnect}>
-                  <Icons.login className='me-2 h-5 w-5' />{' '}
-                  <div className='font-semibold'> CONNECT TO METAMASK </div>
+                  <Icons.login className='me-2 h-5 w-5' /> <div className='font-semibold'> CONNECT TO METAMASK </div>
                 </Button>
                 <Link href='/register'>
                   <Button variant={'outline'} className='ms-2'>
-                    <Icons.key className='me-2 h-5 w-5' />{' '}
-                    <div className='font-semibold'> REGISTER </div>
+                    <Icons.key className='me-2 h-5 w-5' /> <div className='font-semibold'> REGISTER </div>
                   </Button>
                 </Link>
               </div>
@@ -148,9 +140,7 @@ export default function Header() {
             >
               <DialogHeader>
                 <DialogTitle>Set your PIN to log in</DialogTitle>
-                <DialogDescription>
-                  Please Set Your Pin Code to 6 Digits.
-                </DialogDescription>
+                <DialogDescription>Please Set Your Pin Code to 6 Digits.</DialogDescription>
               </DialogHeader>
               <div className='grid justify-center gap-4 py-4'>
                 <InputOTP

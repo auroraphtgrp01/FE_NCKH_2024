@@ -26,20 +26,20 @@ export function getColumns(
       : (products[index].discount = Number(e.target.value))
     const payload = {
       id: data.orderDetails[0].idOrder,
-      products: products,
+      products: products
     }
     await fetchAPI('/orders', 'PATCH', payload)
       .then((res) => {
         toast({
           title: `Update thành công`,
-          variant: 'success',
+          variant: 'success'
         })
         getDataOrders()
       })
       .catch((err) => {
         toast({
           title: `Update không thành công`,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
   }
@@ -47,16 +47,12 @@ export function getColumns(
     {
       accessorKey: 'name',
       header: () => <div className='font-semibold'>Products</div>,
-      cell: ({ row }) => (
-        <div className='text-start'>{row.getValue('name')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start'>{row.getValue('name')}</div>
     },
     {
       accessorKey: 'price',
       header: () => <div className='font-semibold'>Price</div>,
-      cell: ({ row }) => (
-        <div className='text-start'>{row.getValue('price')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start'>{row.getValue('price')}</div>
     },
     {
       accessorKey: 'image',
@@ -67,14 +63,12 @@ export function getColumns(
           src={row.getValue('image')}
           alt='Product Image'
         />
-      ),
+      )
     },
     {
       accessorKey: 'taxPrice',
       header: () => <div className='font-semibold'>Tax Price</div>,
-      cell: ({ row }) => (
-        <div className='text-start'>{row.getValue('taxPrice')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start'>{row.getValue('taxPrice')}</div>
     },
     {
       accessorKey: 'quantity',
@@ -96,7 +90,7 @@ export function getColumns(
             )}
           </div>
         )
-      },
+      }
     },
     {
       accessorKey: 'discount',
@@ -116,21 +110,17 @@ export function getColumns(
             <span>{row.getValue('discount')}</span>
           )}
         </div>
-      ),
+      )
     },
     {
       accessorKey: 'priceWithoutTax',
       header: () => <div className='font-semibold'>Price without tax</div>,
-      cell: ({ row }) => (
-        <div className='text-start'>{row.getValue('priceWithoutTax')}</div>
-      ),
+      cell: ({ row }) => <div className='text-start'>{row.getValue('priceWithoutTax')}</div>
     },
     {
       accessorKey: 'unit',
       header: () => <div className='font-semibold'>Unit</div>,
-      cell: ({ row }) => (
-        <div className='text-start'>{row.getValue('unit')}</div>
-      ),
-    },
+      cell: ({ row }) => <div className='text-start'>{row.getValue('unit')}</div>
+    }
   ]
 }

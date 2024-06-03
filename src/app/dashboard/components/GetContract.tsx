@@ -2,32 +2,15 @@
 
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import axios from 'axios'
 import { Input } from '@/components/ui/input'
 import React, { useEffect, useState } from 'react'
-import {
-  GetContractBodyType,
-  GetSmartContract,
-} from '@/validateSchema/GetContract.validate'
+import { GetContractBodyType, GetSmartContract } from '@/validateSchema/GetContract.validate'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
 import { useAppContext } from '@/components/ThemeProvider'
 import Web3 from 'web3'
@@ -40,10 +23,7 @@ export interface ContractData {
   setDataContract: (data: any) => void
 }
 
-export default function GetContract({
-  dataContract,
-  setDataContract,
-}: ContractData) {
+export default function GetContract({ dataContract, setDataContract }: ContractData) {
   const { toast } = useToast()
   const [contract, setContract] = useState({})
   const [abi, setABI] = useState([])
@@ -58,7 +38,7 @@ export default function GetContract({
     abi: [],
     addressContract: '',
     addressWallet: '',
-    methodCall: '',
+    methodCall: ''
   })
   const { wallet, setWallet }: any = useAppContext()
   function onSubmit(values: z.infer<typeof GetSmartContract>) {
@@ -66,12 +46,12 @@ export default function GetContract({
       toast({
         title: 'Error get ABI',
         description: 'Please get ABI of Contract',
-        variant: 'destructive',
+        variant: 'destructive'
       })
     } else {
       const contractPayload: any = {
         ...values,
-        abi,
+        abi
       }
       setPayload(contractPayload)
       getContract().then((res) => {
@@ -82,10 +62,7 @@ export default function GetContract({
   }
   async function getContract(): Promise<any> {
     const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(
-      payload.abi,
-      '0x26b5e6146C96239700156d3f466CB0a3476cF61c'
-    )
+    const contract = new web3.eth.Contract(payload.abi, '0x26b5e6146C96239700156d3f466CB0a3476cF61c')
     try {
       const result: any = await contract.methods.getContractInformation().call()
       // console.log(">>", JSON.parse(refactorTest(result)))
@@ -105,7 +82,7 @@ export default function GetContract({
       toast({
         title: 'Error get ABI',
         description: 'Please select type of contract to get ABI',
-        variant: 'destructive',
+        variant: 'destructive'
       })
     } else {
       fetchAPI('/smart-contracts/abi', 'GET')
@@ -116,7 +93,7 @@ export default function GetContract({
           toast({
             title: 'Error get ABI',
             description: 'Error when get ABI - Please try again later',
-            variant: 'destructive',
+            variant: 'destructive'
           })
         })
       setError(error)
@@ -137,7 +114,7 @@ export default function GetContract({
     return obj
   }
   const form = useForm<GetContractBodyType>({
-    resolver: zodResolver(GetSmartContract),
+    resolver: zodResolver(GetSmartContract)
   })
 
   return (
@@ -223,12 +200,7 @@ export default function GetContract({
         <FormItem>
           <FormLabel>ABI</FormLabel>
           <FormControl>
-            <Textarea
-              placeholder='ABI of Contract'
-              className='resize-none'
-              rows={10}
-              readOnly
-            />
+            <Textarea placeholder='ABI of Contract' className='resize-none' rows={10} readOnly />
           </FormControl>
           <FormMessage />
         </FormItem>

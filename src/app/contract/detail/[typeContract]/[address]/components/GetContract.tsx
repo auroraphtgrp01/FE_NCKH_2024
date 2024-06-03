@@ -2,32 +2,15 @@
 
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import axios from 'axios'
 import { Input } from '@/components/ui/input'
 import React, { useEffect, useState } from 'react'
-import {
-  GetContractBodyType,
-  GetSmartContract,
-} from '@/validateSchema/GetContract.validate'
+import { GetContractBodyType, GetSmartContract } from '@/validateSchema/GetContract.validate'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ToastAction } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/use-toast'
 import { useAppContext } from '@/components/ThemeProvider'
@@ -47,18 +30,18 @@ export default function GetContract() {
       toast({
         title: 'Error get ABI',
         description: 'Please get ABI of Contract',
-        variant: 'destructive',
+        variant: 'destructive'
       })
     } else {
       const contractPayload = {
         ...values,
-        abi,
+        abi
       }
       // goi api o day
     }
   }
   const form = useForm<GetContractBodyType>({
-    resolver: zodResolver(GetSmartContract),
+    resolver: zodResolver(GetSmartContract)
   })
   async function fetchABI() {
     const nameContract = selectedValue
@@ -66,13 +49,11 @@ export default function GetContract() {
       toast({
         title: 'Error get ABI',
         description: 'Please select type of contract to get ABI',
-        variant: 'destructive',
+        variant: 'destructive'
       })
     } else {
       axios
-        .get(
-          `http://localhost:3000/smart-contracts/abi?contractName=${nameContract}`
-        )
+        .get(`http://localhost:3000/smart-contracts/abi?contractName=${nameContract}`)
         .then((res) => {
           setABI(res.data.abi)
         })
@@ -80,7 +61,7 @@ export default function GetContract() {
           toast({
             title: 'Error get ABI',
             description: 'Error when get ABI - Please try again later',
-            variant: 'destructive',
+            variant: 'destructive'
           })
         })
       setError(error)
@@ -106,13 +87,7 @@ export default function GetContract() {
             <FormItem>
               <FormLabel>Address Wallet: </FormLabel>
               <FormControl>
-                <Input
-                  placeholder=''
-                  {...field}
-                  className='w-96'
-                  readOnly
-                  value={wallet.accounts[0]}
-                />
+                <Input placeholder='' {...field} className='w-96' readOnly value={wallet.accounts[0]} />
               </FormControl>
               <FormMessage />
             </FormItem>

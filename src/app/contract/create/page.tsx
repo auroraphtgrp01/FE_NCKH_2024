@@ -1,22 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 import { use, useEffect, useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from '@/components/ui/carousel'
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { useAppContext } from '@/components/ThemeProvider'
@@ -27,11 +15,7 @@ import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract'
 import InvitationArea from '@/components/InvitationArea'
 import Image from 'next/image'
-import {
-  ContractTemplate,
-  ITemplateContract,
-  InvitationItem,
-} from '@/interface/contract.i'
+import { ContractTemplate, ITemplateContract, InvitationItem } from '@/interface/contract.i'
 import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 
 export default function page() {
@@ -40,8 +24,8 @@ export default function page() {
       id: '',
       name: 'Empty Contract',
       path: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
-      contractAttributes: [],
-    },
+      contractAttributes: []
+    }
   ])
   const { userInfo, setUserInfo }: any = useAppContext()
   const { dataCreateContract, setDataCreateContract }: any = useAppContext()
@@ -93,10 +77,7 @@ export default function page() {
   }, [api])
   useEffect(() => {
     if (current !== 0) {
-      fetchAPI(
-        `/template-contracts/${template[current]?.id}/attributes`,
-        'GET'
-      ).then((res) => {
+      fetchAPI(`/template-contracts/${template[current]?.id}/attributes`, 'GET').then((res) => {
         if (res.status === 200) {
           console.log(res.data)
           setContractAttribute(res.data.contractAttributes)
@@ -117,13 +98,13 @@ export default function page() {
       name: nameOfContractInput,
       templateId,
       invitation: invitation,
-      messagesForInvitation: messages,
+      messagesForInvitation: messages
     }).then((res) => {
       res.contractId ? Router.push(`/contract/${res?.contractId}`) : null
       toast({
         title: res.message,
         description: res.description,
-        variant: res.status,
+        variant: res.status
       })
     })
   }
@@ -147,24 +128,17 @@ export default function page() {
             <CardContent>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Address Wallet: </Label>
-                <Input
-                  disabled
-                  readOnly
-                  defaultValue={userInfo?.data?.addressWallet}
-                />
+                <Input disabled readOnly defaultValue={userInfo?.data?.addressWallet} />
               </div>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Name of Contract: </Label>
-                <Input
-                  defaultValue={nameOfContractInput}
-                  onChange={(e) => setNameOfContractInput(e.target.value)}
-                />
+                <Input defaultValue={nameOfContractInput} onChange={(e) => setNameOfContractInput(e.target.value)} />
               </div>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Template Contract: </Label>
                 <Carousel
                   opts={{
-                    align: 'start',
+                    align: 'start'
                   }}
                   orientation='vertical'
                   className='w-full max-w-xs'
@@ -204,9 +178,7 @@ export default function page() {
                                   className='rounded'
                                 />
                               </div>
-                              <div className='mt-2 text-center'>
-                                {item.name}
-                              </div>
+                              <div className='mt-2 text-center'>{item.name}</div>
                             </CardContent>
                           </Card>
                         </div>
@@ -244,10 +216,7 @@ export default function page() {
               />
             </CardContent>
             <CardFooter>
-              <Button
-                className='me-2 w-full'
-                onClick={onClickCreateContractButton}
-              >
+              <Button className='me-2 w-full' onClick={onClickCreateContractButton}>
                 Create Contract
               </Button>
               <Button className='w=full' variant={'destructive'}>
@@ -259,19 +228,12 @@ export default function page() {
         <div className='ms-4 flex py-4'>
           <Card className='min-w-[600px]'>
             <CardHeader>
-              <CardTitle className='text-center text-lg font-semibold'>
-                {template[current]?.name}
-              </CardTitle>
-              <CardDescription>
-                Preview the contract here - Please choose a template
-              </CardDescription>
+              <CardTitle className='text-center text-lg font-semibold'>{template[current]?.name}</CardTitle>
+              <CardDescription>Preview the contract here - Please choose a template</CardDescription>
             </CardHeader>
             <ScrollArea className='h-[600px]'>
               <CardContent>
-                <PreviewContract
-                  contractAttribute={contractAttribute}
-                  setContractAttribute={setContractAttribute}
-                />
+                <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
               </CardContent>
             </ScrollArea>
           </Card>

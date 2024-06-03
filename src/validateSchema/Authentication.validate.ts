@@ -9,7 +9,7 @@ export const RegisterBody = z
     phoneNumber: z.string().min(10).max(11),
     gender: z.string(),
     dateOfBirth: z.optional(z.string()),
-    role: z.string(),
+    role: z.string()
   })
   .strict()
 
@@ -21,10 +21,10 @@ export const RegisterRes = z.object({
     account: z.object({
       id: z.number(),
       name: z.string(),
-      email: z.string(),
-    }),
+      email: z.string()
+    })
   }),
-  message: z.string(),
+  message: z.string()
 })
 
 export type RegisterResType = z.TypeOf<typeof RegisterRes>
@@ -32,7 +32,7 @@ export type RegisterResType = z.TypeOf<typeof RegisterRes>
 export const LoginBody = z
   .object({
     email: z.string().email(),
-    password: z.string().min(6).max(100),
+    password: z.string().min(6).max(100)
   })
   .strict()
 
@@ -50,7 +50,7 @@ export type RefreshSessionResType = z.TypeOf<typeof RefreshSessionRes>
 
 export const PIN = z
   .object({
-    PIN: z.string().min(6).max(6),
+    PIN: z.string().min(6).max(6)
   })
   .strict()
 

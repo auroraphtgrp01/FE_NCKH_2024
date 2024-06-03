@@ -4,27 +4,17 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  LoginBodyType,
-  LoginBody,
-} from '@/validateSchema/Authentication.validate'
+import { LoginBodyType, LoginBody } from '@/validateSchema/Authentication.validate'
 
 export default function LoginForm() {
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
       email: '',
-      password: '',
-    },
+      password: ''
+    }
   })
   function onSubmit(values: z.infer<typeof LoginBody>) {
     console.log(values)

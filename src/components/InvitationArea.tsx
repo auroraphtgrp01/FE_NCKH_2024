@@ -3,14 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { initPermission } from '@/constants/initVariable.constants'
@@ -30,7 +23,7 @@ export default function InvitationArea({
   setInvitation,
   messages,
   setMessages,
-  participant,
+  participant
 }: IInvitationArea) {
   const [invitationInput, setInvitationInput] = useState('')
   const [indexPerson, setIndexPerson] = useState<number>(-1)
@@ -42,7 +35,7 @@ export default function InvitationArea({
       toast({
         title: 'Error When Add Participant',
         description: 'Email Is Invalid',
-        variant: 'destructive',
+        variant: 'destructive'
       })
       return
     }
@@ -52,15 +45,12 @@ export default function InvitationArea({
         toast({
           title: 'Error When Add Participant',
           description: 'Participant already exists',
-          variant: 'destructive',
+          variant: 'destructive'
         })
         return
       }
     }
-    setInvitation([
-      ...invitation,
-      { email: invitationInput, permission: initPermission },
-    ])
+    setInvitation([...invitation, { email: invitationInput, permission: initPermission }])
     setInvitationInput('')
   }
   function updatePermission(data: IPermission): void {

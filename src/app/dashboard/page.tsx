@@ -1,27 +1,10 @@
 'use client'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import Web3 from 'web3'
-import GetContract, {
-  ContractData,
-} from '@/app/dashboard/components/GetContract'
+import GetContract, { ContractData } from '@/app/dashboard/components/GetContract'
 import { log } from 'console'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -54,10 +37,7 @@ export default function Dashboard() {
             <CardTitle className='text-2xl'>Smart Contract</CardTitle>
           </CardHeader>
           <CardContent>
-            <GetContract
-              dataContract={dataContract}
-              setDataContract={handleDataChange}
-            />
+            <GetContract dataContract={dataContract} setDataContract={handleDataChange} />
           </CardContent>
         </Card>
       </div>

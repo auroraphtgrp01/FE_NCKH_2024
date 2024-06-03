@@ -3,11 +3,7 @@
 import { ReceiptText, Trash2, X } from 'lucide-react'
 import React, { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-} from '@radix-ui/react-icons'
+import { CaretSortIcon, ChevronDownIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -18,7 +14,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -30,17 +26,10 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import {
   AlertDialog,
@@ -51,7 +40,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { ScrollArea } from '@radix-ui/react-scroll-area'
 import { fetchAPI } from '@/utils/fetchAPI'
@@ -78,10 +67,7 @@ export const columns: ColumnDef<Order>[] = [
     id: 'select',
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
       />
@@ -94,68 +80,53 @@ export const columns: ColumnDef<Order>[] = [
       />
     ),
     enableSorting: false,
-    enableHiding: false,
+    enableHiding: false
   },
   {
     accessorKey: 'orderCode',
     header: 'Mã đơn hàng ',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('orderCode')}</div>
-    ),
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('orderCode')}</div>
   },
   {
     accessorKey: 'customer',
     header: 'Người mua ',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('customer')}</div>
-    ),
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('customer')}</div>
   },
   {
     accessorKey: 'supplier',
     header: 'Nhà cung cấp ',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('supplier')}</div>
-    ),
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('supplier')}</div>
   },
   {
     accessorKey: 'numberOfProducts',
     header: 'Số sản phẩm',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('numberOfProducts')}</div>
-    ),
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('numberOfProducts')}</div>
   },
 
   {
     accessorKey: 'total',
     header: 'Tổng tiền',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('total')}</div>
-    ),
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('total')}</div>
   },
 
   {
     accessorKey: 'status',
     header: 'Action',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('status')}</div>
-    ),
-  },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('status')}</div>
+  }
 ]
 
 export default function Page() {
   const router = useRouter()
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [order, setOrder] = React.useState<Order[]>([])
   const [status, setStatus] = React.useState<status>({
     PENDING: 0,
     PROCESSING: 0,
-    OTHER: 0,
+    OTHER: 0
   })
   const [click, setClick] = React.useState(0)
   const table = useReactTable({
@@ -173,8 +144,8 @@ export default function Page() {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
-    },
+      rowSelection
+    }
   })
   function changePage(index: number) {
     setClick(index)
@@ -185,21 +156,15 @@ export default function Page() {
       const dataUserOrder = res.data.orders[0].map((order: any) => {
         return {
           ...order,
-          numberOfProducts: order.products.length,
+          numberOfProducts: order.products.length
         }
       })
       setOrder(dataUserOrder)
       setStatus({
-        PENDING: res.data.orders[0].filter(
-          (item: any) => item.status === 'Pending'
-        ).length,
-        PROCESSING: res.data.orders[0].filter(
-          (item: any) => item.status === 'In Progress'
-        ).length,
-        OTHER: res.data.orders[0].filter(
-          (item: any) =>
-            item.status === 'Completed' || item.status === 'Cancelled'
-        ).length,
+        PENDING: res.data.orders[0].filter((item: any) => item.status === 'Pending').length,
+        PROCESSING: res.data.orders[0].filter((item: any) => item.status === 'In Progress').length,
+        OTHER: res.data.orders[0].filter((item: any) => item.status === 'Completed' || item.status === 'Cancelled')
+          .length
       })
     })
   }, [])
@@ -214,12 +179,8 @@ export default function Page() {
         <div>
           <Input
             placeholder='Filter emails...'
-            value={
-              (table.getColumn('orderCode')?.getFilterValue() as string) ?? ''
-            }
-            onChange={(event) =>
-              table.getColumn('email')?.setFilterValue(event.target.value)
-            }
+            value={(table.getColumn('orderCode')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
             className='max-w-sm'
           />
         </div>
@@ -256,12 +217,7 @@ export default function Page() {
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     )
                   })}
@@ -280,21 +236,13 @@ export default function Page() {
                     data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
+                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className='h-24 text-center'
-                  >
+                  <TableCell colSpan={columns.length} className='h-24 text-center'>
                     No results.
                   </TableCell>
                 </TableRow>
@@ -304,8 +252,8 @@ export default function Page() {
         </div>
         <div className='flex items-center justify-end space-x-2 py-4'>
           <div className='flex-1 text-sm text-muted-foreground'>
-            {table.getFilteredSelectedRowModel().rows.length} of{' '}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+            selected.
           </div>
           <div className='space-x-2'>
             <Button
@@ -316,12 +264,7 @@ export default function Page() {
             >
               Previous
             </Button>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
+            <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
               Next
             </Button>
           </div>

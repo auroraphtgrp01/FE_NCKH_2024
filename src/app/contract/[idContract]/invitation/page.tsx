@@ -19,17 +19,14 @@ export default function page() {
   useEffect(() => {
     console.log(userInfo?.data, idContract)
 
-    fetchAPI(
-      `/participants/find-one/${userInfo?.data?.email}/${idContract}`,
-      'GET'
-    )
+    fetchAPI(`/participants/find-one/${userInfo?.data?.email}/${idContract}`, 'GET')
       .then((res) => {
         if (res.data === null) {
           toast({
             title: 'Account not found',
             description: 'Please register to create an account',
             variant: 'destructive',
-            duration: 2000,
+            duration: 2000
           })
           Router.push('/register')
         }
@@ -40,7 +37,7 @@ export default function page() {
           title: 'Not logged in yet',
           description: err.response.data.message,
           variant: 'destructive',
-          duration: 2000,
+          duration: 2000
         })
         Router.push('/')
       })
@@ -48,13 +45,13 @@ export default function page() {
   async function handleJoinContract() {
     const participant = await fetchAPI('/participants', 'PATCH', {
       id: participantInfo?.id,
-      status: 'ACCEPTED',
+      status: 'ACCEPTED'
     })
       .then((res) => {
         setParticipantInfo(res.data)
         toast({
           title: 'Accept Invitation Success',
-          variant: 'default',
+          variant: 'default'
         })
         Router.push(`/contract/${idContract}`)
       })
@@ -62,7 +59,7 @@ export default function page() {
         toast({
           title: 'Accept Invitation Failed',
           description: err.response.data.message,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
   }
@@ -70,13 +67,13 @@ export default function page() {
   async function handleRefuseContract() {
     const participant = await fetchAPI('/participants', 'PATCH', {
       id: participantInfo?.id,
-      status: 'REFUSED',
+      status: 'REFUSED'
     })
       .then((res) => {
         setParticipantInfo(res.data)
         toast({
           title: 'Refuse Invitation Success',
-          variant: 'default',
+          variant: 'default'
         })
         Router.push(`/`)
       })
@@ -84,7 +81,7 @@ export default function page() {
         toast({
           title: 'Refuse Invitation Failed',
           description: err.response.data.message,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
   }
@@ -102,9 +99,7 @@ export default function page() {
         <Card x-chunk='dashboard-01-chunk-5' className=''>
           <CardHeader>
             <div className='flex justify-between'>
-              <CardTitle className='mt-2'>
-                Invitation Join The Contract
-              </CardTitle>
+              <CardTitle className='mt-2'>Invitation Join The Contract</CardTitle>
             </div>
             <Separator className='mb-2' />
           </CardHeader>
@@ -112,19 +107,14 @@ export default function page() {
             <Alert>
               <AlertTitle>Invitation</AlertTitle>
               <AlertDescription>
-                You have been invited to join the contract. Please click the
-                button below to join.
+                You have been invited to join the contract. Please click the button below to join.
               </AlertDescription>
             </Alert>
             <div className='flex'>
               <Button className='me-2 w-[50%]' onClick={handleJoinContract}>
                 Join
               </Button>
-              <Button
-                variant={'destructive'}
-                className='w-[50%]'
-                onClick={handleRefuseContract}
-              >
+              <Button variant={'destructive'} className='w-[50%]' onClick={handleRefuseContract}>
                 Refuse
               </Button>
             </div>

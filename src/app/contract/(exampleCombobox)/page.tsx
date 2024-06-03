@@ -11,16 +11,11 @@ export default function Contract() {
     {
       property: '',
       value: '',
-      isCreated: false,
-    },
+      isCreated: false
+    }
   ])
   const [newPropertiesArray, setNewProperties] = useState<string[]>([])
-  const [propertiesCBX, setPropertiesCBX] = useState<string[]>([
-    'city',
-    'date',
-    'titleContract',
-    'numberContract',
-  ])
+  const [propertiesCBX, setPropertiesCBX] = useState<string[]>(['city', 'date', 'titleContract', 'numberContract'])
   const [properties, setProperty] = useState<string>('')
   function handleChange(property: string, value: string) {
     setInputValue(value)
@@ -42,13 +37,13 @@ export default function Contract() {
         ...prevProperties[prevProperties.length - 1],
         isCreated: true,
         property: properties,
-        value: inputValue,
+        value: inputValue
       },
-      { property: '', value: '', isCreated: false },
+      { property: '', value: '', isCreated: false }
     ])
     const updatedContractAttribute = {
       ...contractAttribute,
-      [properties]: inputValue,
+      [properties]: inputValue
     }
     setContractAttribute(updatedContractAttribute)
     setInputValue('')
@@ -57,7 +52,7 @@ export default function Contract() {
   function handleInputChange(data: any, index: any) {
     setContractAttribute({
       ...contractAttribute,
-      [propertiesAdd[index].property]: data,
+      [propertiesAdd[index].property]: data
     })
   }
   const [inputValue, setInputValue] = useState('')

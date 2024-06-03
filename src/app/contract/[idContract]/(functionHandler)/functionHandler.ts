@@ -646,7 +646,11 @@ const handleCallFunctionOfBlockchain = async (
 
 const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
   try {
-    const res = await fetchAPI('/contracts', 'POST', (dataParams.templateId === '' ? (({ templateId, ...rest }) => rest)(dataParams) : dataParams))
+    const res = await fetchAPI(
+      '/contracts',
+      'POST',
+      dataParams.templateId === '' ? (({ templateId, ...rest }) => rest)(dataParams) : dataParams
+    )
     if (res.status === 201) {
       return {
         message: 'Create contract successfully',
@@ -693,6 +697,16 @@ const getDataToOpenDisputeContract = (
     invitation: invitations as InvitationItem[]
   }
 }
+
+const getIndividualFromParticipant = (participant: IContractParticipant[]) => {
+  const receiver = participant.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
+  const sender = participant.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
+
+  return {
+    receiver,
+    sender
+  }
+}
 export {
   updateStateButton,
   fetchDataWhenEntryPage,
@@ -708,5 +722,6 @@ export {
   signMessage,
   hashStringWithSHA512,
   handleCallFunctionOfBlockchain,
-  onCreateANewContract
+  onCreateANewContract,
+  getIndividualFromParticipant
 }

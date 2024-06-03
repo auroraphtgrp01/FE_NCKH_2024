@@ -21,21 +21,34 @@ import {
 } from '@/interface/contract.i'
 import { useToast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
+import { IContractParticipant } from '../interface/contract.i'
+import { getIndividualFromParticipant } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 
 export default function AddAttributeArea({
   contractAttribute,
   setContractAttribute,
-  index
+  index,
+  participant
 }: {
   contractAttribute: any
   setContractAttribute: any
   index?: number
+  participant: IContractParticipant[]
 }) {
   const contractAttributeTypeArr: { key: string; value: string }[] = Object.keys(EContractAttributeType).map((key) => ({
     key,
     value: EContractAttributeType[key as keyof typeof EContractAttributeType]
   }))
   const [contractAttributeTypeArray, setContractAttributeType] = useState<any[]>(contractAttributeTypeArr)
+  const [individual, setIndividual] = useState<{
+    receiver: IContractParticipant | undefined
+    sender: IContractParticipant | undefined
+  }>()
+  useEffect(() => {
+    console.log(participant)
+    console.log(getIndividualFromParticipant(participant))
+    setIndividual(getIndividualFromParticipant(participant))
+  }, [participant])
   useEffect(() => {
     if (index && index < 5) {
       const contractAttributeTypeArray: { key: string; value: string }[] = Object.keys(
@@ -194,8 +207,6 @@ export default function AddAttributeArea({
       </div>
       {(SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE ||
         SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
-        SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
-        SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
         SelectType === EContractAttributeType.TOTAL_AMOUNT) && (
         <div>
           <Textarea
@@ -204,6 +215,18 @@ export default function AddAttributeArea({
             }}
             className='mt-2 w-[100%]'
             value={textArea}
+          />
+        </div>
+      )}
+      {(SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+        SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND) && (
+        <div>
+          <Input
+            onChange={(e) => {
+              setTextArea(e.target.value)
+            }}
+            className='mt-2 w-[100%]'
+            value={'ddssd'}
           />
         </div>
       )}

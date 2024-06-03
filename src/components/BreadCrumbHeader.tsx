@@ -131,7 +131,7 @@ export default function BreadCrumbHeader() {
               {userInfo?.balance} ETH
             </Button>
             <Button variant={'outline'} type='button' className='ms-2'>
-              <Icons.user className='me-2 h-5 w-5' /> {userInfo?.data?.name}
+              <Icons.user className='me-2 h-5 w-5 font-semibold' /> {userInfo?.data?.name}
             </Button>
           </div>
         )}

@@ -62,7 +62,7 @@ export interface IContractParticipant {
   email: string
   status: string
   User: User
-  permission?: IPermission
+  permission: IPermission
   completedStages: IStageContract[]
 }
 
@@ -176,7 +176,7 @@ export interface IPermission {
   INVITE_PARTICIPANT: boolean
   CHANGE_STATUS_CONTRACT: boolean
   SET_OWNER_PARTY: boolean
-  ROLES?: ERolesOfParticipant
+  ROLES: ERolesOfParticipant
 }
 
 export enum ERolesOfParticipant {
@@ -286,6 +286,7 @@ export interface IContractCreateParams {
   invitation?: InvitationItem[]
   messagesForInvitation?: string
   type?: 'CONTRACT' | 'DISPUTE'
+  rolesOfCreator?: ERolesOfParticipant
 }
 
 export interface IResponseFunctionFetchData {

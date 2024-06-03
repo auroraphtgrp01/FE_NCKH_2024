@@ -483,6 +483,32 @@ export default function Dashboard() {
                     isVisibleButton={isVisibleButton}
                     payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
                   />
+                  <div>
+                    <Card>
+                      <CardContent className='text-sm'>
+                        <div className='mt-4 w-full'>
+                          <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
+                          <Separator className='mt-2' />
+                        </div>
+                        <ScrollArea className='h-[80px]'>
+                          <div className='mt-3 flex items-center'>
+                            <div className='grid'>
+                              <p className='text-sm font-medium leading-none'>Name</p>
+                              <p className='text-sm text-muted-foreground'>
+                                {'*'.repeat('0x1366441c4a37C946dCbEe7d8dda1D6Ab108A635d'.length - 30) +
+                                  '0x1366441c4a37C946dCbEe7d8dda1D6Ab108A635d'.slice(-5)}
+                              </p>
+                            </div>
+                            <div className='ml-auto font-medium'>
+                              <Badge variant={'default'} className='me-1 translate-y-[-5px]'>
+                                Sender User
+                              </Badge>
+                            </div>
+                          </div>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </CardContent>
             </Card>

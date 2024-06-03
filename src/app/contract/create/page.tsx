@@ -14,10 +14,12 @@ import { useRouter } from 'next/navigation'
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract'
 import InvitationArea from '@/components/InvitationArea'
-import { ContractTemplate, ITemplateContract, InvitationItem } from '@/interface/contract.i'
+import { ContractTemplate, ERolesOfParticipant, ITemplateContract, InvitationItem } from '@/interface/contract.i'
 import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import Image from 'next/image'
 import { Separator } from '@/components/ui/separator'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { rolesTypeParticipant } from '@/constants/initVariable.constants'
 
 export default function page() {
   const [template, setTemplate] = useState<ContractTemplate[]>([
@@ -34,6 +36,13 @@ export default function page() {
   const [templateSelect, setTemplateSelect] = useState<ITemplateContract>()
   const [messages, setMessages] = useState('')
   const [contractAttribute, setContractAttribute] = useState<any[]>([])
+  const [rolesOfCreator, setRolesOfCreator] = useState<ERolesOfParticipant>()
+  const [rolesType, setRolesType] = useState<
+    {
+      key: string
+      value: string
+    }[]
+  >(rolesTypeParticipant)
   const Router = useRouter()
   const { toast } = useToast()
   useEffect(() => {
@@ -79,7 +88,6 @@ export default function page() {
     if (current !== 0) {
       fetchAPI(`/template-contracts/${template[current]?.id}/attributes`, 'GET').then((res) => {
         if (res.status === 200) {
-          console.log(res.data)
           setContractAttribute(res.data.contractAttributes)
         }
       })
@@ -98,7 +106,8 @@ export default function page() {
       name: nameOfContractInput,
       templateId,
       invitation: invitation,
-      messagesForInvitation: messages
+      messagesForInvitation: messages,
+      rolesOfCreator
     }).then((res) => {
       res.contractId ? Router.push(`/contract/${res?.contractId}`) : null
       toast({
@@ -136,6 +145,28 @@ export default function page() {
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Name of Contract: </Label>
                 <Input defaultValue={nameOfContractInput} onChange={(e) => setNameOfContractInput(e.target.value)} />
+              </div>
+              <div className='mt-2 flex flex-col space-y-2'>
+                <Label>Roles of Creator: </Label>
+                <Select
+                  defaultValue='SENDER'
+                  onValueChange={(e) => {
+                    setRolesOfCreator(e as ERolesOfParticipant)
+                  }}
+                >
+                  <SelectTrigger className='mt-2 w-full'>
+                    <SelectValue placeholder={ERolesOfParticipant.PARTICIPANT} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {rolesType.map((item, index) => (
+                        <SelectItem value={item?.key} key={index}>
+                          {item.value}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Template Contract: </Label>

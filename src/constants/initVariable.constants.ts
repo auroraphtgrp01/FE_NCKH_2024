@@ -8,7 +8,7 @@ import {
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
-  cancelButton: true,
+  cancelButton: false,
   withdrawButton: true,
   transferButton: true,
   deployButton: true,

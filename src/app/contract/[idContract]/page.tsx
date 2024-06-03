@@ -130,10 +130,8 @@ export default function Dashboard() {
     ).then((response) => {
       updateStateButton(
         response?.contractData.contract.status,
-        response?.contractData.contractAttributes,
         setIsVisibleButton,
         setIsDisableButton,
-        individual,
         response?.contractData.participants,
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,

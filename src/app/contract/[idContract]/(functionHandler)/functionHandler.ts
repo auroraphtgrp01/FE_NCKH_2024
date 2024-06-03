@@ -31,20 +31,14 @@ import Web3 from 'web3'
 
 const updateStateButton = (
   status: EContractStatus,
-  contractAttributes: IContractAttribute[],
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>,
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>,
-  dataIndividual: IIndividual,
   contractParticipants: IContractParticipant[],
   userInfo: UserInfoData,
   currentBalance: number,
   stages: any[]
 ) => {
-  const addressMatch = (type: any) =>
-    (contractAttributes.find((item: any) => item.type === type)?.value || '').toLowerCase() ===
-    userInfo.data.addressWallet.toLowerCase()
-
-  // let isHave
+  const participantIsLogin = getParticipantInfoLogin(userInfo, contractParticipants)
   if (contractParticipants.length > 0) {
     const participantsLogin = contractParticipants?.find((participant: any) => {
       return participant.userId === userInfo.data.id
@@ -89,28 +83,25 @@ const updateStateButton = (
         break
       case 'SIGNED':
         const hasStageNotStarted = stages.filter((item: any) => item.status === EStageContractStatus.ENFORCE)
-        const receiver = contractParticipants.find(
-          (item: any) => item?.permission.ROLES === ERolesOfParticipant.RECEIVER
-        )
-        const hasStagePending =
-          receiver?.completedStages && receiver?.completedStages.length > 0
-            ? receiver.completedStages.filter((item: any) => item.status === EStageContractStatus.PENDING)
-            : undefined
         setIsVisibleButton((prev: any) => ({
           ...prev,
           signButton: false,
-          confirmButtonSender: userInfo.data.role === 'Customer',
-          confirmButtonReceiver: userInfo.data.role === 'Supplier',
-          transferButton: userInfo.data.role === 'Customer',
-          withdrawButton: userInfo.data.role === 'Supplier'
+          confirmButtonSender: participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
+          confirmButtonReceiver: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant),
+          transferButton: participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
+          withdrawButton: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
           transferButton: currentBalance !== 0,
           cancelButton: true,
           fetchCompareButton: false,
-          confirmButtonReceiver: userInfo.data.role === 'Supplier' && hasStageNotStarted ? false : true,
-          confirmButtonSender: userInfo.data.role === 'Customer' && hasStagePending !== undefined ? false : true,
+          confirmButtonReceiver:
+            participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant) && hasStageNotStarted
+              ? false
+              : true,
+          confirmButtonSender:
+            (participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)) !== undefined ? false : true,
           editContractButton: true,
           inviteButton: true
         }))
@@ -258,7 +249,7 @@ const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): 
     }
   } catch (error) {
     return {
-      message: 'Transfer monye to contract Failed !',
+      message: 'Transfer money to contract failed !',
       description: error?.toString(),
       status: 'destructive'
     }
@@ -711,12 +702,17 @@ const getDataToOpenDisputeContract = (
 const getIndividualFromParticipant = (participant: IContractParticipant[]) => {
   const receiver = participant.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
   const sender = participant.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
-
   return {
     receiver,
     sender
   }
 }
+
+const getParticipantInfoLogin = (userInfo: UserInfoData, participant: IContractParticipant[]) => {
+  const isMatch = getIndividualFromParticipant(participant)
+  return isMatch.receiver?.userId === userInfo.data.id ? isMatch.receiver : isMatch.sender
+}
+
 export {
   updateStateButton,
   fetchDataWhenEntryPage,
@@ -733,5 +729,6 @@ export {
   hashStringWithSHA512,
   handleCallFunctionOfBlockchain,
   onCreateANewContract,
-  getIndividualFromParticipant
+  getIndividualFromParticipant,
+  getParticipantInfoLogin
 }

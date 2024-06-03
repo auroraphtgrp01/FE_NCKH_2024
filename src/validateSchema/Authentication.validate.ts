@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from 'zod'
 
 export const RegisterBody = z
   .object({
@@ -11,9 +11,9 @@ export const RegisterBody = z
     dateOfBirth: z.optional(z.string()),
     role: z.string(),
   })
-  .strict();
+  .strict()
 
-export type RegisterBodyType = z.TypeOf<typeof RegisterBody>;
+export type RegisterBodyType = z.TypeOf<typeof RegisterBody>
 
 export const RegisterRes = z.object({
   data: z.object({
@@ -25,33 +25,33 @@ export const RegisterRes = z.object({
     }),
   }),
   message: z.string(),
-});
+})
 
-export type RegisterResType = z.TypeOf<typeof RegisterRes>;
+export type RegisterResType = z.TypeOf<typeof RegisterRes>
 
 export const LoginBody = z
   .object({
     email: z.string().email(),
     password: z.string().min(6).max(100),
   })
-  .strict();
+  .strict()
 
-export type LoginBodyType = z.TypeOf<typeof LoginBody>;
+export type LoginBodyType = z.TypeOf<typeof LoginBody>
 
-export const LoginRes = RegisterRes;
+export const LoginRes = RegisterRes
 
-export type LoginResType = z.TypeOf<typeof LoginRes>;
-export const RefreshSessionBody = z.object({}).strict();
+export type LoginResType = z.TypeOf<typeof LoginRes>
+export const RefreshSessionBody = z.object({}).strict()
 
-export type RefreshSessionBodyType = z.TypeOf<typeof RefreshSessionBody>;
-export const RefreshSessionRes = RegisterRes;
+export type RefreshSessionBodyType = z.TypeOf<typeof RefreshSessionBody>
+export const RefreshSessionRes = RegisterRes
 
-export type RefreshSessionResType = z.TypeOf<typeof RefreshSessionRes>;
+export type RefreshSessionResType = z.TypeOf<typeof RefreshSessionRes>
 
 export const PIN = z
   .object({
     PIN: z.string().min(6).max(6),
   })
-  .strict();
+  .strict()
 
-export type PINType = z.TypeOf<typeof PIN>;
+export type PINType = z.TypeOf<typeof PIN>

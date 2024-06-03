@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -9,17 +9,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import axios from 'axios';
-import { Input } from '@/components/ui/input';
-import React, { useEffect, useState } from 'react';
+} from '@/components/ui/form'
+import axios from 'axios'
+import { Input } from '@/components/ui/input'
+import React, { useEffect, useState } from 'react'
 import {
   GetContractBodyType,
   GetSmartContract,
-} from '@/validateSchema/GetContract.validate';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/validateSchema/GetContract.validate'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -27,120 +27,118 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
-import { useAppContext } from '@/components/ThemeProvider';
-import Web3 from 'web3';
-import { Icons } from '@/components/ui/icons';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { ethers } from 'ethers';
+} from '@/components/ui/select'
+import { useToast } from '@/components/ui/use-toast'
+import { useAppContext } from '@/components/ThemeProvider'
+import Web3 from 'web3'
+import { Icons } from '@/components/ui/icons'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { ethers } from 'ethers'
 
 export interface ContractData {
-  dataContract: any | undefined;
-  setDataContract: (data: any) => void;
+  dataContract: any | undefined
+  setDataContract: (data: any) => void
 }
 
 export default function GetContract({
   dataContract,
   setDataContract,
 }: ContractData) {
-  const { toast } = useToast();
-  const [contract, setContract] = useState({});
-  const [abi, setABI] = useState([]);
-  const [selectedValue, setSelectedValue] = useState('');
-  const [addressContract, setAddressContract] = useState('');
-  const [error, setError] = useState('');
+  const { toast } = useToast()
+  const [contract, setContract] = useState({})
+  const [abi, setABI] = useState([])
+  const [selectedValue, setSelectedValue] = useState('')
+  const [addressContract, setAddressContract] = useState('')
+  const [error, setError] = useState('')
 
   const handleChange = (event: any) => {
-    setSelectedValue(event.target.value);
-  };
+    setSelectedValue(event.target.value)
+  }
   const [payload, setPayload] = useState({
     abi: [],
     addressContract: '',
     addressWallet: '',
     methodCall: '',
-  });
-  const { wallet, setWallet }: any = useAppContext();
+  })
+  const { wallet, setWallet }: any = useAppContext()
   function onSubmit(values: z.infer<typeof GetSmartContract>) {
     if (abi.length == 0) {
       toast({
         title: 'Error get ABI',
         description: 'Please get ABI of Contract',
         variant: 'destructive',
-      });
+      })
     } else {
       const contractPayload: any = {
         ...values,
         abi,
-      };
-      setPayload(contractPayload);
+      }
+      setPayload(contractPayload)
       getContract().then((res) => {
-        setDataContract(res);
-      });
+        setDataContract(res)
+      })
       // goi api o day
     }
   }
   async function getContract(): Promise<any> {
-    const web3 = new Web3(window.ethereum);
+    const web3 = new Web3(window.ethereum)
     const contract = new web3.eth.Contract(
       payload.abi,
       '0x26b5e6146C96239700156d3f466CB0a3476cF61c'
-    );
+    )
     try {
-      const result: any = await contract.methods
-        .getContractInformation()
-        .call();
+      const result: any = await contract.methods.getContractInformation().call()
       // console.log(">>", JSON.parse(refactorTest(result)))
       // console.log(">>");
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error)
     }
   }
   function refactorTest(jsonData: any) {
-    const data = ethers.toUtf8String(jsonData[0]);
-    return data;
+    const data = ethers.toUtf8String(jsonData[0])
+    return data
   }
 
   async function fetchABI() {
-    const nameContract = selectedValue;
+    const nameContract = selectedValue
     if (false) {
       toast({
         title: 'Error get ABI',
         description: 'Please select type of contract to get ABI',
         variant: 'destructive',
-      });
+      })
     } else {
       fetchAPI('/smart-contracts/abi', 'GET')
         .then((res) => {
-          setABI(res.data.abi.abi);
+          setABI(res.data.abi.abi)
         })
         .catch((error) => {
           toast({
             title: 'Error get ABI',
             description: 'Error when get ABI - Please try again later',
             variant: 'destructive',
-          });
-        });
-      setError(error);
+          })
+        })
+      setError(error)
     }
   }
   function arrayObjectToJson(arr: any) {
     return arr.map((item: any) => {
-      return JSON.stringify(item);
-    });
+      return JSON.stringify(item)
+    })
   }
   function arrayToObject(arr: string[]): { [key: string]: string } {
-    const obj: { [key: string]: string } = {};
+    const obj: { [key: string]: string } = {}
     for (let i = 0; i < arr.length; i += 2) {
       if (i + 1 < arr.length) {
-        obj[arr[i]] = arr[i + 1];
+        obj[arr[i]] = arr[i + 1]
       }
     }
-    return obj;
+    return obj
   }
   const form = useForm<GetContractBodyType>({
     resolver: zodResolver(GetSmartContract),
-  });
+  })
 
   return (
     <Form {...form}>
@@ -242,5 +240,5 @@ export default function GetContract({
         </div>
       </form>
     </Form>
-  );
+  )
 }

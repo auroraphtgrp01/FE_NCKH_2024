@@ -1,9 +1,9 @@
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import { HomePageCard } from '@/components/HomepageCard';
-import { HowItWorks } from '@/components/HowItWork';
-import { TeamDev } from '@/components/TeamDev';
-import BreadCrumb from '@/components/breadcrumb';
-import { Button, buttonVariants } from '@/components/ui/button';
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import { HomePageCard } from '@/components/HomepageCard'
+import { HowItWorks } from '@/components/HowItWork'
+import { TeamDev } from '@/components/TeamDev'
+import BreadCrumb from '@/components/breadcrumb'
+import { Button, buttonVariants } from '@/components/ui/button'
 
 export default function Home() {
   return (
@@ -55,5 +55,5 @@ export default function Home() {
         <TeamDev />
       </main>
     </div>
-  );
+  )
 }

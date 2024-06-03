@@ -1,27 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/rules-of-hooks */
-'use client';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+'use client'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import React, { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel';
+} from '@/components/ui/carousel'
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
-import { Icons } from '@/components/ui/icons';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/dialog'
+import { Card, CardContent } from '@/components/ui/card'
+import { Icons } from '@/components/ui/icons'
+import { useToast } from '@/components/ui/use-toast'
 import {
   Table,
   TableBody,
@@ -31,16 +31,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { useParams } from 'next/navigation';
-import { fetchAPI } from '@/utils/fetchAPI';
-import Link from 'next/link';
+} from '@/components/ui/table'
+import { useParams } from 'next/navigation'
+import { fetchAPI } from '@/utils/fetchAPI'
+import Link from 'next/link'
 const image = [
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720TPB/cong-ty-cp-xi-mang-ha-tien-1-651515.jpg',
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720Ymu/cong-ty-co-phan-go-an-cuong-651470.jpg',
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720GWy/magis-stone-1176889.jpg',
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-];
+]
 
 const dataProduct = [
   {
@@ -83,37 +83,37 @@ const dataProduct = [
     description:
       'Gạch ngói đất sét nung Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc',
   },
-];
+]
 
 export default function page() {
-  const [isSelectImg, setIsSelectImg] = useState(0);
-  const [isDetail, setIsDetail] = useState(false);
-  const [cart, setCart] = useState<any>([]);
-  const [productDetail, setProductDetail] = useState<any>();
-  const [isOrderOpen, setIsOrderOpen] = useState(false);
-  const [dataSupplier, setDataSupplier] = useState<any>([]);
-  const [dataProduct, setDataProduct] = useState<any>([]);
-  const { toast } = useToast();
-  const { id } = useParams();
+  const [isSelectImg, setIsSelectImg] = useState(0)
+  const [isDetail, setIsDetail] = useState(false)
+  const [cart, setCart] = useState<any>([])
+  const [productDetail, setProductDetail] = useState<any>()
+  const [isOrderOpen, setIsOrderOpen] = useState(false)
+  const [dataSupplier, setDataSupplier] = useState<any>([])
+  const [dataProduct, setDataProduct] = useState<any>([])
+  const { toast } = useToast()
+  const { id } = useParams()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const supplierResponse = await fetchAPI(`/suppliers/${id}`, 'GET');
-        setDataSupplier(supplierResponse.data);
+        const supplierResponse = await fetchAPI(`/suppliers/${id}`, 'GET')
+        setDataSupplier(supplierResponse.data)
 
         const productResponse = await fetchAPI(
           `/products/find-all-by-supplier/${id}`,
           'GET'
-        );
-        setDataProduct(productResponse.data);
-        console.log(productResponse.data);
+        )
+        setDataProduct(productResponse.data)
+        console.log(productResponse.data)
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       }
-    };
-    fetchData();
-  }, [id]);
+    }
+    fetchData()
+  }, [id])
   function StarIcon(props: any) {
     return (
       <svg
@@ -130,21 +130,21 @@ export default function page() {
       >
         <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2' />
       </svg>
-    );
+    )
   }
   function openDetailProduct(index: number) {
-    setProductDetail(dataProduct[index]);
-    setIsDetail(true);
-    console.log(dataProduct[index]);
+    setProductDetail(dataProduct[index])
+    setIsDetail(true)
+    console.log(dataProduct[index])
   }
   function isAddToCart() {
-    setCart([...cart, productDetail]);
+    setCart([...cart, productDetail])
     toast({
       title: 'Add to cart',
       description: 'Add product to cart successfully',
       variant: 'success',
-    });
-    setIsDetail(false);
+    })
+    setIsDetail(false)
   }
 
   // addToCart
@@ -152,8 +152,8 @@ export default function page() {
     const payload = {
       supplierId: id,
       productId: productDetail.id,
-    };
-    console.log(payload);
+    }
+    console.log(payload)
 
     await fetchAPI('/orders', 'POST', payload)
       .then((res) => {
@@ -161,14 +161,14 @@ export default function page() {
           toast({
             title: `${res.data.message}`,
             variant: 'success',
-          });
-          setIsDetail(false);
-          console.log(res);
+          })
+          setIsDetail(false)
+          console.log(res)
         }
       })
       .catch((err) => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   }
   return (
     <div>
@@ -200,7 +200,7 @@ export default function page() {
                 <button
                   key={index}
                   onClick={() => {
-                    setIsSelectImg(index);
+                    setIsSelectImg(index)
                   }}
                   className='overflow-hidden rounded-lg border transition-colors hover:border-gray-900 dark:hover:border-gray-50'
                 >
@@ -276,7 +276,7 @@ export default function page() {
                 key={index}
                 className='md:basis-1/2 lg:basis-1/4'
                 onClick={(e) => {
-                  openDetailProduct(index);
+                  openDetailProduct(index)
                 }}
               >
                 <div className='p-1'>
@@ -343,8 +343,8 @@ export default function page() {
                 <Button
                   className='ml-12 mr-auto mt-5 w-[80%] items-center text-center'
                   onClick={(e) => {
-                    isAddToCart;
-                    addToCart();
+                    isAddToCart
+                    addToCart()
                   }}
                 >
                   Add to Order
@@ -399,5 +399,5 @@ export default function page() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

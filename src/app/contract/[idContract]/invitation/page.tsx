@@ -1,23 +1,23 @@
-'use client';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { useEffect, useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { useAppContext } from '@/components/ThemeProvider';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { toast, useToast } from '@/components/ui/use-toast';
-import { useParams, useRouter } from 'next/navigation';
+'use client'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { useAppContext } from '@/components/ThemeProvider'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { toast, useToast } from '@/components/ui/use-toast'
+import { useParams, useRouter } from 'next/navigation'
 
 export default function page() {
-  const { idContract } = useParams();
-  const Router = useRouter();
-  const { toast } = useToast();
-  const [participantInfo, setParticipantInfo] = useState<any>({});
-  const { userInfo, setUserInfo }: any = useAppContext();
+  const { idContract } = useParams()
+  const Router = useRouter()
+  const { toast } = useToast()
+  const [participantInfo, setParticipantInfo] = useState<any>({})
+  const { userInfo, setUserInfo }: any = useAppContext()
   useEffect(() => {
-    console.log(userInfo?.data, idContract);
+    console.log(userInfo?.data, idContract)
 
     fetchAPI(
       `/participants/find-one/${userInfo?.data?.email}/${idContract}`,
@@ -30,10 +30,10 @@ export default function page() {
             description: 'Please register to create an account',
             variant: 'destructive',
             duration: 2000,
-          });
-          Router.push('/register');
+          })
+          Router.push('/register')
         }
-        setParticipantInfo(res.data);
+        setParticipantInfo(res.data)
       })
       .catch((err) => {
         toast({
@@ -41,30 +41,30 @@ export default function page() {
           description: err.response.data.message,
           variant: 'destructive',
           duration: 2000,
-        });
-        Router.push('/');
-      });
-  }, []);
+        })
+        Router.push('/')
+      })
+  }, [])
   async function handleJoinContract() {
     const participant = await fetchAPI('/participants', 'PATCH', {
       id: participantInfo?.id,
       status: 'ACCEPTED',
     })
       .then((res) => {
-        setParticipantInfo(res.data);
+        setParticipantInfo(res.data)
         toast({
           title: 'Accept Invitation Success',
           variant: 'default',
-        });
-        Router.push(`/contract/${idContract}`);
+        })
+        Router.push(`/contract/${idContract}`)
       })
       .catch((err) => {
         toast({
           title: 'Accept Invitation Failed',
           description: err.response.data.message,
           variant: 'destructive',
-        });
-      });
+        })
+      })
   }
 
   async function handleRefuseContract() {
@@ -73,20 +73,20 @@ export default function page() {
       status: 'REFUSED',
     })
       .then((res) => {
-        setParticipantInfo(res.data);
+        setParticipantInfo(res.data)
         toast({
           title: 'Refuse Invitation Success',
           variant: 'default',
-        });
-        Router.push(`/`);
+        })
+        Router.push(`/`)
       })
       .catch((err) => {
         toast({
           title: 'Refuse Invitation Failed',
           description: err.response.data.message,
           variant: 'destructive',
-        });
-      });
+        })
+      })
   }
 
   return (
@@ -132,5 +132,5 @@ export default function page() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

@@ -1,21 +1,21 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+'use client'
+import React, { useEffect, useState } from 'react'
+import { useToast } from '@/components/ui/use-toast'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card } from '@/components/ui/card'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from '@/components/ui/breadcrumb'
 // import { columns } from "../columns";
-import { DataTable } from '../data-table';
+import { DataTable } from '../data-table'
 import {
   Table,
   TableBody,
@@ -24,9 +24,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -35,88 +35,88 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { useParams } from 'next/navigation';
+} from '@/components/ui/select'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { useParams } from 'next/navigation'
 //
-import { useAppContext } from '@/components/ThemeProvider';
-import { Router } from 'lucide-react';
+import { useAppContext } from '@/components/ThemeProvider'
+import { Router } from 'lucide-react'
 export type TData = {
-  id: string;
-  name: string;
-  unit: string;
-  image: string;
-  price: number;
-  discount: number;
-  quantity: number;
-  taxPrice: number;
-  description: string;
-  idSupplier: string;
-  idOrder: string; // Thuộc tính idOrder cần phải có
-};
+  id: string
+  name: string
+  unit: string
+  image: string
+  price: number
+  discount: number
+  quantity: number
+  taxPrice: number
+  description: string
+  idSupplier: string
+  idOrder: string // Thuộc tính idOrder cần phải có
+}
 
 export interface OrderDetail {
-  id: string;
-  name: string;
-  description?: string;
-  quantity?: number;
-  price: number;
-  image: string;
-  taxPrice?: number;
-  discount?: number;
-  taxExclude?: number;
-  unit: string;
-  idOrder: string;
-  idSupplier: string;
-  orderStatus: string;
+  id: string
+  name: string
+  description?: string
+  quantity?: number
+  price: number
+  image: string
+  taxPrice?: number
+  discount?: number
+  taxExclude?: number
+  unit: string
+  idOrder: string
+  idSupplier: string
+  orderStatus: string
 }
 
 export interface DataWithName {
-  status: string;
-  orderDetails: OrderDetail[];
+  status: string
+  orderDetails: OrderDetail[]
 }
 
 export interface UserInfo {
-  access_token: string;
-  addressWallet: string;
-  email: string;
-  id: string;
-  name: string;
-  refresh_token: string;
-  role: string;
+  access_token: string
+  addressWallet: string
+  email: string
+  id: string
+  name: string
+  refresh_token: string
+  role: string
 }
 export interface DataTableProps<TData extends DataWithName> {
-  data: TData;
-  getDataOrders: () => void;
-  setData: React.Dispatch<React.SetStateAction<TData>>;
+  data: TData
+  getDataOrders: () => void
+  setData: React.Dispatch<React.SetStateAction<TData>>
 }
 export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  idSupplier: number;
+  id: number
+  name: string
+  description: string
+  idSupplier: number
 }
 
 export default function Page() {
-  const { toast } = useToast();
-  const router = useRouter();
-  const { dataCreateContract, setDataCreateContract }: any = useAppContext();
+  const { toast } = useToast()
+  const router = useRouter()
+  const { dataCreateContract, setDataCreateContract }: any = useAppContext()
   const [data, setData] = useState<DataWithName>({
     status: '',
     orderDetails: [],
-  });
-  const { id } = useParams<{ id: string }>();
-  const [dataOrder, setDataOrder] = useState<any>({});
-  const [endDate, setEndate] = useState('');
-  const [delivery, setDelivery] = useState('');
+  })
+  const { id } = useParams<{ id: string }>()
+  const [dataOrder, setDataOrder] = useState<any>({})
+  const [endDate, setEndate] = useState('')
+  const [delivery, setDelivery] = useState('')
   const [isDisableButton, setIsDisableButton] = useState({
     isDisableButtonSendRq: false,
     isDisableButtonResendRq: false,
     isDisableButtonDeleteSurvey: false,
     isDisableButtonCreateContract: false,
     isDisableButtonRefuseSurvey: false,
-  });
-  const [isCustomer, setIsCustomer] = useState(false);
+  })
+  const [isCustomer, setIsCustomer] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo>({
     access_token: '',
     addressWallet: '',
@@ -125,17 +125,17 @@ export default function Page() {
     refresh_token: '',
     name: '',
     role: '',
-  });
+  })
   // xxxxxx
   useEffect(() => {
-    getDataOrders();
-    console.log(isDisableButton.isDisableButtonSendRq);
-    console.log(isDisableButton.isDisableButtonResendRq);
+    getDataOrders()
+    console.log(isDisableButton.isDisableButtonSendRq)
+    console.log(isDisableButton.isDisableButtonResendRq)
 
-    const info = JSON.parse(localStorage.getItem('user-info') as string);
-    setUserInfo(info);
-    if (info.data.role === 'Customer') setIsCustomer(true);
-  }, []);
+    const info = JSON.parse(localStorage.getItem('user-info') as string)
+    setUserInfo(info)
+    if (info.data.role === 'Customer') setIsCustomer(true)
+  }, [])
 
   async function sendRequestToSupplier() {
     await fetchAPI(`/orders/send-request/${dataOrder.id}`, 'GET')
@@ -143,20 +143,20 @@ export default function Page() {
         toast({
           title: res.data.message,
           variant: 'success',
-        });
+        })
 
         setIsDisableButton({
           ...isDisableButton,
           isDisableButtonSendRq: true,
-        });
-        getDataOrders();
+        })
+        getDataOrders()
       })
       .catch((err) =>
         toast({
           title: err.message,
           variant: 'destructive',
         })
-      );
+      )
   }
 
   async function resendSurveyToCustomer() {
@@ -165,20 +165,20 @@ export default function Page() {
         toast({
           title: res.data.message,
           variant: 'success',
-        });
+        })
 
         setIsDisableButton({
           ...isDisableButton,
           isDisableButtonResendRq: true,
-        });
-        getDataOrders();
+        })
+        getDataOrders()
       })
       .catch((err) =>
         toast({
           title: err.message,
           variant: 'destructive',
         })
-      );
+      )
   }
 
   async function createContract() {
@@ -186,56 +186,56 @@ export default function Page() {
       supplierId: dataOrder.order.suppliersId,
       userId: dataOrder.order.userId,
       orderId: dataOrder.order.id,
-    });
+    })
 
-    router.push('/contract/create');
+    router.push('/contract/create')
   }
 
   async function updateOrder(e: any, type: string) {
-    let payload = {};
-    const dateValue = new Date(e.target.value);
+    let payload = {}
+    const dateValue = new Date(e.target.value)
     if (!isNaN(dateValue.getTime())) {
-      const isoDate = dateValue.toISOString();
+      const isoDate = dateValue.toISOString()
       if (type === 'endDate') {
         payload = {
           id: id,
           endDate: isoDate,
-        };
+        }
       } else if (type === 'delivery') {
         payload = {
           id: id,
           executeDate: isoDate,
-        };
+        }
       }
       if (payload) {
         try {
           await fetchAPI('/orders', 'PATCH', payload).then((res) => {
-            getDataOrders();
+            getDataOrders()
             toast({
               title: `Update thành công`,
               variant: 'success',
-            });
-          });
+            })
+          })
         } catch (err) {
           toast({
             title: `Update không thành công`,
             variant: 'destructive',
-          });
+          })
         }
       }
     } else {
-      console.log('Chưa nhập xong');
+      console.log('Chưa nhập xong')
     }
   }
   function getDataOrders() {
     fetchAPI(`/orders/${id}`, 'GET')
       .then((res) => {
-        setDataOrder(res.data);
+        setDataOrder(res.data)
         if (res.data.order.endDate !== null)
-          setEndate(res.data.order.endDate.split('T')[0]);
+          setEndate(res.data.order.endDate.split('T')[0])
         if (res.data.order.executeDate !== null)
-          setDelivery(res.data.order.executeDate.split('T')[0]);
-        const { products, ...rest } = res.data.order;
+          setDelivery(res.data.order.executeDate.split('T')[0])
+        const { products, ...rest } = res.data.order
         setIsDisableButton({
           ...isDisableButton,
           isDisableButtonSendRq: res.data.order.status !== 'Pending',
@@ -245,7 +245,7 @@ export default function Page() {
           isDisableButtonCreateContract: res.data.order.status !== 'Completed',
           isDisableButtonRefuseSurvey: res.data.order.status !== 'In Progress',
           isDisableButtonDeleteSurvey: res.data.order.status !== 'Pending',
-        });
+        })
 
         const productOrder = res.data.order.products.map((product: any) => {
           return {
@@ -254,12 +254,12 @@ export default function Page() {
               product.price * product.quantity - product.discount,
             idSupplier: res.data.supplier.id,
             idOrder: id,
-          };
-        });
+          }
+        })
 
-        setData({ status: rest.status, orderDetails: productOrder });
+        setData({ status: rest.status, orderDetails: productOrder })
       })
-      .catch((error) => console.error('Lỗi khi lấy dữ liệu sản phẩm:', error));
+      .catch((error) => console.error('Lỗi khi lấy dữ liệu sản phẩm:', error))
   }
 
   return (
@@ -305,7 +305,7 @@ export default function Page() {
             placeholder='Tên, Email, hoặc Tham chiếu'
             defaultValue={endDate}
             onBlur={(e) => {
-              updateOrder(e, 'endDate');
+              updateOrder(e, 'endDate')
             }}
           ></Input>
         </div>
@@ -328,7 +328,7 @@ export default function Page() {
             placeholder='Tên, Email, hoặc Tham chiếu'
             defaultValue={delivery}
             onBlur={(e) => {
-              updateOrder(e, 'delivery');
+              updateOrder(e, 'delivery')
             }}
           ></Input>
         </div>
@@ -400,5 +400,5 @@ export default function Page() {
         )}
       </div>
     </div>
-  );
+  )
 }

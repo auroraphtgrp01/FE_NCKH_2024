@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -11,12 +11,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
   LoginBodyType,
   LoginBody,
-} from '@/validateSchema/Authentication.validate';
+} from '@/validateSchema/Authentication.validate'
 
 export default function LoginForm() {
   const form = useForm<LoginBodyType>({
@@ -25,15 +25,15 @@ export default function LoginForm() {
       email: '',
       password: '',
     },
-  });
+  })
   function onSubmit(values: z.infer<typeof LoginBody>) {
-    console.log(values);
+    console.log(values)
   }
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, (error) => {
-          console.log(error);
+          console.log(error)
         })}
         className='w-full max-w-[400px] flex-shrink-0 space-y-2'
       >
@@ -70,5 +70,5 @@ export default function LoginForm() {
         </div>
       </form>
     </Form>
-  );
+  )
 }

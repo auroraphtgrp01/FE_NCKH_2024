@@ -1,15 +1,15 @@
-'use client';
-import React from 'react';
-import { State } from '../state';
-import { FunctionHandle } from '../func';
+'use client'
+import React from 'react'
+import { State } from '../state'
+import { FunctionHandle } from '../func'
 
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useContractContext } from '@/context/ContractProvider';
-import { ContractState } from '@/app/contract/[idContract]/(component)/(store)/storeContractData';
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useContractContext } from '@/context/ContractProvider'
+import { ContractState } from '@/app/contract/[idContract]/(component)/(store)/storeContractData'
 
 export default function PreviewContracts() {
-  const { inputRefs, previewRefs } = State();
-  const { contractAttribute, setContractAttribute } = ContractState();
+  const { inputRefs, previewRefs } = State()
+  const { contractAttribute, setContractAttribute } = ContractState()
   const {
     formatDate,
     getDate,
@@ -17,7 +17,7 @@ export default function PreviewContracts() {
     extractDatePart,
     renderContent,
     handleInputChangePosition,
-  } = FunctionHandle();
+  } = FunctionHandle()
   return (
     <div>
       <ScrollArea className='h-[772px] w-[100%] rounded-md border'>
@@ -250,5 +250,5 @@ export default function PreviewContracts() {
         </form>
       </ScrollArea>
     </div>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import Link from 'next/link';
+import React from 'react'
+import Link from 'next/link'
 
 import {
   Breadcrumb,
@@ -8,8 +8,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from '@/components/ui/breadcrumb'
 
 export default function BreadCrumb() {
-  return <div></div>;
+  return <div></div>
 }

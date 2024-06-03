@@ -9,5 +9,5 @@ export const Footer = () => {
         </h3>
       </section>
     </footer>
-  );
-};
+  )
+}

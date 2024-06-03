@@ -1,5 +1,5 @@
-import RegisterForm from '@/app/(Auth)/register/registerForm';
-import React from 'react';
+import RegisterForm from '@/app/(Auth)/register/registerForm'
+import React from 'react'
 
 export default function page() {
   return (
@@ -9,5 +9,5 @@ export default function page() {
         <RegisterForm />
       </div>
     </div>
-  );
+  )
 }

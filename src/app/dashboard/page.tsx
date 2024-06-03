@@ -1,5 +1,5 @@
-'use client';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+'use client'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -16,34 +16,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 
-import Web3 from 'web3';
+import Web3 from 'web3'
 import GetContract, {
   ContractData,
-} from '@/app/dashboard/components/GetContract';
-import { log } from 'console';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/app/dashboard/components/GetContract'
+import { log } from 'console'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 export default function Dashboard() {
   // const [dataContract, setDataContract] = useState(null)
-  const [dataContract, setDataContract] = useState([]);
-  const [balance, setBalance] = React.useState('');
-  useEffect(() => {}, []);
+  const [dataContract, setDataContract] = useState([])
+  const [balance, setBalance] = React.useState('')
+  useEffect(() => {}, [])
 
   function handleDataChange(data: any) {
-    setDataContract(objectToKeyValueArray(data));
-    console.log(dataContract);
+    setDataContract(objectToKeyValueArray(data))
+    console.log(dataContract)
   }
 
   function objectToKeyValueArray(data: any): any {
     if (!data || typeof data !== 'object' || data === null) {
-      return [];
+      return []
     }
     const modifiedKeys = Object.keys(data).map((key) => {
-      return key;
-    });
-    return modifiedKeys.map((key) => ({ [key]: data[key] }));
+      return key
+    })
+    return modifiedKeys.map((key) => ({ [key]: data[key] }))
   }
 
   return (
@@ -101,5 +101,5 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

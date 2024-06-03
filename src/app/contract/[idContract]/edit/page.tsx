@@ -1,34 +1,34 @@
-'use client';
-import React, { use, useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useParams, useRouter } from 'next/navigation';
-import PreviewContract from '../(component)/PreviewContract';
+'use client'
+import React, { use, useEffect, useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useParams, useRouter } from 'next/navigation'
+import PreviewContract from '../(component)/PreviewContract'
 import {
   EContractAttributeType,
   EStatusAttribute,
   IContractAttribute,
   IDefinitionContractAttribute,
-} from '@/interface/contract.i';
-import { InputWithTooltip } from '@/components/InputWithTooltip';
-import AddAttributeArea from '../../../../components/AddAttributeArea';
-import { v4 as uuidv4 } from 'uuid';
-import DialogInfoAttribute from '../../../../components/DialogInfoAttribute';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { useToast } from '@/components/ui/use-toast';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import { Button } from '@/components/ui/button';
+} from '@/interface/contract.i'
+import { InputWithTooltip } from '@/components/InputWithTooltip'
+import AddAttributeArea from '../../../../components/AddAttributeArea'
+import { v4 as uuidv4 } from 'uuid'
+import DialogInfoAttribute from '../../../../components/DialogInfoAttribute'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { useToast } from '@/components/ui/use-toast'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import { Button } from '@/components/ui/button'
 
 export default function DialogEditContract() {
-  const [contractAttribute, setContractAttribute] = useState<any[]>([]);
-  const [contractAttributeRaw, setContractAttributeRaw] = useState<any[]>([]);
-  const { idContract } = useParams();
-  const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false);
-  const [infoOfContractAttribute, setInfoOfContractAttribute] = useState();
-  const [deleteArray, setDeleteArray] = useState<any[]>([]);
-  const { toast } = useToast();
-  const Router = useRouter();
+  const [contractAttribute, setContractAttribute] = useState<any[]>([])
+  const [contractAttributeRaw, setContractAttributeRaw] = useState<any[]>([])
+  const { idContract } = useParams()
+  const [isDetailAttributeDialog, setIsDetailAttributeDialog] = useState(false)
+  const [infoOfContractAttribute, setInfoOfContractAttribute] = useState()
+  const [deleteArray, setDeleteArray] = useState<any[]>([])
+  const { toast } = useToast()
+  const Router = useRouter()
   const getData = React.useCallback(
     async (idContract: string) => {
       return await fetchAPI(
@@ -36,29 +36,29 @@ export default function DialogEditContract() {
         'GET'
       )
         .then((response) => {
-          setContractAttribute(response.data.contractAttributes);
-          setContractAttributeRaw(response.data.contractAttributes);
+          setContractAttribute(response.data.contractAttributes)
+          setContractAttributeRaw(response.data.contractAttributes)
         })
-        .catch((error) => {});
+        .catch((error) => {})
     },
     [setContractAttribute, setContractAttributeRaw]
-  );
+  )
 
   React.useLayoutEffect(() => {
     if (idContract) {
-      getData(idContract as string);
+      getData(idContract as string)
     }
-  }, [idContract, getData]);
+  }, [idContract, getData])
   useEffect(() => {
-    console.log(contractAttribute);
-  }, [contractAttribute]);
+    console.log(contractAttribute)
+  }, [contractAttribute])
 
   const handleChangeAttributeInput = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
   ) => {
-    const updatedAttributes = [...contractAttribute];
-    const attributeToUpdate = updatedAttributes[index];
+    const updatedAttributes = [...contractAttribute]
+    const attributeToUpdate = updatedAttributes[index]
 
     if (
       attributeToUpdate.type === EContractAttributeType.CONTRACT_ATTRIBUTE ||
@@ -73,79 +73,79 @@ export default function DialogEditContract() {
       updatedAttributes[index] = {
         ...attributeToUpdate,
         property: e.target.value,
-      };
+      }
     } else {
       updatedAttributes[index] = {
         ...attributeToUpdate,
         value: e.target.value,
-      };
+      }
     }
-    setContractAttribute(updatedAttributes);
-  };
+    setContractAttribute(updatedAttributes)
+  }
   const handleValueOfTextarea = (
     e: React.ChangeEvent<HTMLTextAreaElement>,
     index: number
   ) => {
-    const updatedAttributes = [...contractAttribute];
-    const attributeToUpdate = updatedAttributes[index];
+    const updatedAttributes = [...contractAttribute]
+    const attributeToUpdate = updatedAttributes[index]
     updatedAttributes[index] = {
       ...attributeToUpdate,
       value: e.target.value,
-    };
-    setContractAttribute(updatedAttributes);
-  };
+    }
+    setContractAttribute(updatedAttributes)
+  }
   function compareChangesOfContractAttribute() {
-    const updatedAttributes = [...contractAttribute];
+    const updatedAttributes = [...contractAttribute]
 
     let payload = updatedAttributes.map((item, index) => {
       const updatedItem = {
         ...item,
         index,
-      };
-      const rawItem = contractAttributeRaw[index];
+      }
+      const rawItem = contractAttributeRaw[index]
       if (item.statusAttribute === EStatusAttribute.CREATE) {
-        return updatedItem;
+        return updatedItem
       }
       if (item.type === EContractAttributeType.CONTRACT_ATTRIBUTE) {
         if (
           item?.value !== rawItem?.value ||
           item.property !== rawItem.property
         ) {
-          updatedItem.statusAttribute = EStatusAttribute.UPDATE;
+          updatedItem.statusAttribute = EStatusAttribute.UPDATE
         }
       } else {
         if (item?.value !== rawItem?.value) {
-          updatedItem.statusAttribute = EStatusAttribute.UPDATE;
+          updatedItem.statusAttribute = EStatusAttribute.UPDATE
         }
       }
-      return updatedItem;
-    });
+      return updatedItem
+    })
     fetchAPI('/contracts/attribute', 'PATCH', {
       id: idContract,
       updatedAttributes: payload,
       deleteArray,
     })
       .then((response) => {
-        payload = [];
-        setDeleteArray([]);
-        Router.push(`/contract/${idContract}`);
+        payload = []
+        setDeleteArray([])
+        Router.push(`/contract/${idContract}`)
         toast({
           title: 'Update Successfully',
           description: 'Your changes have been saved successfully',
           variant: 'default',
-        });
+        })
       })
       .catch((error) => {
         toast({
           title: 'Update Failed',
           description: 'Your changes have not been saved successfully',
           variant: 'destructive',
-        });
-      });
+        })
+      })
   }
   const handleOnClickSaveChanges = () => {
-    compareChangesOfContractAttribute();
-  };
+    compareChangesOfContractAttribute()
+  }
   return (
     <div className='h-[100%]'>
       <div className='flex h-[100%] w-full flex-col'>
@@ -187,7 +187,7 @@ export default function DialogEditContract() {
                                   contractAttribute={contractAttribute}
                                   index={index}
                                   onBlur={(e) => {
-                                    handleChangeAttributeInput(e, index);
+                                    handleChangeAttributeInput(e, index)
                                   }}
                                   description=''
                                   alignCenter={true}
@@ -210,7 +210,7 @@ export default function DialogEditContract() {
                                   contractAttribute={contractAttribute}
                                   index={index}
                                   onBlur={(e) => {
-                                    handleChangeAttributeInput(e, index);
+                                    handleChangeAttributeInput(e, index)
                                   }}
                                   description=''
                                   alignCenter={true}
@@ -227,7 +227,7 @@ export default function DialogEditContract() {
                                     className='ml-auto mr-auto w-[50%] text-center'
                                     defaultValue={item.value}
                                     onBlur={(e) => {
-                                      handleChangeAttributeInput(e, index);
+                                      handleChangeAttributeInput(e, index)
                                     }}
                                   />
                                 </h1>
@@ -241,7 +241,7 @@ export default function DialogEditContract() {
                                     className='ml-auto mr-auto w-[50%] text-center'
                                     defaultValue={item.value}
                                     onBlur={(e) => {
-                                      handleChangeAttributeInput(e, index);
+                                      handleChangeAttributeInput(e, index)
                                     }}
                                   />
                                 </h2>
@@ -276,7 +276,7 @@ export default function DialogEditContract() {
                                     defaultValue={item.value}
                                     description={''}
                                     onBlur={(e) => {
-                                      handleChangeAttributeInput(e, index);
+                                      handleChangeAttributeInput(e, index)
                                     }}
                                   />
                                 </h1>
@@ -299,7 +299,7 @@ export default function DialogEditContract() {
                                     defaultValue={item.value}
                                     description={''}
                                     onBlur={(e) => {
-                                      handleChangeAttributeInput(e, index);
+                                      handleChangeAttributeInput(e, index)
                                     }}
                                   />
                                 </h1>
@@ -335,14 +335,14 @@ export default function DialogEditContract() {
                                       defaultValue={item.property}
                                       description={''}
                                       onBlur={(e) => {
-                                        handleChangeAttributeInput(e, index);
+                                        handleChangeAttributeInput(e, index)
                                       }}
                                     />
                                   </b>
                                   <span className='ms-2 w-[80%] text-wrap'>
                                     <Textarea
                                       onBlur={(e) => {
-                                        handleValueOfTextarea(e, index);
+                                        handleValueOfTextarea(e, index)
                                       }}
                                       className='mr-auto'
                                       defaultValue={item.value}
@@ -388,5 +388,5 @@ export default function DialogEditContract() {
         infoOfAttribute={infoOfContractAttribute}
       />
     </div>
-  );
+  )
 }

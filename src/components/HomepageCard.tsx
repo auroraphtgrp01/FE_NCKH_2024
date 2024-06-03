@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Badge } from '@/components/Badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Badge } from '@/components/Badge'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -8,10 +8,10 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from '@/components/ui/card';
-import { Check, Linkedin, Facebook, Instagram } from 'lucide-react';
-import { LightBulbIcon } from '@/components/HomepageIcon';
-import { GitHubLogoIcon } from '@radix-ui/react-icons';
+} from '@/components/ui/card'
+import { Check, Linkedin, Facebook, Instagram } from 'lucide-react'
+import { LightBulbIcon } from '@/components/HomepageIcon'
+import { GitHubLogoIcon } from '@radix-ui/react-icons'
 
 export const HomePageCard = () => {
   return (
@@ -142,5 +142,5 @@ export const HomePageCard = () => {
         </CardHeader>
       </Card>
     </div>
-  );
-};
+  )
+}

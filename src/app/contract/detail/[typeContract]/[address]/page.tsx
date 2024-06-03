@@ -1,5 +1,5 @@
-'use client';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+'use client'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -16,24 +16,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 
-import Web3 from 'web3';
-import GetContract from '@/app/contract/detail/[typeContract]/[address]/components/GetContract';
+import Web3 from 'web3'
+import GetContract from '@/app/contract/detail/[typeContract]/[address]/components/GetContract'
 export default function Dashboard() {
-  const [data, setData] = useState({});
+  const [data, setData] = useState({})
   const getData = (dataFromChild: any) => {
-    setData(dataFromChild);
-  };
-  const [balance, setBalance] = React.useState('');
+    setData(dataFromChild)
+  }
+  const [balance, setBalance] = React.useState('')
   useEffect(() => {
-    const web3 = new Web3(window.ethereum);
+    const web3 = new Web3(window.ethereum)
     web3.eth
       .getBalance(localStorage.getItem('address-wallet') as string)
       .then((bal) => {
-        setBalance(web3.utils.fromWei(bal, 'ether'));
-      });
-  }, []);
+        setBalance(web3.utils.fromWei(bal, 'ether'))
+      })
+  }, [])
   return (
     <div className='mt-6 flex'>
       <div className='me-3'>
@@ -84,5 +84,5 @@ export default function Dashboard() {
                 </Card>
             </div> */}
     </div>
-  );
+  )
 }

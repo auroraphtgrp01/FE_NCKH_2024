@@ -1,21 +1,21 @@
-import { use, useEffect, useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog';
-import { Switch } from '@/components/ui/switch';
+import { use, useEffect, useState } from 'react'
+import { Label } from '@/components/ui/label'
+import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
+import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
 import {
   Accordion,
   AccordionItem,
   AccordionContent,
-} from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { ERolesOfParticipant, IPermission } from '@/interface/contract.i';
+} from '@/components/ui/accordion'
+import { Button } from '@/components/ui/button'
+import { ERolesOfParticipant, IPermission } from '@/interface/contract.i'
 import {
   Select,
   SelectContent,
@@ -24,12 +24,12 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/select'
 import {
   initPermission,
   rolesTypeParticipant,
-} from '@/constants/initVariable.constants';
-import { Separator } from '@/components/ui/separator';
+} from '@/constants/initVariable.constants'
+import { Separator } from '@/components/ui/separator'
 
 export default function GrantPermission({
   isOpen,
@@ -37,33 +37,33 @@ export default function GrantPermission({
   permission,
   callback,
 }: {
-  isOpen: boolean;
-  setOpen: any;
-  permission: IPermission;
-  callback: (permission: IPermission) => void;
+  isOpen: boolean
+  setOpen: any
+  permission: IPermission
+  callback: (permission: IPermission) => void
 }) {
   const [permissionClone, setPermissionClone] =
-    useState<IPermission>(permission);
+    useState<IPermission>(permission)
   const [rolesType, setRolesType] = useState<
     {
-      key: string;
-      value: string;
+      key: string
+      value: string
     }[]
-  >(rolesTypeParticipant);
+  >(rolesTypeParticipant)
   const onCheckedChange = (e: boolean | string, property: any) => {
-    setPermissionClone({ ...permissionClone, [property]: e });
-  };
+    setPermissionClone({ ...permissionClone, [property]: e })
+  }
   const updatePer = () => {
-    callback(permissionClone);
-    setPermissionClone(initPermission);
-    setOpen(false);
-  };
+    callback(permissionClone)
+    setPermissionClone(initPermission)
+    setOpen(false)
+  }
   useEffect(() => {
-    setPermissionClone(permission);
-  }, [isOpen]);
+    setPermissionClone(permission)
+  }, [isOpen])
   useEffect(() => {
-    console.log(permissionClone);
-  }, [permissionClone]);
+    console.log(permissionClone)
+  }, [permissionClone])
   return (
     <div>
       <Dialog open={isOpen} onOpenChange={setOpen}>
@@ -86,7 +86,7 @@ export default function GrantPermission({
                             <Label className='mb-2 mt-2'>Set Roles</Label>
                             <Select
                               onValueChange={(e) => {
-                                onCheckedChange(e, 'ROLES');
+                                onCheckedChange(e, 'ROLES')
                               }}
                             >
                               <SelectTrigger className='mt-2 w-full'>
@@ -113,7 +113,7 @@ export default function GrantPermission({
                               <Switch
                                 defaultChecked={permissionClone?.READ_CONTRACT}
                                 onCheckedChange={(e) => {
-                                  onCheckedChange(e, 'READ_CONTRACT');
+                                  onCheckedChange(e, 'READ_CONTRACT')
                                 }}
                               />
                               <Label htmlFor='readContractSwitch'>
@@ -126,7 +126,7 @@ export default function GrantPermission({
                               <Switch
                                 defaultChecked={permissionClone?.EDIT_CONTRACT}
                                 onCheckedChange={(e) => {
-                                  onCheckedChange(e, 'EDIT_CONTRACT');
+                                  onCheckedChange(e, 'EDIT_CONTRACT')
                                 }}
                               />
                               <Label htmlFor='editPartyInfoSwitch'>
@@ -144,7 +144,7 @@ export default function GrantPermission({
                                   permissionClone?.INVITE_PARTICIPANT
                                 }
                                 onCheckedChange={(e) => {
-                                  onCheckedChange(e, 'INVITE_PARTICIPANT');
+                                  onCheckedChange(e, 'INVITE_PARTICIPANT')
                                 }}
                               />
                               <Label htmlFor='chatWithPartySwitch'>
@@ -159,7 +159,7 @@ export default function GrantPermission({
                                   permissionClone?.CHANGE_STATUS_CONTRACT
                                 }
                                 onCheckedChange={(e) => {
-                                  onCheckedChange(e, 'CHANGE_STATUS_CONTRACT');
+                                  onCheckedChange(e, 'CHANGE_STATUS_CONTRACT')
                                 }}
                               />
                               <Label htmlFor='editTermsSwitch'>
@@ -174,7 +174,7 @@ export default function GrantPermission({
                                   permissionClone?.SET_OWNER_PARTY
                                 }
                                 onCheckedChange={(e) => {
-                                  onCheckedChange(e, 'SET_OWNER_PARTY');
+                                  onCheckedChange(e, 'SET_OWNER_PARTY')
                                 }}
                               />
                               <Label htmlFor='editTermsSwitch'>
@@ -192,7 +192,7 @@ export default function GrantPermission({
                     className='ml-auto mt-4'
                     variant={'destructive'}
                     onClick={(e) => {
-                      setOpen(false);
+                      setOpen(false)
                     }}
                   >
                     Cancel
@@ -207,5 +207,5 @@ export default function GrantPermission({
         </DialogPortal>
       </Dialog>
     </div>
-  );
+  )
 }

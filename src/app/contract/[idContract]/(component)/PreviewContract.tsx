@@ -1,17 +1,17 @@
-'use client';
-import React from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+'use client'
+import React from 'react'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   EContractAttributeType,
   IContractAttribute,
-} from '@/interface/contract.i';
+} from '@/interface/contract.i'
 
 export default function PreviewContract({
   contractAttribute,
   setContractAttribute,
 }: {
-  contractAttribute: IContractAttribute[];
-  setContractAttribute: (item: any) => void;
+  contractAttribute: IContractAttribute[]
+  setContractAttribute: (item: any) => void
 }) {
   return (
     <div className='h-[100%]'>
@@ -85,5 +85,5 @@ export default function PreviewContract({
         </form>
       </ScrollArea>
     </div>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-'use strict';
-exports.__esModule = true;
-var card_1 = require('@/components/ui/card');
+'use strict'
+exports.__esModule = true
+var card_1 = require('@/components/ui/card')
 function Home() {
   return React.createElement(
     'main',
@@ -29,6 +29,6 @@ function Home() {
         )
       )
     )
-  );
+  )
 }
-exports['default'] = Home;
+exports['default'] = Home

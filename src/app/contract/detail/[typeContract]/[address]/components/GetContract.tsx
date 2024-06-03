@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -9,17 +9,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import axios from 'axios';
-import { Input } from '@/components/ui/input';
-import React, { useEffect, useState } from 'react';
+} from '@/components/ui/form'
+import axios from 'axios'
+import { Input } from '@/components/ui/input'
+import React, { useEffect, useState } from 'react'
 import {
   GetContractBodyType,
   GetSmartContract,
-} from '@/validateSchema/GetContract.validate';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/validateSchema/GetContract.validate'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -27,72 +27,72 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ToastAction } from '@/components/ui/toast';
-import { useToast } from '@/components/ui/use-toast';
-import { useAppContext } from '@/components/ThemeProvider';
+} from '@/components/ui/select'
+import { ToastAction } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/use-toast'
+import { useAppContext } from '@/components/ThemeProvider'
 
 export default function GetContract() {
-  const { toast } = useToast();
-  const [contract, setContract] = useState({});
-  const [abi, setABI] = useState([]);
-  const [selectedValue, setSelectedValue] = useState('');
-  const [error, setError] = useState('');
+  const { toast } = useToast()
+  const [contract, setContract] = useState({})
+  const [abi, setABI] = useState([])
+  const [selectedValue, setSelectedValue] = useState('')
+  const [error, setError] = useState('')
   const handleChange = (event: any) => {
-    setSelectedValue(event.target.value);
-  };
-  const { wallet, setWallet }: any = useAppContext();
+    setSelectedValue(event.target.value)
+  }
+  const { wallet, setWallet }: any = useAppContext()
   function onSubmit(values: z.infer<typeof GetSmartContract>) {
     if (abi.length == 0) {
       toast({
         title: 'Error get ABI',
         description: 'Please get ABI of Contract',
         variant: 'destructive',
-      });
+      })
     } else {
       const contractPayload = {
         ...values,
         abi,
-      };
+      }
       // goi api o day
     }
   }
   const form = useForm<GetContractBodyType>({
     resolver: zodResolver(GetSmartContract),
-  });
+  })
   async function fetchABI() {
-    const nameContract = selectedValue;
+    const nameContract = selectedValue
     if (nameContract === '') {
       toast({
         title: 'Error get ABI',
         description: 'Please select type of contract to get ABI',
         variant: 'destructive',
-      });
+      })
     } else {
       axios
         .get(
           `http://localhost:3000/smart-contracts/abi?contractName=${nameContract}`
         )
         .then((res) => {
-          setABI(res.data.abi);
+          setABI(res.data.abi)
         })
         .catch((error) => {
           toast({
             title: 'Error get ABI',
             description: 'Error when get ABI - Please try again later',
             variant: 'destructive',
-          });
-        });
-      setError(error);
+          })
+        })
+      setError(error)
     }
   }
   function arrayObjectToJson(arr: any) {
     return arr.map((item: any) => {
-      return JSON.stringify(item);
-    });
+      return JSON.stringify(item)
+    })
   }
-  useEffect(() => {}, []);
-  useEffect(() => {}, [abi]);
+  useEffect(() => {}, [])
+  useEffect(() => {}, [abi])
   return (
     <Form {...form}>
       <form
@@ -187,5 +187,5 @@ export default function GetContract() {
         </div>
       </form>
     </Form>
-  );
+  )
 }

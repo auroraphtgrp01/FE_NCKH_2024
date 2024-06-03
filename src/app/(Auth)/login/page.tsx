@@ -1,5 +1,5 @@
-import LoginForm from '@/app/(Auth)/login/loginForm';
-import React from 'react';
+import LoginForm from '@/app/(Auth)/login/loginForm'
+import React from 'react'
 
 export default function page() {
   return (
@@ -9,5 +9,5 @@ export default function page() {
         <LoginForm />
       </div>
     </div>
-  );
+  )
 }

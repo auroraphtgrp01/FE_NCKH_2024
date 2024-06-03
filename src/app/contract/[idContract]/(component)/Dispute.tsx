@@ -1,4 +1,4 @@
-import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler';
+import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,8 +8,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -17,16 +17,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/table'
+import { useToast } from '@/components/ui/use-toast'
 import {
   EStageStatus,
   IOpenDisputedComponentProps,
   IStagesContract,
-} from '@/interface/contract.i';
-import { getDateNow } from '@/utils/dayjs';
-import { AlertDialogCancel } from '@radix-ui/react-alert-dialog';
-import React from 'react';
+} from '@/interface/contract.i'
+import { getDateNow } from '@/utils/dayjs'
+import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
+import React from 'react'
 
 const stages: IStagesContract[] = [
   {
@@ -61,23 +61,23 @@ const stages: IStagesContract[] = [
     status: EStageStatus.APPROVED,
     dueDate: getDateNow(),
   },
-];
+]
 
 export default function Dispute({
   isDisableButton,
   isVisibleButton,
   payload,
 }: IOpenDisputedComponentProps) {
-  const { toast } = useToast();
+  const { toast } = useToast()
   const handleOpenDisputeContract = () => {
     onCreateANewContract(payload).then((res) => {
       toast({
         title: res.message,
         description: res.description,
         variant: res.status,
-      });
-    });
-  };
+      })
+    })
+  }
   return (
     <div>
       <AlertDialog>
@@ -139,5 +139,5 @@ export default function Dispute({
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
+  )
 }

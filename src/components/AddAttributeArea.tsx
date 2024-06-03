@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import React, { use, useEffect, useState } from 'react';
-import { InputWithTooltip } from '@/components/InputWithTooltip';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button'
+import React, { use, useEffect, useState } from 'react'
+import { InputWithTooltip } from '@/components/InputWithTooltip'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -10,7 +10,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/select'
 
 import {
   EContractAttributeType,
@@ -18,27 +18,27 @@ import {
   EContractAttributeTypeAdditionalHeader,
   EStatusAttribute,
   IContractAttribute,
-} from '@/interface/contract.i';
-import { useToast } from '@/components/ui/use-toast';
-import { Input } from '@/components/ui/input';
+} from '@/interface/contract.i'
+import { useToast } from '@/components/ui/use-toast'
+import { Input } from '@/components/ui/input'
 
 export default function AddAttributeArea({
   contractAttribute,
   setContractAttribute,
   index,
 }: {
-  contractAttribute: any;
-  setContractAttribute: any;
-  index?: number;
+  contractAttribute: any
+  setContractAttribute: any
+  index?: number
 }) {
   const contractAttributeTypeArr: { key: string; value: string }[] =
     Object.keys(EContractAttributeType).map((key) => ({
       key,
       value: EContractAttributeType[key as keyof typeof EContractAttributeType],
-    }));
+    }))
   const [contractAttributeTypeArray, setContractAttributeType] = useState<
     any[]
-  >(contractAttributeTypeArr);
+  >(contractAttributeTypeArr)
   useEffect(() => {
     if (index && index < 5) {
       const contractAttributeTypeArray: { key: string; value: string }[] =
@@ -48,8 +48,8 @@ export default function AddAttributeArea({
             EContractAttributeTypeAdditionalHeader[
               key as keyof typeof EContractAttributeTypeAdditionalHeader
             ],
-        }));
-      setContractAttributeType(contractAttributeTypeArray);
+        }))
+      setContractAttributeType(contractAttributeTypeArray)
     }
     if (contractAttribute.length > 4) {
       const contractAttributeTypeArray: { key: string; value: string }[] =
@@ -59,14 +59,14 @@ export default function AddAttributeArea({
             EContractAttributeTypeAdditional[
               key as keyof typeof EContractAttributeTypeAdditional
             ],
-        }));
-      setContractAttributeType(contractAttributeTypeArray);
+        }))
+      setContractAttributeType(contractAttributeTypeArray)
     }
-  }, [contractAttribute]);
-  const { toast } = useToast();
-  const [SelectType, setSelectType] = useState<EContractAttributeType>();
-  const [inputValue, setInputValue] = useState<any>('');
-  const [textArea, setTextArea] = useState<string>('');
+  }, [contractAttribute])
+  const { toast } = useToast()
+  const [SelectType, setSelectType] = useState<EContractAttributeType>()
+  const [inputValue, setInputValue] = useState<any>('')
+  const [textArea, setTextArea] = useState<string>('')
   function handleAddAttribute() {
     if (
       (!SelectType &&
@@ -79,8 +79,8 @@ export default function AddAttributeArea({
         title: 'Empty Field',
         description: 'Please fill all the fields',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     const newContractAttribute: IContractAttribute = {
       value:
@@ -107,8 +107,8 @@ export default function AddAttributeArea({
           : undefined,
       type: SelectType as EContractAttributeType,
       statusAttribute: EStatusAttribute.CREATE,
-    };
-    console.log(newContractAttribute);
+    }
+    console.log(newContractAttribute)
 
     const partyAttributeArr = [
       {
@@ -141,36 +141,36 @@ export default function AddAttributeArea({
         type: EContractAttributeType.CONTRACT_ATTRIBUTE,
         statusAttribute: EStatusAttribute.CREATE,
       },
-    ];
+    ]
     if (!index) {
       if (SelectType === EContractAttributeType.CONTRACT_PARTY_INFO) {
-        setContractAttribute([...contractAttribute, ...partyAttributeArr]);
-        setInputValue('');
-        setTextArea('');
+        setContractAttribute([...contractAttribute, ...partyAttributeArr])
+        setInputValue('')
+        setTextArea('')
       } else {
-        setContractAttribute([...contractAttribute, newContractAttribute]);
-        setInputValue('');
-        setTextArea('');
+        setContractAttribute([...contractAttribute, newContractAttribute])
+        setInputValue('')
+        setTextArea('')
       }
     } else {
       if (SelectType === EContractAttributeType.CONTRACT_PARTY_INFO) {
-        const newContractAttributeArray = [...contractAttribute];
-        newContractAttributeArray.splice(index, 0, ...partyAttributeArr);
-        newContractAttributeArray.splice(index + 6, 1);
-        setContractAttribute(newContractAttributeArray);
-        setInputValue('');
-        setTextArea('');
+        const newContractAttributeArray = [...contractAttribute]
+        newContractAttributeArray.splice(index, 0, ...partyAttributeArr)
+        newContractAttributeArray.splice(index + 6, 1)
+        setContractAttribute(newContractAttributeArray)
+        setInputValue('')
+        setTextArea('')
       } else {
-        const newContractAttributeArray = [...contractAttribute];
-        newContractAttributeArray.splice(index, 0, newContractAttribute);
-        newContractAttributeArray.splice(index + 1, 1);
-        setContractAttribute(newContractAttributeArray);
-        setInputValue('');
-        setTextArea('');
+        const newContractAttributeArray = [...contractAttribute]
+        newContractAttributeArray.splice(index, 0, newContractAttribute)
+        newContractAttributeArray.splice(index + 1, 1)
+        setContractAttribute(newContractAttributeArray)
+        setInputValue('')
+        setTextArea('')
       }
     }
-    setInputValue('');
-    setTextArea('');
+    setInputValue('')
+    setTextArea('')
   }
   return (
     <div className='flex flex-col'>
@@ -179,14 +179,14 @@ export default function AddAttributeArea({
           <Input
             className='w-[32%]'
             onChange={(e) => {
-              setInputValue(e.target.value);
+              setInputValue(e.target.value)
             }}
             value={inputValue}
           />
         )}
         <Select
           onValueChange={(e: EContractAttributeType) => {
-            setSelectType(e);
+            setSelectType(e)
           }}
         >
           <SelectTrigger className='ms-2 w-[45%]'>
@@ -222,7 +222,7 @@ export default function AddAttributeArea({
         <div>
           <Textarea
             onChange={(e) => {
-              setTextArea(e.target.value);
+              setTextArea(e.target.value)
             }}
             className='mt-2 w-[100%]'
             value={textArea}
@@ -230,5 +230,5 @@ export default function AddAttributeArea({
         </div>
       )}
     </div>
-  );
+  )
 }

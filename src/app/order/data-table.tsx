@@ -1,5 +1,5 @@
-'use client';
-import * as React from 'react';
+'use client'
+import * as React from 'react'
 import {
   ColumnDef,
   flexRender,
@@ -11,7 +11,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table';
+} from '@tanstack/react-table'
 import {
   Select,
   SelectContent,
@@ -20,9 +20,9 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -30,24 +30,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Settings2 } from 'lucide-react';
-import { useState } from 'react';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { useToast } from '@/components/ui/use-toast';
-import { getColumns } from './columns'; // Import hàm getColumns
-import { TData } from './[id]/page';
-import { DataWithName } from './[id]/page';
-import { DataTableProps } from './[id]/page';
-import { Product } from './[id]/page';
-import { OrderDetail } from './[id]/page';
+} from '@/components/ui/dropdown-menu'
+import { Settings2 } from 'lucide-react'
+import { useState } from 'react'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { useToast } from '@/components/ui/use-toast'
+import { getColumns } from './columns' // Import hàm getColumns
+import { TData } from './[id]/page'
+import { DataWithName } from './[id]/page'
+import { DataTableProps } from './[id]/page'
+import { Product } from './[id]/page'
+import { OrderDetail } from './[id]/page'
 
 export function DataTable<TData extends DataWithName>({
   data,
@@ -58,19 +58,19 @@ export function DataTable<TData extends DataWithName>({
     data,
     (orderDetails) => setData((prev) => ({ ...prev, orderDetails })),
     getDataOrders
-  ) as ColumnDef<OrderDetail, any>[]; // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  ) as ColumnDef<OrderDetail, any>[] // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
+  const [sorting, setSorting] = React.useState<SortingState>([])
   const [userInfo, setUserInfo] = React.useState<any>(
     JSON.parse(localStorage.getItem('user-info') as string)
-  );
+  )
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  );
+  )
   const [ListSelectProduct, setListSelectProduct] = React.useState<Product[]>(
     []
-  );
+  )
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({})
   const table = useReactTable({
     data: data.orderDetails as OrderDetail[], // Add type assertion to data.orderDetails
     columns,
@@ -85,39 +85,39 @@ export function DataTable<TData extends DataWithName>({
       sorting,
       columnVisibility,
     },
-  });
+  })
 
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const { toast } = useToast();
+  const [selectedIndex, setSelectedIndex] = useState(-1)
+  const { toast } = useToast()
 
   const handleSelect = (index: number) => {
     if (ListSelectProduct.length > 0) {
       const payload = {
         supplierId: ListSelectProduct?.[index]?.idSupplier ?? '',
         productId: ListSelectProduct?.[index]?.id ?? '',
-      };
+      }
       fetchAPI('/orders', 'POST', payload)
         .then((res) => {
           if (res.status === 201) {
             toast({
               title: `${res.data.message}`,
               variant: 'success',
-            });
-            getDataOrders();
+            })
+            getDataOrders()
           }
         })
         .catch((err) => {
           toast({
             title: `${err.message}`,
             variant: 'destructive',
-          });
-        });
+          })
+        })
     }
-  };
+  }
 
   const getProduct = () => {
     if (data.orderDetails.length > 0) {
-      const idSupplier = data?.orderDetails[0]?.idSupplier ?? '';
+      const idSupplier = data?.orderDetails[0]?.idSupplier ?? ''
       fetchAPI(`/products/find-all-by-supplier/${idSupplier}`, 'GET')
         .then((res) => {
           const mappedProducts = res.data.map((value: any) => {
@@ -127,16 +127,16 @@ export function DataTable<TData extends DataWithName>({
               priceWithoutTax: value.price - value.discount,
               idOrder: value.idOrder,
               quantity: 1,
-            };
-          });
-          setListSelectProduct(mappedProducts);
+            }
+          })
+          setListSelectProduct(mappedProducts)
         })
-        .catch((errors) => console.log('Error : ' + errors));
+        .catch((errors) => console.log('Error : ' + errors))
     }
-  };
+  }
   React.useEffect(() => {
-    getProduct();
-  }, [data]);
+    getProduct()
+  }, [data])
   return (
     <div>
       <div className='flex items-center py-4'>
@@ -163,7 +163,7 @@ export function DataTable<TData extends DataWithName>({
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                );
+                )
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -183,7 +183,7 @@ export function DataTable<TData extends DataWithName>({
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -223,8 +223,8 @@ export function DataTable<TData extends DataWithName>({
                       onValueChange={(value) => {
                         const index = ListSelectProduct.findIndex(
                           (item) => item.name === value
-                        );
-                        setSelectedIndex(index);
+                        )
+                        setSelectedIndex(index)
                       }}
                     >
                       <SelectTrigger className='w-[180px]'>
@@ -257,5 +257,5 @@ export function DataTable<TData extends DataWithName>({
         </Table>
       </div>
     </div>
-  );
+  )
 }

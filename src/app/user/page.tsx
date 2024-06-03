@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import * as React from 'react';
+import * as React from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,7 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table';
+} from '@tanstack/react-table'
 import {
   ArrowUpDown,
   CheckCheck,
@@ -24,10 +24,10 @@ import {
   Trash2,
   UserCog,
   X,
-} from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+} from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -36,8 +36,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -45,7 +45,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
 import {
   Dialog,
   DialogContent,
@@ -54,7 +54,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
 import {
   Card,
   CardContent,
@@ -62,7 +62,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui/card'
 import {
   Menubar,
   MenubarContent,
@@ -71,20 +71,20 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
-} from '@/components/ui/menubar';
+} from '@/components/ui/menubar'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/select'
 
-import { Label } from '@/components/ui/label';
-import Link from 'next/link';
-import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog';
-import { fetchAPI } from '@/utils/fetchAPI';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
+import { Label } from '@/components/ui/label'
+import Link from 'next/link'
+import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
+import { fetchAPI } from '@/utils/fetchAPI'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -95,19 +95,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+} from '@/components/ui/alert-dialog'
 
 export interface User {
-  name: string;
-  phoneNumber: string;
-  email: string;
-  indentifyNumber: string;
-  addressWallet: string;
-  gender: string;
-  dateOfBirth: string;
-  role: string;
-  status: string;
-  suppliers: string;
+  name: string
+  phoneNumber: string
+  email: string
+  indentifyNumber: string
+  addressWallet: string
+  gender: string
+  dateOfBirth: string
+  role: string
+  status: string
+  suppliers: string
 }
 const data: Contract[] = [
   {
@@ -123,21 +123,21 @@ const data: Contract[] = [
     status: 'stringstring',
     suppliers: 'stringstring',
   },
-];
+]
 
 export type Contract = {
-  id: string;
-  name: string;
-  phoneNumber: string;
-  email: string;
-  indentifyNumber: string;
-  addressWallet: string;
-  gender: string;
-  dateOfBirth: string;
-  role: string;
-  status: string;
-  suppliers: string;
-};
+  id: string
+  name: string
+  phoneNumber: string
+  email: string
+  indentifyNumber: string
+  addressWallet: string
+  gender: string
+  dateOfBirth: string
+  role: string
+  status: string
+  suppliers: string
+}
 
 const initParticipants: User[] = [
   {
@@ -152,19 +152,19 @@ const initParticipants: User[] = [
     status: '',
     suppliers: '',
   },
-];
+]
 
 export default function DataTableDemo() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([])
   const [participants, setParticipants] =
-    React.useState<User[]>(initParticipants);
+    React.useState<User[]>(initParticipants)
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  );
-  const [isOpen, setIsOpen] = React.useState(false);
+  )
+  const [isOpen, setIsOpen] = React.useState(false)
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    React.useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState({})
 
   const columns: ColumnDef<Contract>[] = [
     {
@@ -192,7 +192,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'name',
       header: ({ column }) => {
-        return <div className='font-semibold'>Name</div>;
+        return <div className='font-semibold'>Name</div>
       },
       cell: ({ row }) => (
         <div className='text-start lowercase'>{row.getValue('name')}</div>
@@ -202,7 +202,7 @@ export default function DataTableDemo() {
       accessorKey: 'phoneNumber',
       enableHiding: true,
       header: ({ column }) => {
-        return <div className='font-semibold'>Phone Number</div>;
+        return <div className='font-semibold'>Phone Number</div>
       },
       cell: ({ row }) => (
         <div className='text-center lowercase'>
@@ -214,7 +214,7 @@ export default function DataTableDemo() {
       accessorKey: 'email',
       enableHiding: true,
       header: ({ column }) => {
-        return <div className='font-semibold'>Email</div>;
+        return <div className='font-semibold'>Email</div>
       },
       cell: ({ row }) => (
         <div className='text-start lowercase'>{row.getValue('email')}</div>
@@ -223,9 +223,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'indentifyNumber',
       header: () => {
-        return (
-          <div className='text-center font-semibold'>Indentify Number</div>
-        );
+        return <div className='text-center font-semibold'>Indentify Number</div>
       },
       cell: ({ row }) => (
         <div className='text-center lowercase'>
@@ -236,7 +234,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'addressWallet',
       header: () => {
-        return <div className='text-center font-semibold'>Address Wallet</div>;
+        return <div className='text-center font-semibold'>Address Wallet</div>
       },
       cell: ({ row }) => (
         <div className='text-start lowercase'>
@@ -247,7 +245,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'gender',
       header: () => {
-        return <div className='text-center font-semibold'>Gender</div>;
+        return <div className='text-center font-semibold'>Gender</div>
       },
       cell: ({ row }) => (
         <div className='text-center lowercase'>{row.getValue('gender')}</div>
@@ -256,7 +254,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'dateOfBirth',
       header: () => {
-        return <div className='text-center font-semibold'>Date Of Birth</div>;
+        return <div className='text-center font-semibold'>Date Of Birth</div>
       },
       cell: ({ row }) => (
         <div className='text-center lowercase'>
@@ -267,7 +265,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'role',
       header: ({ column }) => {
-        return <div className='font-semibold'>Role</div>;
+        return <div className='font-semibold'>Role</div>
       },
       cell: ({ row }) => (
         <div className='text-start lowercase'>{row.getValue('role')}</div>
@@ -276,7 +274,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'status',
       header: ({ column }) => {
-        return <div className='font-semibold'>Status</div>;
+        return <div className='font-semibold'>Status</div>
       },
       cell: ({ row }) => (
         <div className='text-start lowercase'>{row.getValue('status')}</div>
@@ -285,7 +283,7 @@ export default function DataTableDemo() {
     {
       accessorKey: 'suppliers',
       header: ({ column }) => {
-        return <div className='font-semibold'>Suppliers</div>;
+        return <div className='font-semibold'>Suppliers</div>
       },
       cell: ({ row }) => (
         <div className='text-start lowercase'>{row.getValue('suppliers')}</div>
@@ -403,10 +401,10 @@ export default function DataTableDemo() {
               </AlertDialogContent>
             </AlertDialog>
           </div>
-        );
+        )
       },
     },
-  ];
+  ]
 
   const table = useReactTable({
     data,
@@ -425,7 +423,7 @@ export default function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  });
+  })
 
   return (
     <div className='w-full'>
@@ -480,7 +478,7 @@ export default function DataTableDemo() {
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
-                  );
+                  )
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -501,7 +499,7 @@ export default function DataTableDemo() {
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -567,7 +565,7 @@ export default function DataTableDemo() {
               className='min-w-[650px] p-8'
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
-                  e.preventDefault();
+                  e.preventDefault()
                 }
               }}
             >
@@ -583,5 +581,5 @@ export default function DataTableDemo() {
         </DialogPortal>
       </Dialog>
     </div>
-  );
+  )
 }

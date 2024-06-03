@@ -21,10 +21,10 @@ import {
   WalletMinimal,
   ShoppingCart,
   FileCheck2Icon,
-} from 'lucide-react';
-import Image from 'next/image';
+} from 'lucide-react'
+import Image from 'next/image'
 
-export type Icon = LucideIcon;
+export type Icon = LucideIcon
 
 export const Icons = {
   sun: SunMedium,
@@ -58,4 +58,4 @@ export const Icons = {
       ></path>
     </svg>
   ),
-};
+}

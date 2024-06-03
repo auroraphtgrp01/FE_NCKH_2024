@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -12,14 +12,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
   PIN,
   PINType,
   RegisterBody,
   RegisterBodyType,
-} from '@/validateSchema/Authentication.validate';
+} from '@/validateSchema/Authentication.validate'
 import {
   Select,
   SelectContent,
@@ -28,14 +28,14 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { CalendarPicker } from '@/components/ui/calendar-picker';
+} from '@/components/ui/select'
+import { CalendarPicker } from '@/components/ui/calendar-picker'
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from '@/components/ui/input-otp';
+} from '@/components/ui/input-otp'
 import {
   Card,
   CardContent,
@@ -43,7 +43,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -52,48 +52,48 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { useAppContext } from '@/components/ThemeProvider';
-import React, { useEffect } from 'react';
-import { toast, useToast } from '@/components/ui/use-toast';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog';
-import { set } from 'date-fns';
-import usePreventLeave from 'react-hook-use-prevent-leave';
-import { useRouter } from 'next/navigation';
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { useAppContext } from '@/components/ThemeProvider'
+import React, { useEffect } from 'react'
+import { toast, useToast } from '@/components/ui/use-toast'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
+import { set } from 'date-fns'
+import usePreventLeave from 'react-hook-use-prevent-leave'
+import { useRouter } from 'next/navigation'
 
 export default function RegisterForm() {
-  const [blockPage, setBlockPage] = React.useState<boolean>(true);
-  const { userInfo, setUserInfo }: any = useAppContext();
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [registerId, setRegisterId] = React.useState<string>('');
-  const Router = useRouter();
+  const [blockPage, setBlockPage] = React.useState<boolean>(true)
+  const { userInfo, setUserInfo }: any = useAppContext()
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [registerId, setRegisterId] = React.useState<string>('')
+  const Router = useRouter()
   const form = useForm<RegisterBodyType>({
     resolver: zodResolver(RegisterBody),
-  });
+  })
   const formPIN = useForm<PINType>({
     resolver: zodResolver(PIN),
-  });
+  })
   function togglePageBlock(): void {
-    setBlockPage((prev) => !prev);
+    setBlockPage((prev) => !prev)
   }
   useEffect(() => {
-    console.log(userInfo);
-  }, [userInfo]);
-  usePreventLeave(blockPage);
-  const [date, setDate] = React.useState<Date>();
-  const { toast } = useToast();
+    console.log(userInfo)
+  }, [userInfo])
+  usePreventLeave(blockPage)
+  const [date, setDate] = React.useState<Date>()
+  const { toast } = useToast()
   function isBlockClose() {
-    setIsOpen(true);
+    setIsOpen(true)
     toast({
       title: 'Update your PIN',
       description: 'Please update your PIN to continue with this action.',
       variant: 'destructive',
-    });
+    })
     setTimeout(() => {
-      setIsOpen(true);
-    }, 100);
+      setIsOpen(true)
+    }, 100)
   }
   function updatePIN(values: z.infer<typeof PIN>) {
     fetchAPI(`/users/pin/${registerId}`, 'PATCH', values)
@@ -102,17 +102,17 @@ export default function RegisterForm() {
           title: 'Register Success',
           description: 'Register Success. Please login to continue.',
           variant: 'default',
-        });
-        Router.push('/');
+        })
+        Router.push('/')
       })
       .catch((err) => {
         toast({
           title: 'Register Fail',
           description: `Register Fail: ${err.toString()}`,
           variant: 'destructive',
-        });
-      });
-    setIsOpen(false);
+        })
+      })
+    setIsOpen(false)
   }
   function onSubmit(values: z.infer<typeof RegisterBody>) {
     if (!date || !userInfo?.accounts)
@@ -120,19 +120,19 @@ export default function RegisterForm() {
         title: 'Empty Field',
         description: 'Please fill all field to register account',
         variant: 'destructive',
-      });
-    console.log(values);
+      })
+    console.log(values)
 
     const payload = {
       ...values,
       dateOfBirth: date?.toISOString(),
       addressWallet: userInfo?.accounts,
-    };
+    }
     fetchAPI('/auth/register', 'POST', payload)
       .then((res) => {
         if (res.status === 201) {
-          setRegisterId(res.data.id);
-          setIsOpen(true);
+          setRegisterId(res.data.id)
+          setIsOpen(true)
         }
       })
       .catch((err) => {
@@ -140,8 +140,8 @@ export default function RegisterForm() {
           title: 'Register Fail',
           description: `Register Fail: ${err.toString()}`,
           variant: 'destructive',
-        });
-      });
+        })
+      })
   }
   function handleSubmit(values: z.infer<typeof RegisterBody>) {}
   return (
@@ -317,7 +317,7 @@ export default function RegisterForm() {
               className='sm:max-w-[425px]'
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
-                  e.preventDefault();
+                  e.preventDefault()
                 }
               }}
             >
@@ -374,5 +374,5 @@ export default function RegisterForm() {
         </DialogPortal>
       </Dialog>
     </div>
-  );
+  )
 }

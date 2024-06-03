@@ -1,30 +1,30 @@
-'use client';
+'use client'
 
-import * as React from 'react';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import * as React from 'react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@/components/ui/command';
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/components/ui/popover'
 
 interface ComboBoxPicker {
-  value: any;
-  setValue: (newValue: any) => void;
+  value: any
+  setValue: (newValue: any) => void
 }
 
 export function Combobox({ value, setValue }: ComboBoxPicker) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
   const frameworks = [
     {
       value: 'next.js',
@@ -46,7 +46,7 @@ export function Combobox({ value, setValue }: ComboBoxPicker) {
       value: 'astro',
       label: 'Astro',
     },
-  ];
+  ]
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -89,5 +89,5 @@ export function Combobox({ value, setValue }: ComboBoxPicker) {
         </Command>
       </PopoverContent>
     </Popover>
-  );
+  )
 }

@@ -6,14 +6,14 @@ import {
   PlaneIcon,
   ScanFace,
   UsersRound,
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { MedalIcon } from '@/components/HomepageIcon';
+} from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { MedalIcon } from '@/components/HomepageIcon'
 
 interface FeatureProps {
-  icon: JSX.Element;
-  title: string;
-  description: string;
+  icon: JSX.Element
+  title: string
+  description: string
 }
 
 const features: FeatureProps[] = [
@@ -41,7 +41,7 @@ const features: FeatureProps[] = [
     description:
       'Elevate, Deploy, Immutability Prevails: Witness the Birth of Unstoppable Transactions!',
   },
-];
+]
 
 export const HowItWorks = () => {
   return (
@@ -73,5 +73,5 @@ export const HowItWorks = () => {
         ))}
       </div>
     </section>
-  );
-};
+  )
+}

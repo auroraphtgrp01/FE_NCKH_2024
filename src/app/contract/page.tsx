@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import * as React from 'react';
+import * as React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -20,17 +20,17 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   flexRender,
-} from '@tanstack/react-table';
-import { ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@tanstack/react-table'
+import { ChevronDown } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -38,55 +38,55 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import Link from 'next/link';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog';
-import { fetchAPI } from '@/utils/fetchAPI';
+} from '@/components/ui/table'
+import Link from 'next/link'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
+import { fetchAPI } from '@/utils/fetchAPI'
 
 export interface Participant {
-  userName: string;
-  id: string;
-  email: string;
-  status: string;
+  userName: string
+  id: string
+  email: string
+  status: string
 }
 
 export type Contract = {
-  id: string;
-  contractAddress: string;
-  name: string; // Contract Title
-  status: string;
-  type: string;
-  email: string;
-};
+  id: string
+  contractAddress: string
+  name: string // Contract Title
+  status: string
+  type: string
+  email: string
+}
 
 export default function DataTableDemo() {
-  const [dataTable, setDataTable] = React.useState<Contract[]>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [participants, setParticipants] = React.useState<Participant[]>([]);
+  const [dataTable, setDataTable] = React.useState<Contract[]>([])
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [participants, setParticipants] = React.useState<Participant[]>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  );
-  const [isOpen, setIsOpen] = React.useState(false);
+  )
+  const [isOpen, setIsOpen] = React.useState(false)
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    React.useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState({})
 
   React.useEffect(() => {
     fetchAPI(`/contracts/get-all-contract-details`, 'GET').then((res) => {
       if (res.status === 200 || res.status === 201) {
-        console.log(res.data.contracts);
-        setDataTable(res.data.contracts);
+        console.log(res.data.contracts)
+        setDataTable(res.data.contracts)
       }
-    });
-  }, []);
+    })
+  }, [])
   // api-> khi click vào nút participant trên dataTable
   async function handleOpenParticipant(contractId: string) {
     const response = await fetchAPI(
       `/participants/find-all/${contractId}`,
       'GET'
-    );
-    console.log(response.data);
+    )
+    console.log(response.data)
     const data: Participant[] = await Promise.all(
       response.data.map((item: any) => {
         const result: Participant = {
@@ -94,13 +94,13 @@ export default function DataTableDemo() {
           email: item.email,
           userName: item.User.name,
           status: item.status,
-        };
-        return result;
+        }
+        return result
       })
-    );
-    setParticipants(data);
+    )
+    setParticipants(data)
     // setParticipants(sampleParticipants);
-    setIsOpen(true);
+    setIsOpen(true)
   }
 
   const columnsContracts: ColumnDef<Contract>[] = [
@@ -182,7 +182,7 @@ export default function DataTableDemo() {
         </div>
       ),
     },
-  ];
+  ]
 
   const columnsParticipants: ColumnDef<Participant>[] = [
     {
@@ -231,7 +231,7 @@ export default function DataTableDemo() {
         <div className='font-semibold capitalize'>{row.getValue('status')}</div>
       ),
     },
-  ];
+  ]
 
   const tableContracts = useReactTable({
     data: dataTable,
@@ -250,7 +250,7 @@ export default function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  });
+  })
 
   const tableParticipants = useReactTable({
     data: participants,
@@ -269,7 +269,7 @@ export default function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  });
+  })
 
   return (
     <div className='w-full'>
@@ -398,7 +398,7 @@ export default function DataTableDemo() {
               className='min-w-[800px] p-8'
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
-                  e.preventDefault();
+                  e.preventDefault()
                 }
               }}
             >
@@ -424,7 +424,7 @@ export default function DataTableDemo() {
                                           header.getContext()
                                         )}
                                   </TableHead>
-                                );
+                                )
                               })}
                             </TableRow>
                           ))}
@@ -466,5 +466,5 @@ export default function DataTableDemo() {
         </DialogPortal>
       </Dialog>
     </div>
-  );
+  )
 }

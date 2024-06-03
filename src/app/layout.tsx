@@ -1,24 +1,24 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { AppProvider, ThemeProvider } from '@/components/ThemeProvider';
-import Header from '@/components/Header';
-import { Toaster } from '@/components/ui/toaster';
-import { Footer } from '@/components/Footer';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import NavbarVertical from '@/components/NavbarVertical';
-import { cn } from '@/lib/utils';
-const inter = Inter({ subsets: ['vietnamese'] });
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { AppProvider, ThemeProvider } from '@/components/ThemeProvider'
+import Header from '@/components/Header'
+import { Toaster } from '@/components/ui/toaster'
+import { Footer } from '@/components/Footer'
+import { Toaster as Sonner } from '@/components/ui/sonner'
+import NavbarVertical from '@/components/NavbarVertical'
+import { cn } from '@/lib/utils'
+const inter = Inter({ subsets: ['vietnamese'] })
 
 export const metadata: Metadata = {
   title: 'Smart Contract - Supply Chain Management System',
   description: '',
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
@@ -53,5 +53,5 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

@@ -1,48 +1,48 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @next/next/no-img-element */
-'use client';
-import { ColumnDef } from '@tanstack/react-table';
-import { Input } from '@/components/ui/input';
-import { fetchAPI } from '@/utils/fetchAPI';
-import { useToast } from '@/components/ui/use-toast';
-import { useEffect } from 'react';
-import { DataWithName, OrderDetail } from './[id]/page';
+'use client'
+import { ColumnDef } from '@tanstack/react-table'
+import { Input } from '@/components/ui/input'
+import { fetchAPI } from '@/utils/fetchAPI'
+import { useToast } from '@/components/ui/use-toast'
+import { useEffect } from 'react'
+import { DataWithName, OrderDetail } from './[id]/page'
 
 export function getColumns(
   data: DataWithName,
   setData: React.Dispatch<React.SetStateAction<DataWithName>>,
   getDataOrders: () => void
 ): ColumnDef<OrderDetail>[] {
-  const { toast } = useToast();
-  const userInfoString = localStorage.getItem('user-info');
-  const user_info = userInfoString ? JSON.parse(userInfoString) : null;
-  const isCustomer = user_info && user_info.data.role === 'Customer';
+  const { toast } = useToast()
+  const userInfoString = localStorage.getItem('user-info')
+  const user_info = userInfoString ? JSON.parse(userInfoString) : null
+  const isCustomer = user_info && user_info.data.role === 'Customer'
   const updateOrder = async (e: any, index: number, type: string) => {
     const products = data.orderDetails.map((value: any) => {
-      return { ...value };
-    });
+      return { ...value }
+    })
     type == 'quantity'
       ? (products[index].quantity = Number(e.target.value))
-      : (products[index].discount = Number(e.target.value));
+      : (products[index].discount = Number(e.target.value))
     const payload = {
       id: data.orderDetails[0].idOrder,
       products: products,
-    };
+    }
     await fetchAPI('/orders', 'PATCH', payload)
       .then((res) => {
         toast({
           title: `Update thành công`,
           variant: 'success',
-        });
-        getDataOrders();
+        })
+        getDataOrders()
       })
       .catch((err) => {
         toast({
           title: `Update không thành công`,
           variant: 'destructive',
-        });
-      });
-  };
+        })
+      })
+  }
   return [
     {
       accessorKey: 'name',
@@ -87,7 +87,7 @@ export function getColumns(
                 className='w-16'
                 type='text'
                 onBlur={(e) => {
-                  updateOrder(e, row.index, 'quantity');
+                  updateOrder(e, row.index, 'quantity')
                 }}
                 defaultValue={row.getValue('quantity')}
               />
@@ -95,7 +95,7 @@ export function getColumns(
               <span>{row.getValue('quantity')}</span>
             )}
           </div>
-        );
+        )
       },
     },
     {
@@ -109,7 +109,7 @@ export function getColumns(
               type='text'
               defaultValue={row.getValue('discount')}
               onBlur={(e) => {
-                updateOrder(e, row.index, 'discount');
+                updateOrder(e, row.index, 'discount')
               }}
             />
           ) : (
@@ -132,5 +132,5 @@ export function getColumns(
         <div className='text-start'>{row.getValue('unit')}</div>
       ),
     },
-  ];
+  ]
 }

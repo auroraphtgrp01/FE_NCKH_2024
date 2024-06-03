@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/rules-of-hooks */
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -10,22 +10,22 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import { fetchAPI } from '@/utils/fetchAPI';
-import Link from 'next/link';
+} from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import { fetchAPI } from '@/utils/fetchAPI'
+import Link from 'next/link'
 
 export default function page() {
-  const [supplierList, setSupplierList] = useState<any>([]);
+  const [supplierList, setSupplierList] = useState<any>([])
   useEffect(() => {
     fetchAPI('/suppliers', 'GET').then((res) => {
-      setSupplierList([...res.data]);
-      console.log(res.data);
-    });
-  }, []);
+      setSupplierList([...res.data])
+      console.log(res.data)
+    })
+  }, [])
 
   return (
     <div className='mb-14'>
@@ -86,5 +86,5 @@ export default function page() {
         </div>
       </div>
     </div>
-  );
+  )
 }

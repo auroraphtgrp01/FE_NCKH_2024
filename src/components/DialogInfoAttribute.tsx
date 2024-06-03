@@ -1,20 +1,20 @@
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import {
   AlertDialog,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from '@/components/ui/alert-dialog'
 
 export default function DialogInfoAttribute({
   isDetailAttributeDialog,
   setIsDetailAttributeDialog,
   infoOfAttribute,
 }: {
-  isDetailAttributeDialog: boolean;
-  setIsDetailAttributeDialog: (item: boolean) => void;
-  infoOfAttribute: any;
+  isDetailAttributeDialog: boolean
+  setIsDetailAttributeDialog: (item: boolean) => void
+  infoOfAttribute: any
 }) {
   return (
     <div>
@@ -86,5 +86,5 @@ export default function DialogInfoAttribute({
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
+  )
 }

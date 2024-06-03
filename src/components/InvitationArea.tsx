@@ -1,8 +1,8 @@
-import GrantPermission from '@/components/GrantPermission';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import GrantPermission from '@/components/GrantPermission'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -10,19 +10,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
-import { initPermission } from '@/constants/initVariable.constants';
-import { IPermission, InvitationItem } from '@/interface/contract.i';
-import React, { useState } from 'react';
+} from '@/components/ui/table'
+import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/components/ui/use-toast'
+import { initPermission } from '@/constants/initVariable.constants'
+import { IPermission, InvitationItem } from '@/interface/contract.i'
+import React, { useState } from 'react'
 
 export interface IInvitationArea {
-  invitation: InvitationItem[];
-  setInvitation: (invitation: InvitationItem[]) => void;
-  messages: string;
-  setMessages: (messages: string) => void;
-  participant?: any;
+  invitation: InvitationItem[]
+  setInvitation: (invitation: InvitationItem[]) => void
+  messages: string
+  setMessages: (messages: string) => void
+  participant?: any
 }
 
 export default function InvitationArea({
@@ -32,40 +32,40 @@ export default function InvitationArea({
   setMessages,
   participant,
 }: IInvitationArea) {
-  const [invitationInput, setInvitationInput] = useState('');
-  const [indexPerson, setIndexPerson] = useState<number>(-1);
-  const [isOpen, setOpen] = useState(false);
-  const { toast } = useToast();
+  const [invitationInput, setInvitationInput] = useState('')
+  const [indexPerson, setIndexPerson] = useState<number>(-1)
+  const [isOpen, setOpen] = useState(false)
+  const { toast } = useToast()
   function onAddInvitation(): void {
-    const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/);
+    const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
     if (!isEmail.test(invitationInput)) {
       toast({
         title: 'Error When Add Participant',
         description: 'Email Is Invalid',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (participant) {
-      const isExist = participant.find((p: any) => p.email === invitationInput);
+      const isExist = participant.find((p: any) => p.email === invitationInput)
       if (isExist) {
         toast({
           title: 'Error When Add Participant',
           description: 'Participant already exists',
           variant: 'destructive',
-        });
-        return;
+        })
+        return
       }
     }
     setInvitation([
       ...invitation,
       { email: invitationInput, permission: initPermission },
-    ]);
-    setInvitationInput('');
+    ])
+    setInvitationInput('')
   }
   function updatePermission(data: IPermission): void {
-    invitation[indexPerson].permission = data;
-    setInvitation([...invitation]);
+    invitation[indexPerson].permission = data
+    setInvitation([...invitation])
   }
   return (
     <div className='mt-5'>
@@ -75,12 +75,12 @@ export default function InvitationArea({
           <Input
             className='me-2'
             onChange={(e) => {
-              setInvitationInput(e.target.value);
+              setInvitationInput(e.target.value)
             }}
             value={invitationInput}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                onAddInvitation();
+                onAddInvitation()
               }
             }}
           ></Input>
@@ -108,8 +108,8 @@ export default function InvitationArea({
                         variant={'default'}
                         className='me-2 w-[50%]'
                         onClick={() => {
-                          setIndexPerson(index);
-                          setOpen(true);
+                          setIndexPerson(index)
+                          setOpen(true)
                         }}
                       >
                         Grant
@@ -132,7 +132,7 @@ export default function InvitationArea({
           className='min-h-[150px] w-full resize-none'
           defaultValue={messages}
           onChange={(e) => {
-            setMessages(e.target.value);
+            setMessages(e.target.value)
           }}
         />
       </div>
@@ -143,5 +143,5 @@ export default function InvitationArea({
         callback={updatePermission}
       ></GrantPermission>
     </div>
-  );
+  )
 }

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
 import {
   CommandEmpty,
   CommandGroup,
@@ -12,16 +12,16 @@ import {
   CommandItem,
   CommandList,
   Command,
-} from '@/components/ui/command';
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
-import { cn } from '@/lib/utils';
+} from '@/components/ui/command'
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { cn } from '@/lib/utils'
 
 interface ComboBoxPicker {
-  onSelectedData: (data: any) => void;
-  propertiesCBX: string[];
-  setNewProperties: (data: string[]) => void;
-  newPropertiesArray: string[];
-  setPropertiesCBX: (data: string[]) => void;
+  onSelectedData: (data: any) => void
+  propertiesCBX: string[]
+  setNewProperties: (data: string[]) => void
+  newPropertiesArray: string[]
+  setPropertiesCBX: (data: string[]) => void
 }
 
 export default function ComboboxCustomize({
@@ -31,35 +31,35 @@ export default function ComboboxCustomize({
   newPropertiesArray,
   setPropertiesCBX,
 }: ComboBoxPicker) {
-  const [inputValue, setInputValue] = useState('');
-  const [openPopover, setOpenPopover] = useState(false);
-  const [indexProperty, setIndexProperty] = useState<number>(-1);
-  const [properties, setProperty] = useState(propertiesCBX);
+  const [inputValue, setInputValue] = useState('')
+  const [openPopover, setOpenPopover] = useState(false)
+  const [indexProperty, setIndexProperty] = useState<number>(-1)
+  const [properties, setProperty] = useState(propertiesCBX)
   const handleAddComboboxChange = (index: number, e: any) => {
-    const clone = [...properties];
-    clone.push(e);
-    setProperty(clone);
-    setPropertiesCBX([...propertiesCBX, e]);
-    handleExportNewPropertiesArray(clone);
-  };
+    const clone = [...properties]
+    clone.push(e)
+    setProperty(clone)
+    setPropertiesCBX([...propertiesCBX, e])
+    handleExportNewPropertiesArray(clone)
+  }
 
   const handleSelectComboboxChange = (index: number, e: any) => {
-    setIndexProperty(index);
-    onSelectedData(properties[index]);
-    const clone = [...properties];
-    clone[index] = e;
-    clone[index] = e;
-    setProperty(clone);
-  };
+    setIndexProperty(index)
+    onSelectedData(properties[index])
+    const clone = [...properties]
+    clone[index] = e
+    clone[index] = e
+    setProperty(clone)
+  }
   const handleExportNewPropertiesArray = (properties: any) => {
-    let newPropertiesCompare: string[] = [];
+    let newPropertiesCompare: string[] = []
     for (let i = 0; i < properties.length; i++) {
       if (!propertiesCBX.includes(properties[i])) {
-        newPropertiesCompare.push(properties[i]);
+        newPropertiesCompare.push(properties[i])
       }
     }
-    setNewProperties(newPropertiesArray.concat(newPropertiesCompare));
-  };
+    setNewProperties(newPropertiesArray.concat(newPropertiesCompare))
+  }
   return (
     <div>
       <Popover open={openPopover} onOpenChange={setOpenPopover}>
@@ -85,7 +85,7 @@ export default function ComboboxCustomize({
                 type='button'
                 className='w-[80%]'
                 onClick={(e) => {
-                  handleAddComboboxChange(properties.length, inputValue);
+                  handleAddComboboxChange(properties.length, inputValue)
                 }}
               >
                 Thêm mới
@@ -117,5 +117,5 @@ export default function ComboboxCustomize({
         </PopoverContent>
       </Popover>
     </div>
-  );
+  )
 }

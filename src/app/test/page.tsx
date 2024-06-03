@@ -1,6 +1,6 @@
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,9 +19,9 @@ import {
   ShoppingCart,
   Truck,
   Users2,
-} from 'lucide-react';
+} from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -29,8 +29,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/breadcrumb'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -39,8 +39,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 
 export default function BreadCrumbHeader() {
   return (
@@ -100,5 +100,5 @@ export default function BreadCrumbHeader() {
         </DropdownMenu>
       </header>
     </div>
-  );
+  )
 }

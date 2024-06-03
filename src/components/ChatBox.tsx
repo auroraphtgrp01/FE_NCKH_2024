@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { SendHorizontal } from 'lucide-react';
+import React, { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { SendHorizontal } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -9,16 +9,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/ui/card'
 
 export default function ChatBox({
   showChat,
   setShowChat,
 }: {
-  showChat: boolean;
-  setShowChat: (showChat: boolean) => void;
+  showChat: boolean
+  setShowChat: (showChat: boolean) => void
 }) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState('')
 
   return (
     <>
@@ -62,5 +62,5 @@ export default function ChatBox({
         </div>
       )}
     </>
-  );
+  )
 }

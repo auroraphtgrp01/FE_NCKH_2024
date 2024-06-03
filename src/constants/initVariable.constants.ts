@@ -4,7 +4,7 @@ import {
   IPermission,
   IResponseFunction,
   IVisibleButton,
-} from '@/interface/contract.i';
+} from '@/interface/contract.i'
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
@@ -17,7 +17,7 @@ export const initDisableButton: IDisableButton = {
   confirmButtonSender: true,
   confirmButtonReceiver: true,
   openDisputedButton: false,
-};
+}
 
 export const initVisibleButton: IVisibleButton = {
   deployButton: false,
@@ -29,13 +29,13 @@ export const initVisibleButton: IVisibleButton = {
   confirmButtonSender: false,
   confirmButtonReceiver: false,
   openDisputedButton: true,
-};
+}
 
 export const initResponseMessages: IResponseFunction = {
   message: '',
   status: 'destructive',
   description: '',
-};
+}
 
 export const initPermission: IPermission = {
   READ_CONTRACT: false,
@@ -44,10 +44,10 @@ export const initPermission: IPermission = {
   CHANGE_STATUS_CONTRACT: false,
   SET_OWNER_PARTY: false,
   ROLES: ERolesOfParticipant.PARTICIPANT,
-};
+}
 
 export const rolesTypeParticipant: { key: string; value: string }[] =
   Object.keys(ERolesOfParticipant).map((key) => ({
     key,
     value: ERolesOfParticipant[key as keyof typeof ERolesOfParticipant],
-  }));
+  }))

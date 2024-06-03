@@ -1,43 +1,43 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { Icons } from '@/components/ui/icons';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { Icons } from '@/components/ui/icons'
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { ModeToggle } from './DarkModeToggle';
-import { useRouter } from 'next/navigation';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { toast } from '@/components/ui/use-toast';
-import { useAppContext } from '@/components/ThemeProvider';
+} from '@/components/ui/tooltip'
+import { ModeToggle } from './DarkModeToggle'
+import { useRouter } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { toast } from '@/components/ui/use-toast'
+import { useAppContext } from '@/components/ThemeProvider'
 export default function NavbarVertical() {
-  const { userInfo, setUserInfo }: any = useAppContext();
-  const Router = useRouter();
-  const pathname = usePathname();
-  var containsContract = pathname.includes('contract');
-  var containsSupplier = pathname.includes('supplier');
+  const { userInfo, setUserInfo }: any = useAppContext()
+  const Router = useRouter()
+  const pathname = usePathname()
+  var containsContract = pathname.includes('contract')
+  var containsSupplier = pathname.includes('supplier')
   if (containsContract) {
-    containsSupplier = false;
+    containsSupplier = false
   } else if (containsSupplier) {
-    containsContract = false;
+    containsContract = false
   } else {
-    containsSupplier = false;
-    containsContract = false;
+    containsSupplier = false
+    containsContract = false
   }
 
   function logout() {
-    localStorage.removeItem('user-info');
-    setUserInfo(null);
-    Router.push('/');
+    localStorage.removeItem('user-info')
+    setUserInfo(null)
+    Router.push('/')
     toast({
       title: 'Logout Successful',
       description: 'You have been logged out successfully!',
       variant: 'success',
-    });
+    })
   }
   return (
     <div className='z-50 bg-white'>
@@ -146,5 +146,5 @@ export default function NavbarVertical() {
         </nav>
       </aside>
     </div>
-  );
+  )
 }

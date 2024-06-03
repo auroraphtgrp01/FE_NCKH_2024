@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from 'zod'
 
 export const GetSmartContract = z
   .object({
@@ -8,6 +8,6 @@ export const GetSmartContract = z
     addressWallet: z.optional(z.string()),
     methodCall: z.optional(z.string()),
   })
-  .strict();
+  .strict()
 
-export type GetContractBodyType = z.TypeOf<typeof GetSmartContract>;
+export type GetContractBodyType = z.TypeOf<typeof GetSmartContract>

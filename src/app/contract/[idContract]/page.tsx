@@ -1,24 +1,24 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract';
-import { useEffect, useState } from 'react';
-import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Icons } from '@/components/ui/icons';
-import ChatBox from '@/components/ChatBox';
-import { useParams } from 'next/navigation';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
-import { fetchAPI } from '@/utils/fetchAPI';
+} from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract'
+import { useEffect, useState } from 'react'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Icons } from '@/components/ui/icons'
+import ChatBox from '@/components/ChatBox'
+import { useParams } from 'next/navigation'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
+import { fetchAPI } from '@/utils/fetchAPI'
 import {
   ContractData,
   EContractAttributeType,
@@ -32,9 +32,9 @@ import {
   IVisibleButton,
   InvitationItem,
   RSAKey,
-} from '@/interface/contract.i';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+} from '@/interface/contract.i'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,10 +44,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import Web3 from 'web3';
-import { useAppContext } from '@/components/ThemeProvider';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/alert-dialog'
+import Web3 from 'web3'
+import { useAppContext } from '@/components/ThemeProvider'
+import { useToast } from '@/components/ui/use-toast'
 import {
   Dialog,
   DialogContent,
@@ -55,8 +55,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import InvitationArea from '@/components/InvitationArea';
+} from '@/components/ui/dialog'
+import InvitationArea from '@/components/InvitationArea'
 import {
   fetchDataWhenEntryPage,
   handleCallFunctionOfBlockchain,
@@ -66,7 +66,7 @@ import {
   transferMoneyFunc,
   updateStateButton,
   withdrawMoneyFunc,
-} from '@/app/contract/[idContract]/(functionHandler)/functionHandler';
+} from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   Select,
   SelectContent,
@@ -75,60 +75,60 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/select'
 import {
   initDisableButton,
   initVisibleButton,
-} from '@/constants/initVariable.constants';
-import Dispute from './(component)/Dispute';
-import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog';
-import { initContractAttribute } from './(component)/(store)/storeContractData';
+} from '@/constants/initVariable.constants'
+import Dispute from './(component)/Dispute'
+import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
+import { initContractAttribute } from './(component)/(store)/storeContractData'
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<
     IContractAttribute[]
-  >(initContractAttribute);
-  const [currentBalance, setCurrentBalance] = useState<number>(0);
+  >(initContractAttribute)
+  const [currentBalance, setCurrentBalance] = useState<number>(0)
   const [contractParticipants, setContractParticipants] = useState<
     IContractParticipant[]
-  >([]);
-  const [contractUsers, setContractUsers] = useState<any[]>([]);
+  >([])
+  const [contractUsers, setContractUsers] = useState<any[]>([])
 
-  const [contractData, setContractData] = useState<ContractData>();
+  const [contractData, setContractData] = useState<ContractData>()
   const [individual, setIndividual] = useState<IIndividual>({
     receiverInd: '',
     senderInd: '',
     totalAmount: '',
-  });
-  const [isOpenAlert, setIsOpenAlert] = useState(false);
-  const [isOpenEnterPrivateKey, setIsOpenEnterPrivateKey] = useState(false);
-  const [messages, setMessages] = useState('');
-  const [isDeployContractAlert, setIsDeployContractAlert] = useState(false);
-  const [isCompareContractAlert, setIsCompareContractAlert] = useState(false);
-  const [isCancelContractAlert, setIsCancelContractAlert] = useState(false);
-  const [privateKey, setPrivateKey] = useState('');
-  const [filePrivateKey, setFilePrivateKey] = useState<File>();
-  const { userInfo, setUserInfo }: any = useAppContext();
-  const [invitation, setInvitation] = useState<InvitationItem[]>([]);
-  const [contractStatus, setContractStatus] = useState<string>('');
-  const [addressContract, setAddressContract] = useState<string>('');
-  const [selectTypeKey, setSelectTypeKey] = useState(0);
-  const { toast } = useToast();
+  })
+  const [isOpenAlert, setIsOpenAlert] = useState(false)
+  const [isOpenEnterPrivateKey, setIsOpenEnterPrivateKey] = useState(false)
+  const [messages, setMessages] = useState('')
+  const [isDeployContractAlert, setIsDeployContractAlert] = useState(false)
+  const [isCompareContractAlert, setIsCompareContractAlert] = useState(false)
+  const [isCancelContractAlert, setIsCancelContractAlert] = useState(false)
+  const [privateKey, setPrivateKey] = useState('')
+  const [filePrivateKey, setFilePrivateKey] = useState<File>()
+  const { userInfo, setUserInfo }: any = useAppContext()
+  const [invitation, setInvitation] = useState<InvitationItem[]>([])
+  const [contractStatus, setContractStatus] = useState<string>('')
+  const [addressContract, setAddressContract] = useState<string>('')
+  const [selectTypeKey, setSelectTypeKey] = useState(0)
+  const { toast } = useToast()
   const [isDisableButton, setIsDisableButton] =
-    useState<IDisableButton>(initDisableButton);
+    useState<IDisableButton>(initDisableButton)
   const [isVisibleButton, setIsVisibleButton] =
-    useState<IVisibleButton>(initVisibleButton);
-  const [dialogInvite, setDialogInvite] = useState(false);
+    useState<IVisibleButton>(initVisibleButton)
+  const [dialogInvite, setDialogInvite] = useState(false)
   const [stages, setStages] = useState<any[]>([
     {
       percent: 100,
       deliveryAt: '2024-07-16T00:00:00Z',
       description: 'This is the stage of the contract',
     },
-  ]);
-  const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>();
-  const [showChat, setShowChat] = useState(false);
-  const { idContract } = useParams();
+  ])
+  const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>()
+  const [showChat, setShowChat] = useState(false)
+  const { idContract } = useParams()
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   // fetchDataWhenEntryPage
   useEffect(() => {
@@ -151,8 +151,8 @@ export default function Dashboard() {
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,
         response?.contractData.contract.stages
-      );
-      setContractStatus(response?.contractData.contract.status);
+      )
+      setContractStatus(response?.contractData.contract.status)
       // response?.contractData.participants.map((participant: any) => {
       //   if (participant?.userId === userInfo?.data?.id) {
       //     if (participant?.status === "SIGNED") {
@@ -185,8 +185,8 @@ export default function Dashboard() {
       //     ),
       //   }));
       // }
-    });
-  }, []);
+    })
+  }, [])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   // onInviteParticipant
   useEffect(() => {
@@ -203,20 +203,20 @@ export default function Dashboard() {
       setIsDisableButton({
         ...isDisableButton,
         deployButton: false,
-      });
+      })
     }
-  }, [individual]);
+  }, [individual])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   function handleBadgeColor(status: string) {
     switch (status) {
       case 'JOINED':
-        return `default`;
+        return `default`
       case 'PENDING':
-        return `blue`;
+        return `blue`
       case 'REFUSED':
-        return `destructive`;
+        return `destructive`
       default:
-        return `blue`;
+        return `blue`
     }
   }
 
@@ -231,16 +231,16 @@ export default function Dashboard() {
         toast({
           title: response.message,
           variant: 'success',
-        });
+        })
       })
       .catch((error) => {
         toast({
           title: 'Invitation failed to send',
           description: error,
           variant: 'destructive',
-        });
-      });
-    setDialogInvite(false);
+        })
+      })
+    setDialogInvite(false)
   }
 
   async function withdrawMoney() {
@@ -251,12 +251,12 @@ export default function Dashboard() {
           title: 'Error occurred while withdrawing money',
           description: error,
           variant: 'destructive',
-        });
-      });
+        })
+      })
   }
 
   async function onCallFunctionInBlockchain() {
-    setIsOpenEnterPrivateKey(false);
+    setIsOpenEnterPrivateKey(false)
     const responseMessage = await handleCallFunctionOfBlockchain(
       {
         typeAuthentication: selectTypeKey,
@@ -295,23 +295,23 @@ export default function Dashboard() {
           contractParticipants,
         },
       }
-    );
+    )
     toast({
       title: responseMessage.message,
       variant: responseMessage.status,
       description: responseMessage.description,
-    });
+    })
   }
 
   function pickFilePrivateKey(e: any) {
-    const files = e.target.files;
+    const files = e.target.files
     if (files) {
-      setFilePrivateKey(files[0]);
+      setFilePrivateKey(files[0])
     } else {
       toast({
         title: 'Please choose a file !',
         variant: 'destructive',
-      });
+      })
     }
   }
 
@@ -331,9 +331,9 @@ export default function Dashboard() {
         title: result?.messages,
         variant: result?.status as any,
         description: result?.description?.toString() || '',
-      });
-    });
-    setIsDeployContractAlert(false);
+      })
+    })
+    setIsDeployContractAlert(false)
   }
 
   // async function handleConfirmStages() {
@@ -362,16 +362,16 @@ export default function Dashboard() {
 
   async function handleCancelContract() {
     try {
-      const privateCode = await fetchAPI('/smart-contracts/abi', 'GET');
-      const abi = privateCode.data.abi.abi;
-      const web3 = new Web3(window.ethereum);
-      const contract = new web3.eth.Contract(abi, addressContract as string);
+      const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+      const abi = privateCode.data.abi.abi
+      const web3 = new Web3(window.ethereum)
+      const contract = new web3.eth.Contract(abi, addressContract as string)
       await contract.methods
         .setStatus(1)
-        .send({ from: userInfo?.data?.addressWallet });
-      setIsCancelContractAlert(false);
+        .send({ from: userInfo?.data?.addressWallet })
+      setIsCancelContractAlert(false)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
@@ -390,16 +390,16 @@ export default function Dashboard() {
           email: item.email,
           permission: item.permission,
           messages: 'You have a invitation to join a dispute contract',
-        };
-    });
+        }
+    })
     return {
       addressWallet,
       name: 'Disputed Contract - Supply Chain Management',
       type: 'DISPUTE',
       templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d',
       invitation: invitations as InvitationItem[],
-    };
-  };
+    }
+  }
 
   return (
     <div className='flex min-h-screen w-full flex-col'>
@@ -497,9 +497,9 @@ export default function Dashboard() {
                       variant={'destructive'}
                       className='ms-2'
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
-                        setNameFunctionCall(EFunctionCall.CANCEL_CONTRACT);
-                        setPrivateKey('');
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.CANCEL_CONTRACT)
+                        setPrivateKey('')
                       }}
                     >
                       Cancel The Contract
@@ -509,11 +509,11 @@ export default function Dashboard() {
                     <Button
                       disabled={isDisableButton.fetchCompareButton}
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
+                        setIsOpenEnterPrivateKey(true)
                         setNameFunctionCall(
                           EFunctionCall.FETCH_COMPARE_CONTRACT
-                        );
-                        setPrivateKey('');
+                        )
+                        setPrivateKey('')
                       }}
                     >
                       Fetch Blockchain to Compare Database
@@ -522,7 +522,7 @@ export default function Dashboard() {
                       variant={'orange'}
                       className='ms-2 w-full'
                       onClick={() => {
-                        setDialogInvite(true);
+                        setDialogInvite(true)
                       }}
                     >
                       Invite
@@ -608,7 +608,7 @@ export default function Dashboard() {
                       variant={'orange'}
                       className='w-full'
                       onClick={() => {
-                        setIsDeployContractAlert(true);
+                        setIsDeployContractAlert(true)
                       }}
                     >
                       Deploy Contract
@@ -620,9 +620,9 @@ export default function Dashboard() {
                       variant={'blue'}
                       className='w-full'
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
-                        setNameFunctionCall(EFunctionCall.SIGN_CONTRACT);
-                        setPrivateKey('');
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
+                        setPrivateKey('')
                       }}
                     >
                       Sign Contract
@@ -634,9 +634,9 @@ export default function Dashboard() {
                       variant={'destructive'}
                       className='w-full'
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
-                        setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT);
-                        setPrivateKey('');
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
+                        setPrivateKey('')
                       }}
                     >
                       Transfer
@@ -647,9 +647,9 @@ export default function Dashboard() {
                       disabled={isDisableButton.withdrawButton}
                       className='w-full'
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
-                        setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT);
-                        setPrivateKey('');
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
+                        setPrivateKey('')
                       }}
                     >
                       Withdraw
@@ -663,11 +663,11 @@ export default function Dashboard() {
                       variant={'indigo'}
                       className='mt-2 w-full'
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
+                        setIsOpenEnterPrivateKey(true)
                         setNameFunctionCall(
                           EFunctionCall.CONFIRM_CONTRACT_SENDER
-                        );
-                        setPrivateKey('');
+                        )
+                        setPrivateKey('')
                       }}
                     >
                       Customer confirmation completed
@@ -679,11 +679,11 @@ export default function Dashboard() {
                       variant={'indigo'}
                       className='mt-2 w-full'
                       onClick={() => {
-                        setIsOpenEnterPrivateKey(true);
+                        setIsOpenEnterPrivateKey(true)
                         setNameFunctionCall(
                           EFunctionCall.CONFIRM_CONTRACT_RECEIVER
-                        );
-                        setPrivateKey('');
+                        )
+                        setPrivateKey('')
                       }}
                     >
                       Supplier confirmation completed
@@ -821,7 +821,7 @@ export default function Dashboard() {
                 placeholder='Fill your private key'
                 className='w-full'
                 onChange={(e) => {
-                  setPrivateKey(e.target.value);
+                  setPrivateKey(e.target.value)
                 }}
               />
               <div className='flex w-full'>
@@ -829,7 +829,7 @@ export default function Dashboard() {
                   className='me-2 ml-auto w-full'
                   variant={'destructive'}
                   onClick={() => {
-                    setIsDeployContractAlert(false);
+                    setIsDeployContractAlert(false)
                   }}
                 >
                   Close
@@ -863,9 +863,9 @@ export default function Dashboard() {
               <div className='flex'>
                 <Select
                   onValueChange={(e) => {
-                    setPrivateKey('');
-                    setFilePrivateKey(undefined);
-                    setSelectTypeKey(Number(e));
+                    setPrivateKey('')
+                    setFilePrivateKey(undefined)
+                    setSelectTypeKey(Number(e))
                   }}
                 >
                   <SelectTrigger className='w-full'>
@@ -884,7 +884,7 @@ export default function Dashboard() {
                     placeholder='Fill your private key'
                     className='ms-2 w-full'
                     onChange={(e) => {
-                      setPrivateKey(e.target.value);
+                      setPrivateKey(e.target.value)
                     }}
                   />
                 )}
@@ -895,7 +895,7 @@ export default function Dashboard() {
                     accept='.pem'
                     className='ms-2'
                     onChange={(e) => {
-                      pickFilePrivateKey(e);
+                      pickFilePrivateKey(e)
                     }}
                   />
                 )}
@@ -905,7 +905,7 @@ export default function Dashboard() {
                   className='me-2 ml-auto w-full'
                   variant={'destructive'}
                   onClick={() => {
-                    setIsOpenEnterPrivateKey(false);
+                    setIsOpenEnterPrivateKey(false)
                   }}
                 >
                   Close
@@ -914,7 +914,7 @@ export default function Dashboard() {
                   className='ml-auto mr-auto w-full'
                   variant={'violet'}
                   onClick={() => {
-                    onCallFunctionInBlockchain();
+                    onCallFunctionInBlockchain()
                   }}
                 >
                   Execute Function
@@ -941,7 +941,7 @@ export default function Dashboard() {
                 placeholder='Fill your private key'
                 className='w-full'
                 onChange={(e) => {
-                  setPrivateKey(e.target.value);
+                  setPrivateKey(e.target.value)
                 }}
               />
               <div className='flex w-full'>
@@ -949,7 +949,7 @@ export default function Dashboard() {
                   className='me-2 ml-auto w-full'
                   variant={'destructive'}
                   onClick={() => {
-                    setIsCompareContractAlert(false);
+                    setIsCompareContractAlert(false)
                   }}
                 >
                   Close
@@ -982,7 +982,7 @@ export default function Dashboard() {
                   className='me-2 ml-auto w-full'
                   variant={'destructive'}
                   onClick={() => {
-                    setIsCancelContractAlert(false);
+                    setIsCancelContractAlert(false)
                   }}
                 >
                   Close
@@ -1023,5 +1023,5 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

@@ -1,8 +1,8 @@
-import ComboboxCustomize from '@/components/ComboBoxCustomize';
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { IAddPropertyAreaProps } from '@/interface/contract.i';
+import ComboboxCustomize from '@/components/ComboBoxCustomize'
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { IAddPropertyAreaProps } from '@/interface/contract.i'
 
 export default function AddPropertyArea({
   propertiesCBX,
@@ -12,21 +12,21 @@ export default function AddPropertyArea({
   contractAttribute,
   setContractAttribute,
 }: IAddPropertyAreaProps) {
-  const [properties, setProperty] = useState<string>('');
-  const [inputValue, setInputValue] = useState('');
-  const [propertiesAdd, setPropertiesAdd] = useState<any[]>([]);
+  const [properties, setProperty] = useState<string>('')
+  const [inputValue, setInputValue] = useState('')
+  const [propertiesAdd, setPropertiesAdd] = useState<any[]>([])
   function handleChange(property: string, value: string) {
-    setInputValue(value);
+    setInputValue(value)
     const updatedProperties = propertiesAdd.map((item) => {
       if (item.property === property) {
-        return { ...item, value: value };
+        return { ...item, value: value }
       }
-      return item;
-    });
-    setPropertiesAdd(updatedProperties);
+      return item
+    })
+    setPropertiesAdd(updatedProperties)
   }
   function handleInputChange(key: any, event: any) {
-    setContractAttribute({ ...contractAttribute, [key]: event });
+    setContractAttribute({ ...contractAttribute, [key]: event })
   }
   function addProperty() {
     setPropertiesAdd((prevProperties) => [
@@ -38,14 +38,14 @@ export default function AddPropertyArea({
         value: inputValue,
       },
       { property: '', value: '', isCreated: false },
-    ]);
+    ])
     const updatedContractAttribute = {
       ...contractAttribute,
       [properties]: inputValue,
-    };
-    setContractAttribute(updatedContractAttribute);
-    setInputValue('');
-    setProperty('');
+    }
+    setContractAttribute(updatedContractAttribute)
+    setInputValue('')
+    setProperty('')
   }
   return (
     <div>
@@ -71,9 +71,9 @@ export default function AddPropertyArea({
             className='my-3 h-[100px]'
             placeholder='Nhập các điều khoản chính'
             onChange={(e) => {
-              handleChange(item.property, e.target.value);
+              handleChange(item.property, e.target.value)
               if (item.isCreated) {
-                handleInputChange(item.property, e.target.value);
+                handleInputChange(item.property, e.target.value)
               }
             }}
             defaultValue={item.value}
@@ -84,5 +84,5 @@ export default function AddPropertyArea({
         Add New Property
       </Button>
     </div>
-  );
+  )
 }

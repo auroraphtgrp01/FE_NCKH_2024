@@ -1,28 +1,28 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import parse from 'html-react-parser';
-import { Icons } from '@/components/ui/icons';
-import { EStatusAttribute, IContractAttribute } from '@/interface/contract.i';
-import { v4 as uuidRandom } from 'uuid';
+} from '@/components/ui/tooltip'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
+import parse from 'html-react-parser'
+import { Icons } from '@/components/ui/icons'
+import { EStatusAttribute, IContractAttribute } from '@/interface/contract.i'
+import { v4 as uuidRandom } from 'uuid'
 export interface IInputWithTooltipProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  description?: string;
-  alignCenter?: boolean;
-  index: number;
-  contractAttribute: IContractAttribute[];
-  setContractAttribute: (item: IContractAttribute[]) => void;
-  setIsDetailOpen: (item: boolean) => void;
-  setInfoOfContractAttribute: (item: any) => void;
-  deleteArray?: any[];
-  setDeleteArray: (item: any) => void;
+  description?: string
+  alignCenter?: boolean
+  index: number
+  contractAttribute: IContractAttribute[]
+  setContractAttribute: (item: IContractAttribute[]) => void
+  setIsDetailOpen: (item: boolean) => void
+  setInfoOfContractAttribute: (item: any) => void
+  deleteArray?: any[]
+  setDeleteArray: (item: any) => void
 }
 
 const InputWithTooltip = React.forwardRef<
@@ -51,22 +51,22 @@ const InputWithTooltip = React.forwardRef<
         value: '',
         id: '',
         statusAttribute: EStatusAttribute.PREPARE,
-      };
-      const newContractAttributeArray = [...contractAttribute];
-      newContractAttributeArray.splice(index, 0, newContractAttribute);
-      setContractAttribute(newContractAttributeArray);
-    };
+      }
+      const newContractAttributeArray = [...contractAttribute]
+      newContractAttributeArray.splice(index, 0, newContractAttribute)
+      setContractAttribute(newContractAttributeArray)
+    }
     const handleDeleteItem = () => {
-      setDeleteArray([...(deleteArray as any), contractAttribute[index].id]);
-      const newContractAttributeArray = [...contractAttribute];
-      newContractAttributeArray.splice(index, 1);
-      setContractAttribute(newContractAttributeArray);
-    };
+      setDeleteArray([...(deleteArray as any), contractAttribute[index].id])
+      const newContractAttributeArray = [...contractAttribute]
+      newContractAttributeArray.splice(index, 1)
+      setContractAttribute(newContractAttributeArray)
+    }
 
     const handleOpenDetail = () => {
-      setInfoOfContractAttribute(contractAttribute[index]);
-      setIsDetailOpen(true);
-    };
+      setInfoOfContractAttribute(contractAttribute[index])
+      setIsDetailOpen(true)
+    }
     return (
       <div className={cn(className)}>
         <TooltipProvider delayDuration={300}>
@@ -109,9 +109,9 @@ const InputWithTooltip = React.forwardRef<
           </Tooltip>
         </TooltipProvider>
       </div>
-    );
+    )
   }
-);
+)
 
-InputWithTooltip.displayName = 'InputWithTooltip';
-export { InputWithTooltip };
+InputWithTooltip.displayName = 'InputWithTooltip'
+export { InputWithTooltip }

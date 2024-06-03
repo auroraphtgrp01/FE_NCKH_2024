@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
-'use client';
-import { ReceiptText, Trash2, X } from 'lucide-react';
-import React, { use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+'use client'
+import { ReceiptText, Trash2, X } from 'lucide-react'
+import React, { use, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   CaretSortIcon,
   ChevronDownIcon,
   DotsHorizontalIcon,
-} from '@radix-ui/react-icons';
+} from '@radix-ui/react-icons'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -19,10 +19,10 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from '@tanstack/react-table';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@tanstack/react-table'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,8 +31,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -40,8 +40,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import BreadCrumbHeader from '@/components/BreadCrumbHeader';
+} from '@/components/ui/table'
+import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,26 +52,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { fetchAPI } from '@/utils/fetchAPI';
-const data: Order[] = [];
+} from '@/components/ui/alert-dialog'
+import { ScrollArea } from '@radix-ui/react-scroll-area'
+import { fetchAPI } from '@/utils/fetchAPI'
+const data: Order[] = []
 
 export type Order = {
-  id: string;
-  orderCode: string;
-  customer: string;
-  supplier: string;
-  numberOfProducts: number;
-  total: number;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED';
-};
+  id: string
+  orderCode: string
+  customer: string
+  supplier: string
+  numberOfProducts: number
+  total: number
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED'
+}
 
 type status = {
-  PENDING: number;
-  PROCESSING: number;
-  OTHER: number;
-};
+  PENDING: number
+  PROCESSING: number
+  OTHER: number
+}
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -140,24 +140,24 @@ export const columns: ColumnDef<Order>[] = [
       <div className='capitalize'>{row.getValue('status')}</div>
     ),
   },
-];
+]
 
 export default function Page() {
-  const router = useRouter();
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const router = useRouter()
+  const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  );
+  )
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [order, setOrder] = React.useState<Order[]>([]);
+    React.useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState({})
+  const [order, setOrder] = React.useState<Order[]>([])
   const [status, setStatus] = React.useState<status>({
     PENDING: 0,
     PROCESSING: 0,
     OTHER: 0,
-  });
-  const [click, setClick] = React.useState(0);
+  })
+  const [click, setClick] = React.useState(0)
   const table = useReactTable({
     data: order,
     columns,
@@ -175,10 +175,10 @@ export default function Page() {
       columnVisibility,
       rowSelection,
     },
-  });
+  })
   function changePage(index: number) {
-    setClick(index);
-    router.push(`/order/${order[index].id}`);
+    setClick(index)
+    router.push(`/order/${order[index].id}`)
   }
   useEffect(() => {
     fetchAPI('/orders/find-all-by-user-id', 'GET').then((res) => {
@@ -186,9 +186,9 @@ export default function Page() {
         return {
           ...order,
           numberOfProducts: order.products.length,
-        };
-      });
-      setOrder(dataUserOrder);
+        }
+      })
+      setOrder(dataUserOrder)
       setStatus({
         PENDING: res.data.orders[0].filter(
           (item: any) => item.status === 'Pending'
@@ -200,9 +200,9 @@ export default function Page() {
           (item: any) =>
             item.status === 'Completed' || item.status === 'Cancelled'
         ).length,
-      });
-    });
-  }, []);
+      })
+    })
+  }, [])
 
   return (
     <div className='w-full'>
@@ -263,7 +263,7 @@ export default function Page() {
                               header.getContext()
                             )}
                       </TableHead>
-                    );
+                    )
                   })}
                 </TableRow>
               ))}
@@ -274,7 +274,7 @@ export default function Page() {
                   <TableRow
                     className='w-[150px] cursor-pointer'
                     onClick={() => {
-                      changePage(index);
+                      changePage(index)
                     }}
                     key={row.id}
                     data-state={row.getIsSelected() && 'selected'}
@@ -328,5 +328,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  );
+  )
 }

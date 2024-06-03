@@ -6,69 +6,68 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
-   Command,
-   CommandEmpty,
-   CommandGroup,
-   CommandInput,
-   CommandItem,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
 } from '@/components/ui/command';
 import {
-   Popover,
-   PopoverContent,
-   PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from '@/components/ui/popover';
 
 interface ComboBoxPicker {
-   value: any;
-   setValue: (newValue: any) => void;
+  value: any;
+  setValue: (newValue: any) => void;
 }
 
 export function Combobox({ value, setValue }: ComboBoxPicker) {
-   const [open, setOpen] = React.useState(false);
-   const frameworks = [
-      {
-         value: 'next.js',
-         label: 'Next.js',
-      },
-      {
-         value: 'sveltekit',
-         label: 'SvelteKit',
-      },
-      {
-         value: 'nuxt.js',
-         label: 'Nuxt.js',
-      },
-      {
-         value: 'remix',
-         label: 'Remix',
-      },
-      {
-         value: 'astro',
-         label: 'Astro',
-      },
-   ];
-   return (
-      <Popover open={open} onOpenChange={setOpen}>
-         <PopoverTrigger asChild>
-            <Button
-               variant='outline'
-               role='combobox'
-               aria-expanded={open}
-               className='w-full justify-between'
-            >
-               {value
-                  ? frameworks.find((framework) => framework.value === value)
-                       ?.label
-                  : 'Select Account'}
-               <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-            </Button>
-         </PopoverTrigger>
-         <PopoverContent className='w-full p-0'>
-            <Command>
-               <CommandInput placeholder='Search Account' />
-               <CommandEmpty></CommandEmpty>
-               <CommandGroup>
-                  {/* {frameworks.map((framework) => (
+  const [open, setOpen] = React.useState(false);
+  const frameworks = [
+    {
+      value: 'next.js',
+      label: 'Next.js',
+    },
+    {
+      value: 'sveltekit',
+      label: 'SvelteKit',
+    },
+    {
+      value: 'nuxt.js',
+      label: 'Nuxt.js',
+    },
+    {
+      value: 'remix',
+      label: 'Remix',
+    },
+    {
+      value: 'astro',
+      label: 'Astro',
+    },
+  ];
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant='outline'
+          role='combobox'
+          aria-expanded={open}
+          className='w-full justify-between'
+        >
+          {value
+            ? frameworks.find((framework) => framework.value === value)?.label
+            : 'Select Account'}
+          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className='w-full p-0'>
+        <Command>
+          <CommandInput placeholder='Search Account' />
+          <CommandEmpty></CommandEmpty>
+          <CommandGroup>
+            {/* {frameworks.map((framework) => (
                             <CommandItem
                                 key={framework.value}
                                 value={framework.value}
@@ -86,9 +85,9 @@ export function Combobox({ value, setValue }: ComboBoxPicker) {
                                 {framework.label}
                             </CommandItem>
                         ))} */}
-               </CommandGroup>
-            </Command>
-         </PopoverContent>
-      </Popover>
-   );
+          </CommandGroup>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
 }

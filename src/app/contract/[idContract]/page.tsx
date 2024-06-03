@@ -457,13 +457,13 @@ export default function Dashboard() {
                           <Separator className='mt-2' />
                         </div>
                         <ScrollArea className='mt-2 h-[180px]'>
-                          {dependentInfo?.sender && (
+                          {dependentInfo?.sender?.User?.name && (
                             <div className='mt-3 flex items-center'>
                               <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User.name}</p>
+                                <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
                                 <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.sender.User.addressWallet.length - 30) +
-                                    dependentInfo.sender.User.addressWallet.slice(-5)}
+                                  {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
+                                    dependentInfo.sender?.User.addressWallet.slice(-5)}
                                 </p>
                               </div>
                               <div className='ml-auto font-medium'>
@@ -473,13 +473,13 @@ export default function Dashboard() {
                               </div>
                             </div>
                           )}
-                          {dependentInfo?.receiver && (
+                          {dependentInfo?.receiver?.User?.name && (
                             <div className='mt-3 flex items-center'>
                               <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User.name}</p>
+                                <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User?.name}</p>
                                 <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.receiver.User.addressWallet.length - 30) +
-                                    dependentInfo.receiver.User.addressWallet.slice(-5)}
+                                  {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
+                                    dependentInfo.receiver.User?.addressWallet.slice(-5)}
                                 </p>
                               </div>
                               <div className='ml-auto font-medium'>
@@ -539,7 +539,7 @@ export default function Dashboard() {
                 </div>
                 <div className='mt-2 grid gap-3'>
                   <div className='flex align-middle'>
-                    <div className='font-semibold'>Total Amount of Money:</div>
+                    <div className='font-semibold'>Total Value Of Contract: </div>
                     <div className='translate-x-[15px] translate-y-[-7px]'>
                       <Input
                         readOnly

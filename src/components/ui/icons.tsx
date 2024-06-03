@@ -20,7 +20,8 @@ import {
   CloudSun,
   WalletMinimal,
   ShoppingCart,
-  FileCheck2Icon
+  FileCheck2Icon,
+  CircleUser
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -47,6 +48,7 @@ export const Icons = {
   walletMinimal: WalletMinimal,
   shoppingCart: ShoppingCart,
   FileCheck2Icon: FileCheck2Icon,
+  user: CircleUser,
   logo: (props: LucideProps) => <Image src={'/metamask.png'} alt='' height={62} width={62} />,
   gitHub: (props: LucideProps) => (
     <svg viewBox='0 0 438.549 438.549' {...props}>

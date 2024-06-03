@@ -130,6 +130,9 @@ export default function BreadCrumbHeader() {
               <Icons.walletMinimal className='me-2 h-5 w-5' />
               {userInfo?.balance} ETH
             </Button>
+            <Button variant={'outline'} type='button' className='ms-2'>
+              <Icons.user className='me-2 h-5 w-5' /> {userInfo?.data?.name}
+            </Button>
           </div>
         )}
         {!checkLogin() && (
@@ -139,9 +142,6 @@ export default function BreadCrumbHeader() {
             </Button>
           </div>
         )}
-        <div className='ms-2'>
-          <ModeToggle />
-        </div>
       </div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogPortal>

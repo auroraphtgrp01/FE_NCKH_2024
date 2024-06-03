@@ -73,7 +73,12 @@ const updateStateButton = (
           deployButton: false,
           signButton: true
         }))
-
+        setIsDisableButton((prev: any) => ({
+          ...prev,
+          editContractButton: true,
+          inviteButton: true,
+          cancelButton: true
+        }))
         if (participantsLogin?.status !== 'SIGNED') {
           setIsDisableButton((prev: any) => ({
             ...prev,
@@ -105,7 +110,9 @@ const updateStateButton = (
           cancelButton: true,
           fetchCompareButton: false,
           confirmButtonReceiver: userInfo.data.role === 'Supplier' && hasStageNotStarted ? false : true,
-          confirmButtonSender: userInfo.data.role === 'Customer' && hasStagePending !== undefined ? false : true
+          confirmButtonSender: userInfo.data.role === 'Customer' && hasStagePending !== undefined ? false : true,
+          editContractButton: true,
+          inviteButton: true
         }))
         break
       default:
@@ -463,7 +470,10 @@ const handleOnDeployContractFunc = async (
       ...prevState,
       transferButton: true,
       deployButton: true,
-      signButton: false
+      signButton: false,
+      inviteButton: true,
+      cancelButton: true,
+      editContractButton: true
     }))
     await Promise.all([
       fetchAPI('/contracts', 'PATCH', {

@@ -141,38 +141,6 @@ export default function Dashboard() {
       )
       setContractStatus(response?.contractData.contract.status)
       setDependentInfo(getIndividualFromParticipant(response?.contractData.participants))
-      // response?.contractData.participants.map((participant: any) => {
-      //   if (participant?.userId === userInfo?.data?.id) {
-      //     if (participant?.status === "SIGNED") {
-      //       setIsDisableButton((prev: any) => ({
-      //         ...prev,
-      //         signButton: true,
-      //       }));
-      //     }
-      //   }
-      // });
-      // const addressMatch = (type: any) =>
-      //   (
-      //     response?.contractData.contractAttributes.find(
-      //       (item: any) => item.type === type
-      //     )?.value || ""
-      //   ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
-      // if (
-      //   response?.contractData.contract.status === "SIGNED" ||
-      //   response?.contractData.contract.status === "ENFORCE"
-      // ) {
-      //   setIsDisableButton((prev: any) => ({
-      //     ...prev,
-      //     cancelButton: false,
-      //     fetchCompareButton: false,
-      //     withdrawButton: !addressMatch(
-      //       EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-      //     ),
-      //     transferButton: !addressMatch(
-      //       EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
-      //     ),
-      //   }));
-      // }
     })
   }, [])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -432,11 +400,9 @@ export default function Dashboard() {
                   </div>
                   <Separator className='' />
                   <div className='flex items-center justify-center text-center'>
-                    <Link href={`/contract/${idContract}/edit`}>
-                      <Button className='' variant={'violet'}>
-                        Edit contract
-                      </Button>
-                    </Link>
+                    <Button className='' disabled={isDisableButton.editContractButton} variant={'violet'}>
+                      <Link href={`/contract/${idContract}/edit`}>Edit contract</Link>
+                    </Button>
                     <Button
                       onClick={() => setShowChat(!showChat)}
                       className='ms-2 w-full rounded-md border border-none bg-blue-500 px-2 py-2 text-sm text-white shadow outline-none hover:bg-blue-500/90 dark:text-white'
@@ -468,6 +434,7 @@ export default function Dashboard() {
                       Fetch Blockchain to Compare Database
                     </Button>
                     <Button
+                      disabled={isDisableButton.inviteButton}
                       variant={'orange'}
                       className='ms-2 w-full'
                       onClick={() => {

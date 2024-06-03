@@ -4,13 +4,13 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 
 export default function DialogInfoAttribute({
   isDetailAttributeDialog,
   setIsDetailAttributeDialog,
-  infoOfAttribute,
+  infoOfAttribute
 }: {
   isDetailAttributeDialog: boolean
   setIsDetailAttributeDialog: (item: boolean) => void
@@ -18,15 +18,10 @@ export default function DialogInfoAttribute({
 }) {
   return (
     <div>
-      <AlertDialog
-        open={isDetailAttributeDialog}
-        onOpenChange={setIsDetailAttributeDialog}
-      >
+      <AlertDialog open={isDetailAttributeDialog} onOpenChange={setIsDetailAttributeDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className='text-center'>
-              Info of Contract Attribute
-            </AlertDialogTitle>
+            <AlertDialogTitle className='text-center'>Info of Contract Attribute</AlertDialogTitle>
             <Table>
               <TableBody>
                 <TableRow>
@@ -51,31 +46,19 @@ export default function DialogInfoAttribute({
                   <TableCell>
                     <b>Property</b>
                   </TableCell>
-                  <TableCell>
-                    {infoOfAttribute?.property
-                      ? infoOfAttribute.property
-                      : 'N/A'}
-                  </TableCell>
+                  <TableCell>{infoOfAttribute?.property ? infoOfAttribute.property : 'N/A'}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <b>Created By:</b>{' '}
                   </TableCell>
-                  <TableCell>
-                    {infoOfAttribute?.createdBy?.email
-                      ? infoOfAttribute?.createdBy?.email
-                      : 'N/A'}
-                  </TableCell>
+                  <TableCell>{infoOfAttribute?.createdBy?.email ? infoOfAttribute?.createdBy?.email : 'N/A'}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>
                     <b>Updated By: </b>
                   </TableCell>
-                  <TableCell>
-                    {infoOfAttribute?.updatedBy?.email
-                      ? infoOfAttribute?.updatedBy?.email
-                      : 'N/A'}
-                  </TableCell>
+                  <TableCell>{infoOfAttribute?.updatedBy?.email ? infoOfAttribute?.updatedBy?.email : 'N/A'}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>

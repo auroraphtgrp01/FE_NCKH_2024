@@ -34,8 +34,7 @@ export default function Home() {
             </main>
 
             <p className='mx-auto text-xl text-muted-foreground md:w-10/12 lg:mx-0'>
-              Empower Your Supply Chain with Smart Contracts: Efficiency,
-              Transparency, and Trust in Every Link.
+              Empower Your Supply Chain with Smart Contracts: Efficiency, Transparency, and Trust in Every Link.
             </p>
 
             <div className='space-y-4 md:space-x-4 md:space-y-0'>

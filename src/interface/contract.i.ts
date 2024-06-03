@@ -16,7 +16,7 @@ export enum EContractAttributeType {
   CONTRACT_HEADING_1 = 'Contract Heading 1',
   CONTRACT_HEADING_2 = 'Contract Heading 2',
   CONTRACT_ATTRIBUTE = 'Contract Attribute',
-  CONTRACT_SIGNATURE = 'Contract Signature',
+  CONTRACT_SIGNATURE = 'Contract Signature'
 }
 export enum EContractAttributeTypeAdditional {
   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = 'Contract Attribute Party Address Wallet Joined',
@@ -29,12 +29,12 @@ export enum EContractAttributeTypeAdditional {
   CONTRACT_HEADING_1 = 'Contract Heading 1',
   CONTRACT_HEADING_2 = 'Contract Heading 2',
   CONTRACT_ATTRIBUTE = 'Contract Attribute',
-  CONTRACT_SIGNATURE = 'Contract Signature',
+  CONTRACT_SIGNATURE = 'Contract Signature'
 }
 export enum EContractAttributeTypeAdditionalHeader {
   CONTRACT_HEADER = 'Contract Header',
   CONTRACT_HEADER_DATE = 'Contract Header Date',
-  CONTRACT_TITLE = 'Contract Title',
+  CONTRACT_TITLE = 'Contract Title'
 }
 export interface IContractAttribute {
   id?: string
@@ -51,10 +51,9 @@ export enum EStatusAttribute {
   CREATE = 'Create',
   UPDATE = 'Update',
   PREPARE = 'Prepare',
-  NOT_CHANGE = 'Not Change',
+  NOT_CHANGE = 'Not Change'
 }
-export interface IDefinitionContractAttribute
-  extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {}
+export interface IDefinitionContractAttribute extends Omit<IContractAttribute, 'id' | 'value' | 'property'> {}
 export interface IContractParticipant {
   id: string
   userId: string
@@ -83,7 +82,7 @@ export enum EContractStatus {
   ENFORCE = 'ENFORCE',
   SIGNED = 'SIGNED',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
+  FAILED = 'FAILED'
 }
 export interface DynamicType {
   [key: string]: any
@@ -168,7 +167,7 @@ export interface InvitationItem {
 export interface ContractTemplate {
   id: string
   name: string
-  path: string
+  path?: string
   contractAttributes: any[]
 }
 export interface IPermission {
@@ -184,7 +183,7 @@ export enum ERolesOfParticipant {
   SENDER = 'Sender Users',
   RECEIVER = 'Receiver Users',
   ARBITRATION = 'Arbitration',
-  PARTICIPANT = 'Participant',
+  PARTICIPANT = 'Participant'
 }
 export interface IAddPropertyAreaProps {
   propertiesCBX: string[]
@@ -201,7 +200,7 @@ export enum EFunctionCall {
   TRANSFER_CONTRACT = 'TRANSFER_CONTRACT',
   SIGN_CONTRACT = 'SIGN_CONTRACT',
   CONFIRM_CONTRACT_SENDER = 'CONFIRM_CONTRACT_SENDER',
-  CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER',
+  CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER'
 }
 
 export interface ISignContractFunctionCallParams {
@@ -264,7 +263,7 @@ export enum EStageStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
-  OUT_OF_DATE = 'OUT_OF_DATE',
+  OUT_OF_DATE = 'OUT_OF_DATE'
 }
 
 export interface ITemplateContract {
@@ -299,5 +298,5 @@ export enum EStageContractStatus {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
   ENFORCE = 'ENFORCE',
-  WITHDRAWN = 'WITHDRAWN',
+  WITHDRAWN = 'WITHDRAWN'
 }

@@ -1,22 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 import { use, useEffect, useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from '@/components/ui/carousel'
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { useAppContext } from '@/components/ThemeProvider'
@@ -26,28 +14,24 @@ import { useRouter } from 'next/navigation'
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract'
 import InvitationArea from '@/components/InvitationArea'
-import Image from 'next/image'
-import {
-  ContractTemplate,
-  ITemplateContract,
-  InvitationItem,
-} from '@/interface/contract.i'
+import { ContractTemplate, ITemplateContract, InvitationItem } from '@/interface/contract.i'
 import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
+import Image from 'next/image'
+import { Separator } from '@/components/ui/separator'
 
 export default function page() {
   const [template, setTemplate] = useState<ContractTemplate[]>([
     {
       id: '',
       name: 'Empty Contract',
-      path: 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
       contractAttributes: [],
-    },
+      path: 'https://i.ibb.co/XkJxzFW/sddsdsds.png'
+    }
   ])
-  const { userInfo, setUserInfo }: any = useAppContext()
-  const { dataCreateContract, setDataCreateContract }: any = useAppContext()
+  const { userInfo }: any = useAppContext()
   const [invitation, setInvitation] = useState<InvitationItem[]>([])
   const [nameOfContractInput, setNameOfContractInput] = useState('')
-  const [templateSelect, setTemplateSelect] = useState<ITemplateContract[]>()
+  const [templateSelect, setTemplateSelect] = useState<ITemplateContract>()
   const [messages, setMessages] = useState('')
   const [contractAttribute, setContractAttribute] = useState<any[]>([])
   const Router = useRouter()
@@ -56,24 +40,24 @@ export default function page() {
     fetchAPI('/template-contracts', 'GET')
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          setTemplate([res?.data])
-          if (res.data.length > 0) {
-            const firstTemplateId = res.data[0]?.id
-            fetchAPI(`/template-contracts/${firstTemplateId}/attributes`, 'GET')
-              .then((res) => {
-                if (res.status === 200) {
-                  setContractAttribute(res.data.contractAttributes)
-                } else {
-                  setContractAttribute([])
-                }
-              })
-              .catch((error) => {
-                console.error('Error fetching contract attributes:', error)
-                setContractAttribute([])
-              })
-          } else {
-            setContractAttribute([])
-          }
+          setTemplate((prev) => [...prev, ...res.data])
+          // if (res.data.length > 0) {
+          //   const firstTemplateId = res.data[0]?.id
+          //   fetchAPI(`/template-contracts/${firstTemplateId}/attributes`, 'GET')
+          //     .then((res) => {
+          //       if (res.status === 200) {
+          //         setContractAttribute(res.data.contractAttributes)
+          //       } else {
+          //         setContractAttribute([])
+          //       }
+          //     })
+          //     .catch((error) => {
+          //       console.error('Error fetching contract attributes:', error)
+          //       setContractAttribute([])
+          //     })
+          // } else {
+          //   setContractAttribute([])
+          // }
         }
       })
       .catch((error) => {
@@ -93,10 +77,7 @@ export default function page() {
   }, [api])
   useEffect(() => {
     if (current !== 0) {
-      fetchAPI(
-        `/template-contracts/${template[current]?.id}/attributes`,
-        'GET'
-      ).then((res) => {
+      fetchAPI(`/template-contracts/${template[current]?.id}/attributes`, 'GET').then((res) => {
         if (res.status === 200) {
           console.log(res.data)
           setContractAttribute(res.data.contractAttributes)
@@ -111,22 +92,25 @@ export default function page() {
     console.log(templateSelect)
   }, [templateSelect])
   async function onClickCreateContractButton() {
-    const templateId = templateSelect ? templateSelect[0].id : undefined
+    const templateId = templateSelect ? templateSelect.id : undefined
     onCreateANewContract({
       addressWallet: userInfo?.data?.addressWallet,
       name: nameOfContractInput,
       templateId,
       invitation: invitation,
-      messagesForInvitation: messages,
+      messagesForInvitation: messages
     }).then((res) => {
       res.contractId ? Router.push(`/contract/${res?.contractId}`) : null
       toast({
         title: res.message,
         description: res.description,
-        variant: res.status,
+        variant: res.status
       })
     })
   }
+  useEffect(() => {
+    console.log(template)
+  }, [template])
 
   return (
     <div>
@@ -147,24 +131,17 @@ export default function page() {
             <CardContent>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Address Wallet: </Label>
-                <Input
-                  disabled
-                  readOnly
-                  defaultValue={userInfo?.data?.addressWallet}
-                />
+                <Input disabled readOnly defaultValue={userInfo?.data?.addressWallet} />
               </div>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Name of Contract: </Label>
-                <Input
-                  defaultValue={nameOfContractInput}
-                  onChange={(e) => setNameOfContractInput(e.target.value)}
-                />
+                <Input defaultValue={nameOfContractInput} onChange={(e) => setNameOfContractInput(e.target.value)} />
               </div>
               <div className='mt-2 flex flex-col space-y-2'>
                 <Label>Template Contract: </Label>
                 <Carousel
                   opts={{
-                    align: 'start',
+                    align: 'start'
                   }}
                   orientation='vertical'
                   className='w-full max-w-xs'
@@ -172,48 +149,21 @@ export default function page() {
                 >
                   <CarouselContent className='-mt-1 h-[300px]'>
                     {template.map((item, index) => (
-                      // <CarouselItem key={index} className="pt-1 md:basis-1/2">
-                      //   <div className="p-1">
-                      //     <Card>
-                      //       <CardContent className="flex justify-center p-6">
-                      //         {
-                      //           <div className="h-[150px] mt-auto">
-                      //             <Image
-                      //               alt={item.name}
-                      //               src={item.path}
-                      //               width={"220"}
-                      //               height={"120"}
-                      //             ></Image>
-                      //             {item.name}
-                      //           </div>
-                      //         }
-                      //       </CardContent>
-                      //     </Card>
-                      //   </div>
-                      // </CarouselItem>
                       <CarouselItem key={index} className='pt-1 md:basis-1/2'>
                         <div className='p-1'>
                           <Card>
                             <CardContent className='flex flex-col items-center p-6'>
                               <div className='relative h-[150px] w-[220px]'>
-                                <Image
-                                  alt={item.name}
-                                  src={item.path}
-                                  layout='fill'
-                                  objectFit='contain'
-                                  className='rounded'
-                                />
+                                {item.path ? <img src={item.path} className='rounded'></img> : null}
                               </div>
-                              <div className='mt-2 text-center'>
-                                {item.name}
-                              </div>
+                              <div className='mt-2 text-center'>{item.name}</div>
                             </CardContent>
                           </Card>
                         </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                </Carousel>
+                </Carousel>{' '}
               </div>
             </CardContent>
             <CardFooter>
@@ -222,6 +172,11 @@ export default function page() {
                 variant={'destructive'}
                 onClick={() => {
                   setTemplateSelect(template[current] as any)
+                  toast({
+                    title: 'Template selected',
+                    description: template[current]?.name,
+                    variant: 'success'
+                  })
                 }}
               >
                 Choose a Template
@@ -244,10 +199,7 @@ export default function page() {
               />
             </CardContent>
             <CardFooter>
-              <Button
-                className='me-2 w-full'
-                onClick={onClickCreateContractButton}
-              >
+              <Button className='me-2 w-full' onClick={onClickCreateContractButton}>
                 Create Contract
               </Button>
               <Button className='w=full' variant={'destructive'}>
@@ -259,21 +211,12 @@ export default function page() {
         <div className='ms-4 flex py-4'>
           <Card className='min-w-[600px]'>
             <CardHeader>
-              <CardTitle className='text-center text-lg font-semibold'>
-                {template[current]?.name}
-              </CardTitle>
-              <CardDescription>
-                Preview the contract here - Please choose a template
-              </CardDescription>
+              <CardTitle className='text-center text-lg font-semibold'>{template[current]?.name}</CardTitle>
+              <Separator />
             </CardHeader>
-            <ScrollArea className='h-[600px]'>
-              <CardContent>
-                <PreviewContract
-                  contractAttribute={contractAttribute}
-                  setContractAttribute={setContractAttribute}
-                />
-              </CardContent>
-            </ScrollArea>
+            <CardContent>
+              <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
+            </CardContent>
           </Card>
         </div>
       </div>

@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import {
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  Command,
-} from '@/components/ui/command'
+import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, Command } from '@/components/ui/command'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { cn } from '@/lib/utils'
 
@@ -29,7 +18,7 @@ export default function ComboboxCustomize({
   propertiesCBX,
   setNewProperties,
   newPropertiesArray,
-  setPropertiesCBX,
+  setPropertiesCBX
 }: ComboBoxPicker) {
   const [inputValue, setInputValue] = useState('')
   const [openPopover, setOpenPopover] = useState(false)
@@ -64,11 +53,7 @@ export default function ComboboxCustomize({
     <div>
       <Popover open={openPopover} onOpenChange={setOpenPopover}>
         <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className='w-[160px] justify-between truncate'
-          >
+          <Button variant='outline' role='combobox' className='w-[160px] justify-between truncate'>
             {indexProperty > -1 ? properties[indexProperty] : 'Select property'}
             <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>

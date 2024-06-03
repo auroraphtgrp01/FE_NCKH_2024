@@ -7,23 +7,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import {
-  EStageStatus,
-  IOpenDisputedComponentProps,
-  IStagesContract,
-} from '@/interface/contract.i'
+import { EStageStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i'
 import { getDateNow } from '@/utils/dayjs'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
 import React from 'react'
@@ -35,7 +24,7 @@ const stages: IStagesContract[] = [
     requestBy: '0x',
     requestTo: '1x',
     status: EStageStatus.PENDING,
-    dueDate: getDateNow(),
+    dueDate: getDateNow()
   },
   {
     id: '2',
@@ -43,7 +32,7 @@ const stages: IStagesContract[] = [
     requestBy: '0x',
     requestTo: '1x',
     status: EStageStatus.PENDING,
-    dueDate: getDateNow(),
+    dueDate: getDateNow()
   },
   {
     id: '3',
@@ -51,7 +40,7 @@ const stages: IStagesContract[] = [
     requestBy: '0x',
     requestTo: '1x',
     status: EStageStatus.PENDING,
-    dueDate: getDateNow(),
+    dueDate: getDateNow()
   },
   {
     id: '4',
@@ -59,22 +48,18 @@ const stages: IStagesContract[] = [
     requestBy: '0x',
     requestTo: '1x',
     status: EStageStatus.APPROVED,
-    dueDate: getDateNow(),
-  },
+    dueDate: getDateNow()
+  }
 ]
 
-export default function Dispute({
-  isDisableButton,
-  isVisibleButton,
-  payload,
-}: IOpenDisputedComponentProps) {
+export default function Dispute({ isDisableButton, isVisibleButton, payload }: IOpenDisputedComponentProps) {
   const { toast } = useToast()
   const handleOpenDisputeContract = () => {
     onCreateANewContract(payload).then((res) => {
       toast({
         title: res.message,
         description: res.description,
-        variant: res.status,
+        variant: res.status
       })
     })
   }
@@ -95,9 +80,7 @@ export default function Dispute({
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you absolutely sure to create dispute contract?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Are you absolutely sure to create dispute contract?</AlertDialogTitle>
             <AlertDialogDescription>
               <Table className=''>
                 <TableHeader>
@@ -116,9 +99,7 @@ export default function Dispute({
                       <TableCell>{item.requestBy}</TableCell>
                       <TableCell>{item.requestTo}</TableCell>
                       <TableCell>{item.dueDate.toString()}</TableCell>
-                      <TableCell className='text-right'>
-                        {item.status}
-                      </TableCell>
+                      <TableCell className='text-right'>{item.status}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -129,10 +110,7 @@ export default function Dispute({
             <AlertDialogCancel>
               <Button variant={'destructive'}>Close</Button>
             </AlertDialogCancel>
-            <AlertDialogAction
-              className='me-1'
-              onClick={handleOpenDisputeContract}
-            >
+            <AlertDialogAction className='me-1' onClick={handleOpenDisputeContract}>
               Open Dispute Contract
             </AlertDialogAction>
           </AlertDialogFooter>

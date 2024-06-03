@@ -10,7 +10,7 @@ export default function AddPropertyArea({
   newPropertiesArray,
   setNewProperties,
   contractAttribute,
-  setContractAttribute,
+  setContractAttribute
 }: IAddPropertyAreaProps) {
   const [properties, setProperty] = useState<string>('')
   const [inputValue, setInputValue] = useState('')
@@ -35,13 +35,13 @@ export default function AddPropertyArea({
         ...prevProperties[prevProperties.length - 1],
         isCreated: true,
         property: properties,
-        value: inputValue,
+        value: inputValue
       },
-      { property: '', value: '', isCreated: false },
+      { property: '', value: '', isCreated: false }
     ])
     const updatedContractAttribute = {
       ...contractAttribute,
-      [properties]: inputValue,
+      [properties]: inputValue
     }
     setContractAttribute(updatedContractAttribute)
     setInputValue('')

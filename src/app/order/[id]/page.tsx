@@ -8,23 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 // import { columns } from "../columns";
 import { DataTable } from '../data-table'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -34,7 +21,7 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { useParams } from 'next/navigation'
@@ -103,7 +90,7 @@ export default function Page() {
   const { dataCreateContract, setDataCreateContract }: any = useAppContext()
   const [data, setData] = useState<DataWithName>({
     status: '',
-    orderDetails: [],
+    orderDetails: []
   })
   const { id } = useParams<{ id: string }>()
   const [dataOrder, setDataOrder] = useState<any>({})
@@ -114,7 +101,7 @@ export default function Page() {
     isDisableButtonResendRq: false,
     isDisableButtonDeleteSurvey: false,
     isDisableButtonCreateContract: false,
-    isDisableButtonRefuseSurvey: false,
+    isDisableButtonRefuseSurvey: false
   })
   const [isCustomer, setIsCustomer] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -124,7 +111,7 @@ export default function Page() {
     id: '',
     refresh_token: '',
     name: '',
-    role: '',
+    role: ''
   })
   // xxxxxx
   useEffect(() => {
@@ -142,19 +129,19 @@ export default function Page() {
       .then((res) => {
         toast({
           title: res.data.message,
-          variant: 'success',
+          variant: 'success'
         })
 
         setIsDisableButton({
           ...isDisableButton,
-          isDisableButtonSendRq: true,
+          isDisableButtonSendRq: true
         })
         getDataOrders()
       })
       .catch((err) =>
         toast({
           title: err.message,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       )
   }
@@ -164,19 +151,19 @@ export default function Page() {
       .then((res) => {
         toast({
           title: res.data.message,
-          variant: 'success',
+          variant: 'success'
         })
 
         setIsDisableButton({
           ...isDisableButton,
-          isDisableButtonResendRq: true,
+          isDisableButtonResendRq: true
         })
         getDataOrders()
       })
       .catch((err) =>
         toast({
           title: err.message,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       )
   }
@@ -185,7 +172,7 @@ export default function Page() {
     setDataCreateContract({
       supplierId: dataOrder.order.suppliersId,
       userId: dataOrder.order.userId,
-      orderId: dataOrder.order.id,
+      orderId: dataOrder.order.id
     })
 
     router.push('/contract/create')
@@ -199,12 +186,12 @@ export default function Page() {
       if (type === 'endDate') {
         payload = {
           id: id,
-          endDate: isoDate,
+          endDate: isoDate
         }
       } else if (type === 'delivery') {
         payload = {
           id: id,
-          executeDate: isoDate,
+          executeDate: isoDate
         }
       }
       if (payload) {
@@ -213,13 +200,13 @@ export default function Page() {
             getDataOrders()
             toast({
               title: `Update thành công`,
-              variant: 'success',
+              variant: 'success'
             })
           })
         } catch (err) {
           toast({
             title: `Update không thành công`,
-            variant: 'destructive',
+            variant: 'destructive'
           })
         }
       }
@@ -231,29 +218,24 @@ export default function Page() {
     fetchAPI(`/orders/${id}`, 'GET')
       .then((res) => {
         setDataOrder(res.data)
-        if (res.data.order.endDate !== null)
-          setEndate(res.data.order.endDate.split('T')[0])
-        if (res.data.order.executeDate !== null)
-          setDelivery(res.data.order.executeDate.split('T')[0])
+        if (res.data.order.endDate !== null) setEndate(res.data.order.endDate.split('T')[0])
+        if (res.data.order.executeDate !== null) setDelivery(res.data.order.executeDate.split('T')[0])
         const { products, ...rest } = res.data.order
         setIsDisableButton({
           ...isDisableButton,
           isDisableButtonSendRq: res.data.order.status !== 'Pending',
-          isDisableButtonResendRq:
-            res.data.order.status === 'Completed' ||
-            res.data.order.status === 'Cancelled',
+          isDisableButtonResendRq: res.data.order.status === 'Completed' || res.data.order.status === 'Cancelled',
           isDisableButtonCreateContract: res.data.order.status !== 'Completed',
           isDisableButtonRefuseSurvey: res.data.order.status !== 'In Progress',
-          isDisableButtonDeleteSurvey: res.data.order.status !== 'Pending',
+          isDisableButtonDeleteSurvey: res.data.order.status !== 'Pending'
         })
 
         const productOrder = res.data.order.products.map((product: any) => {
           return {
             ...product,
-            priceWithoutTax:
-              product.price * product.quantity - product.discount,
+            priceWithoutTax: product.price * product.quantity - product.discount,
             idSupplier: res.data.supplier.id,
-            idOrder: id,
+            idOrder: id
           }
         })
 
@@ -265,15 +247,11 @@ export default function Page() {
   return (
     <div>
       <div className='flex justify-between'>
-        <h2 className='mb-5 text-lg font-semibold tracking-tight'>
-          Request a quote
-        </h2>
+        <h2 className='mb-5 text-lg font-semibold tracking-tight'>Request a quote</h2>
         <Breadcrumb className='mt-2'>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <div className='cursor-default font-bold text-green-500'>
-                Confirm
-              </div>
+              <div className='cursor-default font-bold text-green-500'>Confirm</div>
             </BreadcrumbItem>
             <BreadcrumbSeparator className='text-green-500' />
             <BreadcrumbItem>
@@ -336,11 +314,7 @@ export default function Page() {
       <Tabs defaultValue='products' className='mb-5 w-full'>
         <TabsContent value='products'>
           {/* columns={columns} */}
-          <DataTable
-            data={data}
-            setData={setData}
-            getDataOrders={getDataOrders}
-          />
+          <DataTable data={data} setData={setData} getDataOrders={getDataOrders} />
         </TabsContent>
       </Tabs>
       <div className='flex justify-end'>

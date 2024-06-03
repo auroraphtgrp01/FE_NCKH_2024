@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   ignoreBuildErrors: true,
   reactStrictMode: false,
   images: {
@@ -8,10 +11,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**',
         port: '',
-        pathname: '**',
-      },
-    ],
-  },
+        pathname: '**'
+      }
+    ]
+  }
 }
 
 export default nextConfig

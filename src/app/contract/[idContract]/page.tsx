@@ -2,13 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import PreviewContract from '@/app/contract/[idContract]/(component)/PreviewContract'
 import { useEffect, useState } from 'react'
@@ -31,7 +25,7 @@ import {
   IIndividual,
   IVisibleButton,
   InvitationItem,
-  RSAKey,
+  RSAKey
 } from '@/interface/contract.i'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -43,7 +37,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import Web3 from 'web3'
 import { useAppContext } from '@/components/ThemeProvider'
@@ -54,7 +48,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import InvitationArea from '@/components/InvitationArea'
 import {
@@ -65,7 +59,7 @@ import {
   inviteNewParticipant,
   transferMoneyFunc,
   updateStateButton,
-  withdrawMoneyFunc,
+  withdrawMoneyFunc
 } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   Select,
@@ -74,31 +68,24 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
-import {
-  initDisableButton,
-  initVisibleButton,
-} from '@/constants/initVariable.constants'
+import { initDisableButton, initVisibleButton } from '@/constants/initVariable.constants'
 import Dispute from './(component)/Dispute'
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
 import { initContractAttribute } from './(component)/(store)/storeContractData'
 
 export default function Dashboard() {
-  const [contractAttribute, setContractAttribute] = useState<
-    IContractAttribute[]
-  >(initContractAttribute)
+  const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute)
   const [currentBalance, setCurrentBalance] = useState<number>(0)
-  const [contractParticipants, setContractParticipants] = useState<
-    IContractParticipant[]
-  >([])
+  const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([])
   const [contractUsers, setContractUsers] = useState<any[]>([])
 
   const [contractData, setContractData] = useState<ContractData>()
   const [individual, setIndividual] = useState<IIndividual>({
     receiverInd: '',
     senderInd: '',
-    totalAmount: '',
+    totalAmount: ''
   })
   const [isOpenAlert, setIsOpenAlert] = useState(false)
   const [isOpenEnterPrivateKey, setIsOpenEnterPrivateKey] = useState(false)
@@ -114,17 +101,15 @@ export default function Dashboard() {
   const [addressContract, setAddressContract] = useState<string>('')
   const [selectTypeKey, setSelectTypeKey] = useState(0)
   const { toast } = useToast()
-  const [isDisableButton, setIsDisableButton] =
-    useState<IDisableButton>(initDisableButton)
-  const [isVisibleButton, setIsVisibleButton] =
-    useState<IVisibleButton>(initVisibleButton)
+  const [isDisableButton, setIsDisableButton] = useState<IDisableButton>(initDisableButton)
+  const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>(initVisibleButton)
   const [dialogInvite, setDialogInvite] = useState(false)
   const [stages, setStages] = useState<any[]>([
     {
       percent: 100,
       deliveryAt: '2024-07-16T00:00:00Z',
-      description: 'This is the stage of the contract',
-    },
+      description: 'This is the stage of the contract'
+    }
   ])
   const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>()
   const [showChat, setShowChat] = useState(false)
@@ -202,42 +187,37 @@ export default function Dashboard() {
     ) {
       setIsDisableButton({
         ...isDisableButton,
-        deployButton: false,
+        deployButton: false
       })
     }
   }, [individual])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   function handleBadgeColor(status: string) {
     switch (status) {
-      case 'JOINED':
-        return `default`
       case 'PENDING':
         return `blue`
-      case 'REFUSED':
-        return `destructive`
+      case 'ACCEPTED':
+        return `default`
+      case 'SIGNED':
+        return `default`
       default:
         return `blue`
     }
   }
 
   function inviteParticipant() {
-    inviteNewParticipant(
-      idContract,
-      invitation,
-      messages,
-      setContractParticipants
-    )
+    inviteNewParticipant(idContract, invitation, messages, setContractParticipants)
       .then((response) => {
         toast({
           title: response.message,
-          variant: 'success',
+          variant: 'success'
         })
       })
       .catch((error) => {
         toast({
           title: 'Invitation failed to send',
           description: error,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
     setDialogInvite(false)
@@ -250,7 +230,7 @@ export default function Dashboard() {
         toast({
           title: 'Error occurred while withdrawing money',
           description: error,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
   }
@@ -261,7 +241,7 @@ export default function Dashboard() {
       {
         typeAuthentication: selectTypeKey,
         privateKey: privateKey,
-        filePrivateKey: filePrivateKey,
+        filePrivateKey: filePrivateKey
       },
       {
         nameFunctionCall,
@@ -273,7 +253,7 @@ export default function Dashboard() {
           contractParticipants,
           setContractParticipants,
           setIsVisibleButton,
-          setIsDisableButton,
+          setIsDisableButton
         },
         transferFunctionParams: {
           addressContract,
@@ -282,7 +262,7 @@ export default function Dashboard() {
           setUserInfo,
           userInfo,
           setIsVisibleButton,
-          setIsDisableButton,
+          setIsDisableButton
         },
         confirmFunctionParams: {
           addressContract,
@@ -292,14 +272,14 @@ export default function Dashboard() {
           setIsDisableButton,
           setIsVisibleButton,
           privateKey,
-          contractParticipants,
-        },
+          contractParticipants
+        }
       }
     )
     toast({
       title: responseMessage.message,
       variant: responseMessage.status,
-      description: responseMessage.description,
+      description: responseMessage.description
     })
   }
 
@@ -310,7 +290,7 @@ export default function Dashboard() {
     } else {
       toast({
         title: 'Please choose a file !',
-        variant: 'destructive',
+        variant: 'destructive'
       })
     }
   }
@@ -330,7 +310,7 @@ export default function Dashboard() {
       toast({
         title: result?.messages,
         variant: result?.status as any,
-        description: result?.description?.toString() || '',
+        description: result?.description?.toString() || ''
       })
     })
     setIsDeployContractAlert(false)
@@ -366,9 +346,7 @@ export default function Dashboard() {
       const abi = privateCode.data.abi.abi
       const web3 = new Web3(window.ethereum)
       const contract = new web3.eth.Contract(abi, addressContract as string)
-      await contract.methods
-        .setStatus(1)
-        .send({ from: userInfo?.data?.addressWallet })
+      await contract.methods.setStatus(1).send({ from: userInfo?.data?.addressWallet })
       setIsCancelContractAlert(false)
     } catch (error) {
       console.log(error)
@@ -389,7 +367,7 @@ export default function Dashboard() {
         return {
           email: item.email,
           permission: item.permission,
-          messages: 'You have a invitation to join a dispute contract',
+          messages: 'You have a invitation to join a dispute contract'
         }
     })
     return {
@@ -397,7 +375,7 @@ export default function Dashboard() {
       name: 'Disputed Contract - Supply Chain Management',
       type: 'DISPUTE',
       templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d',
-      invitation: invitations as InvitationItem[],
+      invitation: invitations as InvitationItem[]
     }
   }
 
@@ -416,9 +394,7 @@ export default function Dashboard() {
             <Card className='h-[755px] w-[430px] overflow-hidden'>
               <CardHeader className='flex flex-row items-start'>
                 <div className='w-full'>
-                  <CardTitle className='flex items-center text-lg'>
-                    Contract Information
-                  </CardTitle>
+                  <CardTitle className='flex items-center text-lg'>Contract Information</CardTitle>
                   <CardDescription>Date: November 23, 2023</CardDescription>
                   <Separator className='mt-4' />
                 </div>
@@ -436,47 +412,25 @@ export default function Dashboard() {
                     <Input readOnly className='mt-2' value={addressContract} />
                   </div>
                   <div className='mt-1 flex align-middle'>
-                    <div className='font-semibold'>
-                      Funds locked in a Contract:
-                    </div>
+                    <div className='font-semibold'>Funds locked in a Contract:</div>
                     <div className='ms-3 translate-y-[-15px]'>
-                      <Input
-                        readOnly
-                        className='mt-2 w-[155px]'
-                        value={currentBalance + ' ETH'}
-                      />
+                      <Input readOnly className='mt-2 w-[155px]' value={currentBalance + ' ETH'} />
                     </div>
                   </div>
                   <div>
                     <div className='font-semibold'>Contract Progress </div>
-                    {contractStatus === 'PENDING' && (
-                      <Progress value={0} className='my-2' />
-                    )}
-                    {contractStatus === 'PARTICIPATED' && (
-                      <Progress value={25} className='my-2' />
-                    )}
-                    {contractStatus === 'ENFORCE' && (
-                      <Progress value={50} className='my-2' />
-                    )}
-                    {contractStatus === 'SIGNED' && (
-                      <Progress value={75} className='my-2' />
-                    )}
-                    {contractStatus === 'COMPLETED' && (
-                      <Progress value={100} className='my-2' />
-                    )}
+                    {contractStatus === 'PENDING' && <Progress value={0} className='my-2' />}
+                    {contractStatus === 'PARTICIPATED' && <Progress value={25} className='my-2' />}
+                    {contractStatus === 'ENFORCE' && <Progress value={50} className='my-2' />}
+                    {contractStatus === 'SIGNED' && <Progress value={75} className='my-2' />}
+                    {contractStatus === 'COMPLETED' && <Progress value={100} className='my-2' />}
                     <div className='flex'>
-                      <div className='ms-1 text-center font-semibold'>
-                        Participated
-                      </div>
-                      <div className='ms-8 text-center font-semibold'>
-                        Deployed
-                      </div>
+                      <div className='ms-1 text-center font-semibold'>Participated</div>
+                      <div className='ms-8 text-center font-semibold'>Deployed</div>
                       <div className='ms-8 text-center font-semibold'>
                         Signed <br /> Contract
                       </div>
-                      <div className='ms-10 text-center font-semibold'>
-                        Completed
-                      </div>
+                      <div className='ms-10 text-center font-semibold'>Completed</div>
                     </div>
                   </div>
                   <Separator className='' />
@@ -510,9 +464,7 @@ export default function Dashboard() {
                       disabled={isDisableButton.fetchCompareButton}
                       onClick={() => {
                         setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(
-                          EFunctionCall.FETCH_COMPARE_CONTRACT
-                        )
+                        setNameFunctionCall(EFunctionCall.FETCH_COMPARE_CONTRACT)
                         setPrivateKey('')
                       }}
                     >
@@ -531,10 +483,7 @@ export default function Dashboard() {
                   <Dispute
                     isDisableButton={isDisableButton}
                     isVisibleButton={isVisibleButton}
-                    payload={getDataToOpenDisputeContract(
-                      contractParticipants,
-                      userInfo?.data.addressWallet
-                    )}
+                    payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
                   />
                 </div>
               </CardContent>
@@ -542,19 +491,14 @@ export default function Dashboard() {
           </div>
           <div className='min-w-[640px] flex-1'>
             <Card className=''>
-              <PreviewContract
-                contractAttribute={contractAttribute}
-                setContractAttribute={setContractAttribute}
-              />
+              <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
             </Card>
           </div>
           <div className='h-[642px] min-w-[300px] flex-1 px-3'>
             <Card className='h-[755px] w-[420px] overflow-hidden'>
               <CardHeader className='flex flex-row items-start'>
                 <div className='w-full'>
-                  <CardTitle className='flex items-center text-lg'>
-                    Dependent Information
-                  </CardTitle>
+                  <CardTitle className='flex items-center text-lg'>Dependent Information</CardTitle>
                   <Separator className='mt-4' />
                 </div>
               </CardHeader>
@@ -574,9 +518,7 @@ export default function Dashboard() {
                 </div>
                 <div className='mt-2 grid gap-3'>
                   <div className='flex align-middle'>
-                    <div className='font-semibold'>
-                      Receiver Representative:
-                    </div>
+                    <div className='font-semibold'>Receiver Representative:</div>
                     <div className='ms-2 translate-y-[-7px]'>
                       <Input
                         readOnly
@@ -595,7 +537,7 @@ export default function Dashboard() {
                         readOnly
                         className='w-[180px]'
                         placeholder='Total Amount of Money'
-                        defaultValue={individual?.totalAmount}
+                        defaultValue={`${individual?.totalAmount ? individual?.totalAmount + ' ETH' : ''}`}
                       />
                     </div>
                   </div>
@@ -664,9 +606,7 @@ export default function Dashboard() {
                       className='mt-2 w-full'
                       onClick={() => {
                         setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(
-                          EFunctionCall.CONFIRM_CONTRACT_SENDER
-                        )
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_SENDER)
                         setPrivateKey('')
                       }}
                     >
@@ -680,9 +620,7 @@ export default function Dashboard() {
                       className='mt-2 w-full'
                       onClick={() => {
                         setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(
-                          EFunctionCall.CONFIRM_CONTRACT_RECEIVER
-                        )
+                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_RECEIVER)
                         setPrivateKey('')
                       }}
                     >
@@ -699,9 +637,7 @@ export default function Dashboard() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure to create dispute contract?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure to create dispute contract?</AlertDialogTitle>
                         <AlertDialogDescription>
                           <div className='mx-auto max-w-md'>
                             <div className='flex flex-col space-y-2'>
@@ -752,27 +688,18 @@ export default function Dashboard() {
                       </div>
                       <Separator className='mb-2' />
                     </CardHeader>
-                    <ScrollArea className='h-full max-h-[300px]'>
+                    <ScrollArea className='h-[300px]'>
                       <CardContent className='grid gap-8 p-5'>
                         {contractParticipants.map((participant, index) => (
                           <div className='flex items-center' key={index}>
                             <div className='grid'>
                               <p className='text-sm font-medium leading-none'>
-                                {participant?.User
-                                  ? participant?.User?.name
-                                  : 'No Name'}
+                                {participant?.User ? participant?.User?.name : 'No Name'}
                               </p>
-                              <p className='text-sm text-muted-foreground'>
-                                {participant.email}
-                              </p>
+                              <p className='text-sm text-muted-foreground'>{participant.email}</p>
                             </div>
                             <div className='ml-auto font-medium'>
-                              <Badge
-                                variant={
-                                  handleBadgeColor(participant.status) as any
-                                }
-                                className='me-1 translate-y-[-5px]'
-                              >
+                              <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>
                                 {participant.status}
                               </Badge>
                               <Button className='px-2' variant={'destructive'}>
@@ -793,8 +720,8 @@ export default function Dashboard() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
+                  This action cannot be undone. This will permanently delete your account and remove your data from our
+                  servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -803,23 +730,18 @@ export default function Dashboard() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <AlertDialog
-            open={isDeployContractAlert}
-            onOpenChange={setIsDeployContractAlert}
-          >
+          <AlertDialog open={isDeployContractAlert} onOpenChange={setIsDeployContractAlert}>
             <AlertDialogContent>
-              <AlertDialogTitle className='text-center'>
-                Deploy Contract
-              </AlertDialogTitle>
+              <AlertDialogTitle className='text-center'>Deploy Contract</AlertDialogTitle>
               <AlertDialogDescription className='text-center'>
                 <b className='text-red-500'>
-                  If you forget the private key, you will not be able to recover
-                  it and will lose access to the contract
+                  If you forget the private key, you will not be able to recover it and will lose access to the contract
                 </b>
               </AlertDialogDescription>
               <Input
                 placeholder='Fill your private key'
                 className='w-full'
+                type='password'
                 onChange={(e) => {
                   setPrivateKey(e.target.value)
                 }}
@@ -834,25 +756,16 @@ export default function Dashboard() {
                 >
                   Close
                 </Button>
-                <Button
-                  className='ml-auto mr-auto w-full'
-                  variant={'violet'}
-                  onClick={handleOnDeployContract}
-                >
+                <Button className='ml-auto mr-auto w-full' variant={'violet'} onClick={handleOnDeployContract}>
                   Deploy Contract
                 </Button>
               </div>
             </AlertDialogContent>
           </AlertDialog>
           {/* CALL ALERT DIALOG */}
-          <AlertDialog
-            open={isOpenEnterPrivateKey}
-            onOpenChange={setIsOpenEnterPrivateKey}
-          >
+          <AlertDialog open={isOpenEnterPrivateKey} onOpenChange={setIsOpenEnterPrivateKey}>
             <AlertDialogContent>
-              <AlertDialogTitle className='text-center'>
-                Enter your private key
-              </AlertDialogTitle>
+              <AlertDialogTitle className='text-center'>Enter your private key</AlertDialogTitle>
               <AlertDialogDescription className='text-center'>
                 <b className='text-red-500'>
                   You must enter your private key to continue <br />
@@ -923,18 +836,12 @@ export default function Dashboard() {
             </AlertDialogContent>
           </AlertDialog>
 
-          <AlertDialog
-            open={isCompareContractAlert}
-            onOpenChange={setIsCompareContractAlert}
-          >
+          <AlertDialog open={isCompareContractAlert} onOpenChange={setIsCompareContractAlert}>
             <AlertDialogContent>
-              <AlertDialogTitle className='text-center'>
-                Fetch Blockchain to Compare Database
-              </AlertDialogTitle>
+              <AlertDialogTitle className='text-center'>Fetch Blockchain to Compare Database</AlertDialogTitle>
               <AlertDialogDescription className='text-center'>
                 <b className='text-red-500'>
-                  If you forget the private key, you will not be able to recover
-                  it and will lose access to the contract
+                  If you forget the private key, you will not be able to recover it and will lose access to the contract
                 </b>
               </AlertDialogDescription>
               <Input
@@ -964,18 +871,11 @@ export default function Dashboard() {
               </div>
             </AlertDialogContent>
           </AlertDialog>
-          <AlertDialog
-            open={isCancelContractAlert}
-            onOpenChange={setIsCancelContractAlert}
-          >
+          <AlertDialog open={isCancelContractAlert} onOpenChange={setIsCancelContractAlert}>
             <AlertDialogContent>
-              <AlertDialogTitle className='text-center'>
-                Cancel Contract
-              </AlertDialogTitle>
+              <AlertDialogTitle className='text-center'>Cancel Contract</AlertDialogTitle>
               <AlertDialogDescription className='text-center'>
-                <b className='text-red-500'>
-                  Once canceled, this action cannot be reversed.
-                </b>
+                <b className='text-red-500'>Once canceled, this action cannot be reversed.</b>
               </AlertDialogDescription>
               <div className='flex w-full'>
                 <Button
@@ -1000,9 +900,7 @@ export default function Dashboard() {
         <DialogContent className='sm:max-w-[500px]'>
           <DialogHeader>
             <DialogTitle>Invitation Participant</DialogTitle>
-            <DialogDescription>
-              Invite your partner to join the contract
-            </DialogDescription>
+            <DialogDescription>Invite your partner to join the contract</DialogDescription>
           </DialogHeader>
           <div className='flex items-center space-x-2'>
             <Card className='min-w-[450px]'>

@@ -17,16 +17,8 @@ function Home() {
           React.createElement(card_1.CardTitle, null, 'Card Title'),
           React.createElement(card_1.CardDescription, null, 'Card Description')
         ),
-        React.createElement(
-          card_1.CardContent,
-          null,
-          React.createElement('p', null, 'Card Content')
-        ),
-        React.createElement(
-          card_1.CardFooter,
-          null,
-          React.createElement('p', null, 'Card Footer')
-        )
+        React.createElement(card_1.CardContent, null, React.createElement('p', null, 'Card Content')),
+        React.createElement(card_1.CardFooter, null, React.createElement('p', null, 'Card Footer'))
       )
     )
   )

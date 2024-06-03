@@ -4,22 +4,9 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  PIN,
-  PINType,
-  RegisterBody,
-  RegisterBodyType,
-} from '@/validateSchema/Authentication.validate'
+import { PIN, PINType, RegisterBody, RegisterBodyType } from '@/validateSchema/Authentication.validate'
 import {
   Select,
   SelectContent,
@@ -27,23 +14,11 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 import { CalendarPicker } from '@/components/ui/calendar-picker'
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from '@/components/ui/input-otp'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -51,7 +26,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useAppContext } from '@/components/ThemeProvider'
@@ -70,10 +45,10 @@ export default function RegisterForm() {
   const [registerId, setRegisterId] = React.useState<string>('')
   const Router = useRouter()
   const form = useForm<RegisterBodyType>({
-    resolver: zodResolver(RegisterBody),
+    resolver: zodResolver(RegisterBody)
   })
   const formPIN = useForm<PINType>({
-    resolver: zodResolver(PIN),
+    resolver: zodResolver(PIN)
   })
   function togglePageBlock(): void {
     setBlockPage((prev) => !prev)
@@ -89,7 +64,7 @@ export default function RegisterForm() {
     toast({
       title: 'Update your PIN',
       description: 'Please update your PIN to continue with this action.',
-      variant: 'destructive',
+      variant: 'destructive'
     })
     setTimeout(() => {
       setIsOpen(true)
@@ -101,7 +76,7 @@ export default function RegisterForm() {
         toast({
           title: 'Register Success',
           description: 'Register Success. Please login to continue.',
-          variant: 'default',
+          variant: 'default'
         })
         Router.push('/')
       })
@@ -109,7 +84,7 @@ export default function RegisterForm() {
         toast({
           title: 'Register Fail',
           description: `Register Fail: ${err.toString()}`,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
     setIsOpen(false)
@@ -119,14 +94,14 @@ export default function RegisterForm() {
       return toast({
         title: 'Empty Field',
         description: 'Please fill all field to register account',
-        variant: 'destructive',
+        variant: 'destructive'
       })
     console.log(values)
 
     const payload = {
       ...values,
       dateOfBirth: date?.toISOString(),
-      addressWallet: userInfo?.accounts,
+      addressWallet: userInfo?.accounts
     }
     fetchAPI('/auth/register', 'POST', payload)
       .then((res) => {
@@ -139,7 +114,7 @@ export default function RegisterForm() {
         toast({
           title: 'Register Fail',
           description: `Register Fail: ${err.toString()}`,
-          variant: 'destructive',
+          variant: 'destructive'
         })
       })
   }
@@ -164,12 +139,7 @@ export default function RegisterForm() {
                   <FormItem>
                     <FormLabel>Address Wallet: </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder=''
-                        {...field}
-                        disabled
-                        value={userInfo?.accounts}
-                      />
+                      <Input placeholder='' {...field} disabled value={userInfo?.accounts} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -287,10 +257,7 @@ export default function RegisterForm() {
                       <FormItem>
                         <FormLabel>Date Of Birth: </FormLabel>
                         <FormControl>
-                          <CalendarPicker
-                            onDateChange={setDate}
-                            selectedDate={date}
-                          />
+                          <CalendarPicker onDateChange={setDate} selectedDate={date} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -323,27 +290,18 @@ export default function RegisterForm() {
             >
               <DialogHeader>
                 <DialogTitle>Set your PIN to log in</DialogTitle>
-                <DialogDescription>
-                  Please Set Your Pin Code to 6 Digits.
-                </DialogDescription>
+                <DialogDescription>Please Set Your Pin Code to 6 Digits.</DialogDescription>
               </DialogHeader>
               <div className='grid justify-center gap-4 py-4'>
                 <Form {...formPIN}>
-                  <form
-                    onSubmit={formPIN.handleSubmit(updatePIN)}
-                    className='space-y-6 text-center'
-                  >
+                  <form onSubmit={formPIN.handleSubmit(updatePIN)} className='space-y-6 text-center'>
                     <FormField
                       control={formPIN.control}
                       name='PIN'
                       render={({ field }) => (
                         <FormItem className='justify-center text-center'>
                           <FormControl className='justify-center text-center'>
-                            <InputOTP
-                              maxLength={6}
-                              {...field}
-                              className='justify-center text-center'
-                            >
+                            <InputOTP maxLength={6} {...field} className='justify-center text-center'>
                               <InputOTPGroup>
                                 <InputOTPSlot index={0} />
                                 <InputOTPSlot index={1} />

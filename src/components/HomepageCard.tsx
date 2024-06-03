@@ -1,14 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Badge } from '@/components/Badge'
 import { Button, buttonVariants } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Check, Linkedin, Facebook, Instagram } from 'lucide-react'
 import { LightBulbIcon } from '@/components/HomepageIcon'
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
@@ -37,16 +30,13 @@ export const HomePageCard = () => {
             className='absolute -top-12 aspect-square h-24 w-24 rounded-full object-cover grayscale-[0%]'
           />
           <CardTitle className='text-center'>Le Minh Tuan</CardTitle>
-          <CardDescription className='font-normal text-primary'>
-            Software Engineer
-          </CardDescription>
+          <CardDescription className='font-normal text-primary'>Software Engineer</CardDescription>
         </CardHeader>
 
         <CardContent className='pb-2 text-center'>
           <p>
-            Our SCM's smart contracts: Efficiency and transparency
-            revolutionized! Trust and precision in every transaction, seamlessly
-            executed and recorded
+            Our SCM's smart contracts: Efficiency and transparency revolutionized! Trust and precision in every
+            transaction, seamlessly executed and recorded
           </p>
         </CardContent>
 
@@ -57,7 +47,7 @@ export const HomePageCard = () => {
               target='_blank'
               className={buttonVariants({
                 variant: 'ghost',
-                size: 'sm',
+                size: 'sm'
               })}
             >
               <span className='sr-only'>Github icon</span>
@@ -68,7 +58,7 @@ export const HomePageCard = () => {
               target='_blank'
               className={buttonVariants({
                 variant: 'ghost',
-                size: 'sm',
+                size: 'sm'
               })}
             >
               <Facebook size={20} />
@@ -78,7 +68,7 @@ export const HomePageCard = () => {
               target='_blank'
               className={buttonVariants({
                 variant: 'ghost',
-                size: 'sm',
+                size: 'sm'
               })}
             >
               <Instagram size={20} />
@@ -100,9 +90,7 @@ export const HomePageCard = () => {
             <span className='text-3xl font-bold'>Unlock Possibilities </span>
           </div>
 
-          <CardDescription>
-            Where Innovation Meets the Blockchain Future
-          </CardDescription>
+          <CardDescription>Where Innovation Meets the Blockchain Future</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -113,14 +101,9 @@ export const HomePageCard = () => {
 
         <CardFooter className='flex'>
           <div className='space-y-4'>
-            {[
-              'Security First',
-              'Scalability Solutions',
-              'Versatile Innovation',
-            ].map((benefit: string) => (
+            {['Security First', 'Scalability Solutions', 'Versatile Innovation'].map((benefit: string) => (
               <span key={benefit} className='flex'>
-                <Check className='text-green-500' />{' '}
-                <h3 className='ml-2'>{benefit}</h3>
+                <Check className='text-green-500' /> <h3 className='ml-2'>{benefit}</h3>
               </span>
             ))}
           </div>

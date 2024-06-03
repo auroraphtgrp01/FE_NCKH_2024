@@ -5,20 +5,8 @@
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
 import { Icons } from '@/components/ui/icons'
 import { useToast } from '@/components/ui/use-toast'
@@ -30,7 +18,7 @@ import {
   TableFooter,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table'
 import { useParams } from 'next/navigation'
 import { fetchAPI } from '@/utils/fetchAPI'
@@ -39,7 +27,7 @@ const image = [
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720TPB/cong-ty-cp-xi-mang-ha-tien-1-651515.jpg',
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720Ymu/cong-ty-co-phan-go-an-cuong-651470.jpg',
   'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720GWy/magis-stone-1176889.jpg',
-  'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
+  'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg'
 ]
 
 const dataProduct = [
@@ -48,41 +36,36 @@ const dataProduct = [
     name: 'Xi măng Hà Tiên 1',
     image:
       'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description:
-      'Xi măng Hà Tiên 1, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc',
+    description: 'Xi măng Hà Tiên 1, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
   },
   {
     id: 5,
     name: 'Gạch ốp lát Viglacera',
     image:
       'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description:
-      'Gạch ốp lát Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc',
+    description: 'Gạch ốp lát Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
   },
   {
     id: 6,
     name: 'Sứ vệ sinh Viglacera',
     image:
       'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description:
-      'Sứ vệ sinh Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc',
+    description: 'Sứ vệ sinh Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
   },
   {
     id: 7,
     name: 'Kính xây dựng Viglacera',
     image:
       'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description:
-      'Kính xây dựng Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc',
+    description: 'Kính xây dựng Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
   },
   {
     id: 8,
     name: 'Gạch ngói đất sét nung Viglacera',
     image:
       'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description:
-      'Gạch ngói đất sét nung Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc',
-  },
+    description: 'Gạch ngói đất sét nung Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
+  }
 ]
 
 export default function page() {
@@ -102,10 +85,7 @@ export default function page() {
         const supplierResponse = await fetchAPI(`/suppliers/${id}`, 'GET')
         setDataSupplier(supplierResponse.data)
 
-        const productResponse = await fetchAPI(
-          `/products/find-all-by-supplier/${id}`,
-          'GET'
-        )
+        const productResponse = await fetchAPI(`/products/find-all-by-supplier/${id}`, 'GET')
         setDataProduct(productResponse.data)
         console.log(productResponse.data)
       } catch (error) {
@@ -142,7 +122,7 @@ export default function page() {
     toast({
       title: 'Add to cart',
       description: 'Add product to cart successfully',
-      variant: 'success',
+      variant: 'success'
     })
     setIsDetail(false)
   }
@@ -151,7 +131,7 @@ export default function page() {
   async function addToCart() {
     const payload = {
       supplierId: id,
-      productId: productDetail.id,
+      productId: productDetail.id
     }
     console.log(payload)
 
@@ -160,7 +140,7 @@ export default function page() {
         if (res.status === 201) {
           toast({
             title: `${res.data.message}`,
-            variant: 'success',
+            variant: 'success'
           })
           setIsDetail(false)
           console.log(res)
@@ -179,11 +159,7 @@ export default function page() {
             <Link href='/order-list'>
               <Button
                 variant={'outline'}
-                className={
-                  cart.length !== 0
-                    ? 'ms-2 font-bold text-red-600'
-                    : 'ms-2 font-bold'
-                }
+                className={cart.length !== 0 ? 'ms-2 font-bold text-red-600' : 'ms-2 font-bold'}
               >
                 <Icons.FileCheck2Icon className='me-2 h-5 w-5' />
                 Price Surveys{' '}
@@ -232,9 +208,7 @@ export default function page() {
         </div>
         <div className='grid items-start gap-4 md:gap-10'>
           <div className='grid gap-4'>
-            <h1 className='text-3xl font-bold lg:text-4xl'>
-              {dataSupplier.name}
-            </h1>
+            <h1 className='text-3xl font-bold lg:text-4xl'>{dataSupplier.name}</h1>
             <div className='flex items-center gap-4'>
               <div className='flex items-center gap-0.5'>
                 <StarIcon className='h-5 w-5 fill-black' />
@@ -244,9 +218,7 @@ export default function page() {
                 <StarIcon className='h-5 w-5 fill-muted stroke-muted-foreground' />
               </div>
               <div>
-                <span className='text-sm text-gray-500 dark:text-gray-400'>
-                  4.5
-                </span>
+                <span className='text-sm text-gray-500 dark:text-gray-400'>4.5</span>
               </div>
             </div>
             <div className='text-sm leading-loose text-gray-500 dark:text-gray-400'>
@@ -258,8 +230,7 @@ export default function page() {
                 <b className='font-bold'>Email: </b> {dataSupplier.email}
               </div>
               <div>
-                <b className='font-bold'>Phone: </b>{' '}
-                {dataSupplier?.User?.phoneNumber}
+                <b className='font-bold'>Phone: </b> {dataSupplier?.User?.phoneNumber}
               </div>
               <div>
                 <b className='font-bold'>TaxCode: </b> {dataSupplier?.taxCode}
@@ -294,14 +265,12 @@ export default function page() {
                           }
                           style={{
                             aspectRatio: '400/300',
-                            objectFit: 'cover',
+                            objectFit: 'cover'
                           }}
                           width='400'
                         />
                         <div className='p-4'>
-                          <h3 className='mb-2 select-none text-lg font-semibold'>
-                            {item.name}
-                          </h3>
+                          <h3 className='mb-2 select-none text-lg font-semibold'>{item.name}</h3>
                           <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>
                             {item.description}
                           </p>
@@ -332,14 +301,10 @@ export default function page() {
             <div className='ms-4 grid gap-4'>
               <div>
                 <h1 className='text-3xl font-bold'>{productDetail?.name}</h1>
-                <p className='mt-2 text-gray-500 dark:text-gray-400'>
-                  {productDetail?.description}
-                </p>
+                <p className='mt-2 text-gray-500 dark:text-gray-400'>{productDetail?.description}</p>
               </div>
               <div className='flex flex-col'>
-                <span className='text-2xl font-bold'>
-                  Estimate Price: {productDetail?.price} ETH / Unit
-                </span>
+                <span className='text-2xl font-bold'>Estimate Price: {productDetail?.price} ETH / Unit</span>
                 <Button
                   className='ml-12 mr-auto mt-5 w-[80%] items-center text-center'
                   onClick={(e) => {
@@ -380,7 +345,7 @@ export default function page() {
                       src={item.image}
                       style={{
                         aspectRatio: '100/100',
-                        objectFit: 'cover',
+                        objectFit: 'cover'
                       }}
                       width={50}
                     />

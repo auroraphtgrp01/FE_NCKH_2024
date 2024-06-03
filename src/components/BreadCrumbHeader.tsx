@@ -7,7 +7,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
+  BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 import {
   Dialog,
@@ -17,14 +17,9 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogPortal,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from '@/components/ui/input-otp'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/DarkModeToggle'
 import { useAppContext } from '@/components/ThemeProvider'
@@ -57,7 +52,7 @@ export default function BreadCrumbHeader() {
     try {
       const login = await fetchAPI('/auth/login', 'POST', {
         addressWallet: wallet.accounts[0],
-        PIN: pin,
+        PIN: pin
       })
       if (login.status == 201) {
         const web3 = new Web3(window.ethereum)
@@ -66,13 +61,13 @@ export default function BreadCrumbHeader() {
         const balanceEth = web3.utils.fromWei(balance, 'ether')
         setUserInfo({
           data: login.data,
-          balance: Number(balanceEth).toFixed(3),
+          balance: Number(balanceEth).toFixed(3)
         })
         localStorage.setItem(
           'user-info',
           JSON.stringify({
             data: login.data,
-            balance: Number(balanceEth).toFixed(3),
+            balance: Number(balanceEth).toFixed(3)
           })
         )
 
@@ -81,14 +76,14 @@ export default function BreadCrumbHeader() {
           title: 'Login success',
           description: 'You have successfully logged in',
           variant: 'success',
-          duration: 2000,
+          duration: 2000
         })
       } else {
         toast({
           title: 'Login failed',
           description: 'Please check your PIN code',
           variant: 'destructive',
-          duration: 2000,
+          duration: 2000
         })
       }
     } catch (error) {}
@@ -102,7 +97,7 @@ export default function BreadCrumbHeader() {
   }
   const handleConnect = async () => {
     let accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts',
+      method: 'eth_requestAccounts'
     })
     setWallet({ accounts })
     const checkAccount = await fetchAPI(`/auth/${accounts[0]}`, 'GET')
@@ -116,7 +111,7 @@ export default function BreadCrumbHeader() {
           title: 'Account not found',
           description: 'Please register to create an account',
           variant: 'destructive',
-          duration: 2000,
+          duration: 2000
         })
         Router.push('/register')
       }
@@ -129,8 +124,7 @@ export default function BreadCrumbHeader() {
         {checkLogin() && (
           <div className='flex'>
             <Button variant={'outline'} type='button'>
-              <Icons.login className='me-2 h-5 w-5' />{' '}
-              {userInfo?.data?.addressWallet}
+              <Icons.login className='me-2 h-5 w-5' /> {userInfo?.data?.addressWallet}
             </Button>
             <Button variant={'outline'} type='button' className='ms-2'>
               <Icons.walletMinimal className='me-2 h-5 w-5' />
@@ -141,8 +135,7 @@ export default function BreadCrumbHeader() {
         {!checkLogin() && (
           <div className='flex'>
             <Button variant={'outline'} onClick={handleConnect}>
-              <Icons.login className='me-2 h-5 w-5' />{' '}
-              <div className='font-semibold'> CONNECT TO METAMASK </div>
+              <Icons.login className='me-2 h-5 w-5' /> <div className='font-semibold'> CONNECT TO METAMASK </div>
             </Button>
           </div>
         )}
@@ -161,9 +154,7 @@ export default function BreadCrumbHeader() {
           >
             <DialogHeader>
               <DialogTitle>Set your PIN to log in</DialogTitle>
-              <DialogDescription>
-                Please Set Your Pin Code to 6 Digits.
-              </DialogDescription>
+              <DialogDescription>Please Set Your Pin Code to 6 Digits.</DialogDescription>
             </DialogHeader>
             <div className='grid justify-center gap-4 py-4'>
               <InputOTP

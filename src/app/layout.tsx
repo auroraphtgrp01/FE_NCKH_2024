@@ -12,11 +12,11 @@ const inter = Inter({ subsets: ['vietnamese'] })
 
 export const metadata: Metadata = {
   title: 'Smart Contract - Supply Chain Management System',
-  description: '',
+  description: ''
 }
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode
 }>) {
@@ -24,12 +24,7 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <head></head>
       <body className={cn(inter.className)} suppressHydrationWarning={true}>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
           <AppProvider>
             {/* <Header /> */}
             <div className='flex min-h-screen w-full flex-col overflow-hidden'>

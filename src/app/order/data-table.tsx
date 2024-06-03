@@ -10,7 +10,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from '@tanstack/react-table'
 import {
   Select,
@@ -19,24 +19,17 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Settings2 } from 'lucide-react'
 import { useState } from 'react'
@@ -49,28 +42,17 @@ import { DataTableProps } from './[id]/page'
 import { Product } from './[id]/page'
 import { OrderDetail } from './[id]/page'
 
-export function DataTable<TData extends DataWithName>({
-  data,
-  getDataOrders,
-  setData,
-}: DataTableProps<TData>) {
+export function DataTable<TData extends DataWithName>({ data, getDataOrders, setData }: DataTableProps<TData>) {
   const columns = getColumns(
     data,
     (orderDetails) => setData((prev) => ({ ...prev, orderDetails })),
     getDataOrders
   ) as ColumnDef<OrderDetail, any>[] // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [userInfo, setUserInfo] = React.useState<any>(
-    JSON.parse(localStorage.getItem('user-info') as string)
-  )
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [ListSelectProduct, setListSelectProduct] = React.useState<Product[]>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  const [userInfo, setUserInfo] = React.useState<any>(JSON.parse(localStorage.getItem('user-info') as string))
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [ListSelectProduct, setListSelectProduct] = React.useState<Product[]>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const table = useReactTable({
     data: data.orderDetails as OrderDetail[], // Add type assertion to data.orderDetails
     columns,
@@ -83,8 +65,8 @@ export function DataTable<TData extends DataWithName>({
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
-      columnVisibility,
-    },
+      columnVisibility
+    }
   })
 
   const [selectedIndex, setSelectedIndex] = useState(-1)
@@ -94,14 +76,14 @@ export function DataTable<TData extends DataWithName>({
     if (ListSelectProduct.length > 0) {
       const payload = {
         supplierId: ListSelectProduct?.[index]?.idSupplier ?? '',
-        productId: ListSelectProduct?.[index]?.id ?? '',
+        productId: ListSelectProduct?.[index]?.id ?? ''
       }
       fetchAPI('/orders', 'POST', payload)
         .then((res) => {
           if (res.status === 201) {
             toast({
               title: `${res.data.message}`,
-              variant: 'success',
+              variant: 'success'
             })
             getDataOrders()
           }
@@ -109,7 +91,7 @@ export function DataTable<TData extends DataWithName>({
         .catch((err) => {
           toast({
             title: `${err.message}`,
-            variant: 'destructive',
+            variant: 'destructive'
           })
         })
     }
@@ -126,7 +108,7 @@ export function DataTable<TData extends DataWithName>({
               image: value?.images?.[0]?.path ?? '',
               priceWithoutTax: value.price - value.discount,
               idOrder: value.idOrder,
-              quantity: 1,
+              quantity: 1
             }
           })
           setListSelectProduct(mappedProducts)
@@ -157,9 +139,7 @@ export function DataTable<TData extends DataWithName>({
                     key={column.id}
                     className='capitalize'
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -176,12 +156,7 @@ export function DataTable<TData extends DataWithName>({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
                 })}
@@ -191,26 +166,15 @@ export function DataTable<TData extends DataWithName>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
+                <TableCell colSpan={columns.length} className='h-24 text-center'>
                   No results.
                 </TableCell>
               </TableRow>
@@ -221,9 +185,7 @@ export function DataTable<TData extends DataWithName>({
                   <div className='flex'>
                     <Select
                       onValueChange={(value) => {
-                        const index = ListSelectProduct.findIndex(
-                          (item) => item.name === value
-                        )
+                        const index = ListSelectProduct.findIndex((item) => item.name === value)
                         setSelectedIndex(index)
                       }}
                     >
@@ -240,11 +202,7 @@ export function DataTable<TData extends DataWithName>({
                         </SelectGroup>
                       </SelectContent>
                     </Select>
-                    <Button
-                      className='ml-2'
-                      variant='blue'
-                      onClick={() => handleSelect(selectedIndex)}
-                    >
+                    <Button className='ml-2' variant='blue' onClick={() => handleSelect(selectedIndex)}>
                       Add Product
                     </Button>
                   </div>

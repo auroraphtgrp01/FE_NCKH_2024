@@ -2,18 +2,8 @@ import { use, useEffect, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
 import { Switch } from '@/components/ui/switch'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
-import {
-  Accordion,
-  AccordionItem,
-  AccordionContent,
-} from '@/components/ui/accordion'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Accordion, AccordionItem, AccordionContent } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { ERolesOfParticipant, IPermission } from '@/interface/contract.i'
 import {
@@ -23,27 +13,23 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
-import {
-  initPermission,
-  rolesTypeParticipant,
-} from '@/constants/initVariable.constants'
+import { initPermission, rolesTypeParticipant } from '@/constants/initVariable.constants'
 import { Separator } from '@/components/ui/separator'
 
 export default function GrantPermission({
   isOpen,
   setOpen,
   permission,
-  callback,
+  callback
 }: {
   isOpen: boolean
   setOpen: any
   permission: IPermission
   callback: (permission: IPermission) => void
 }) {
-  const [permissionClone, setPermissionClone] =
-    useState<IPermission>(permission)
+  const [permissionClone, setPermissionClone] = useState<IPermission>(permission)
   const [rolesType, setRolesType] = useState<
     {
       key: string
@@ -72,9 +58,7 @@ export default function GrantPermission({
             <DialogContent className='min-w-[600px]'>
               <DialogHeader>
                 <DialogTitle>Grant Permission</DialogTitle>
-                <DialogDescription>
-                  Grant Permission to participant
-                </DialogDescription>
+                <DialogDescription>Grant Permission to participant</DialogDescription>
               </DialogHeader>
               <Accordion type='single' defaultValue='item-1'>
                 <AccordionItem value='item-1'>
@@ -90,9 +74,7 @@ export default function GrantPermission({
                               }}
                             >
                               <SelectTrigger className='mt-2 w-full'>
-                                <SelectValue
-                                  placeholder={ERolesOfParticipant.PARTICIPANT}
-                                />
+                                <SelectValue placeholder={ERolesOfParticipant.PARTICIPANT} />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectGroup>
@@ -116,9 +98,7 @@ export default function GrantPermission({
                                   onCheckedChange(e, 'READ_CONTRACT')
                                 }}
                               />
-                              <Label htmlFor='readContractSwitch'>
-                                Read Contract
-                              </Label>
+                              <Label htmlFor='readContractSwitch'>Read Contract</Label>
                             </div>
                           </td>
                           <td className='px-1'>
@@ -129,9 +109,7 @@ export default function GrantPermission({
                                   onCheckedChange(e, 'EDIT_CONTRACT')
                                 }}
                               />
-                              <Label htmlFor='editPartyInfoSwitch'>
-                                Edit Contract
-                              </Label>
+                              <Label htmlFor='editPartyInfoSwitch'>Edit Contract</Label>
                             </div>
                           </td>
                           <td></td>
@@ -140,46 +118,34 @@ export default function GrantPermission({
                           <td className='px-1 pt-5'>
                             <div className='flex items-center space-x-2'>
                               <Switch
-                                defaultChecked={
-                                  permissionClone?.INVITE_PARTICIPANT
-                                }
+                                defaultChecked={permissionClone?.INVITE_PARTICIPANT}
                                 onCheckedChange={(e) => {
                                   onCheckedChange(e, 'INVITE_PARTICIPANT')
                                 }}
                               />
-                              <Label htmlFor='chatWithPartySwitch'>
-                                Invite Participant
-                              </Label>
+                              <Label htmlFor='chatWithPartySwitch'>Invite Participant</Label>
                             </div>
                           </td>
                           <td className='px-1 pt-5'>
                             <div className='flex items-center space-x-2'>
                               <Switch
-                                defaultChecked={
-                                  permissionClone?.CHANGE_STATUS_CONTRACT
-                                }
+                                defaultChecked={permissionClone?.CHANGE_STATUS_CONTRACT}
                                 onCheckedChange={(e) => {
                                   onCheckedChange(e, 'CHANGE_STATUS_CONTRACT')
                                 }}
                               />
-                              <Label htmlFor='editTermsSwitch'>
-                                Change Status Contract
-                              </Label>
+                              <Label htmlFor='editTermsSwitch'>Change Status Contract</Label>
                             </div>
                           </td>
                           <td className='px-1 pt-5'>
                             <div className='flex items-center space-x-2'>
                               <Switch
-                                defaultChecked={
-                                  permissionClone?.SET_OWNER_PARTY
-                                }
+                                defaultChecked={permissionClone?.SET_OWNER_PARTY}
                                 onCheckedChange={(e) => {
                                   onCheckedChange(e, 'SET_OWNER_PARTY')
                                 }}
                               />
-                              <Label htmlFor='editTermsSwitch'>
-                                Set Owner Party
-                              </Label>
+                              <Label htmlFor='editTermsSwitch'>Set Owner Party</Label>
                             </div>
                           </td>
                         </tr>

@@ -1,12 +1,5 @@
 import { buttonVariants } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Facebook, Instagram, Linkedin } from 'lucide-react'
 
 interface TeamProps {
@@ -29,13 +22,13 @@ const teamList: TeamProps[] = [
     socialNetworks: [
       {
         name: 'Facebook',
-        url: 'https://www.facebook.com/profile.php?id=100042505665348',
+        url: 'https://www.facebook.com/profile.php?id=100042505665348'
       },
       {
         name: 'Instagram',
-        url: 'https://www.instagram.com/',
-      },
-    ],
+        url: 'https://www.instagram.com/'
+      }
+    ]
   },
   {
     imageUrl: 'https://github.com/shadcn.png',
@@ -45,13 +38,13 @@ const teamList: TeamProps[] = [
       { name: 'Linkedin', url: 'http://linkedin.com' },
       {
         name: 'Facebook',
-        url: 'https://www.facebook.com/',
+        url: 'https://www.facebook.com/'
       },
       {
         name: 'Instagram',
-        url: 'https://www.instagram.com/',
-      },
-    ],
+        url: 'https://www.instagram.com/'
+      }
+    ]
   },
   {
     imageUrl: 'https://github.com/shadcn.png',
@@ -62,9 +55,9 @@ const teamList: TeamProps[] = [
 
       {
         name: 'Instagram',
-        url: 'https://www.instagram.com/',
-      },
-    ],
+        url: 'https://www.instagram.com/'
+      }
+    ]
   },
   {
     imageUrl: '/avatar/huy.jpg',
@@ -73,14 +66,14 @@ const teamList: TeamProps[] = [
     socialNetworks: [
       {
         name: 'Instagram',
-        url: 'https://www.instagram.com/huyyyyyyyyyyyyyyyyyyy',
+        url: 'https://www.instagram.com/huyyyyyyyyyyyyyyyyyyy'
       },
       {
         name: 'Facebook',
-        url: 'https://www.facebook.com/huyyyyyyyyyyyyyyyyyyy',
-      },
-    ],
-  },
+        url: 'https://www.facebook.com/huyyyyyyyyyyyyyyyyyyy'
+      }
+    ]
+  }
 ]
 
 export const TeamDev = () => {
@@ -100,9 +93,7 @@ export const TeamDev = () => {
   return (
     <section id='team' className='container py-24 sm:py-32'>
       <h2 className='text-3xl font-bold md:text-4xl'>
-        <span className='bg-gradient-to-b from-primary/60 to-primary bg-clip-text text-transparent'>
-          Our Members{' '}
-        </span>
+        <span className='bg-gradient-to-b from-primary/60 to-primary bg-clip-text text-transparent'>Our Members </span>
         of the Team
       </h2>
 
@@ -111,43 +102,36 @@ export const TeamDev = () => {
       </p>
 
       <div className='grid gap-8 gap-y-10 md:grid-cols-2 lg:grid-cols-4'>
-        {teamList.map(
-          ({ imageUrl, name, position, socialNetworks }: TeamProps) => (
-            <Card
-              key={name}
-              className='relative mt-8 flex flex-col items-center justify-center bg-muted/50'
-            >
-              <CardHeader className='mt-8 flex items-center justify-center pb-2'>
-                <img
-                  src={imageUrl}
-                  alt={`${name} ${position}`}
-                  className='absolute -top-12 aspect-square h-24 w-24 rounded-full object-cover'
-                />
-                <CardTitle className='text-center'>{name}</CardTitle>
-                <CardDescription className='text-primary'>
-                  {position}
-                </CardDescription>
-              </CardHeader>
-              <CardFooter>
-                {socialNetworks.map(({ name, url }: SociaNetworkslProps) => (
-                  <div key={name}>
-                    <a
-                      href={url}
-                      target='_blank'
-                      className={buttonVariants({
-                        variant: 'ghost',
-                        size: 'sm',
-                      })}
-                    >
-                      <span className='sr-only'>{name} icon</span>
-                      {socialIcon(name)}
-                    </a>
-                  </div>
-                ))}
-              </CardFooter>
-            </Card>
-          )
-        )}
+        {teamList.map(({ imageUrl, name, position, socialNetworks }: TeamProps) => (
+          <Card key={name} className='relative mt-8 flex flex-col items-center justify-center bg-muted/50'>
+            <CardHeader className='mt-8 flex items-center justify-center pb-2'>
+              <img
+                src={imageUrl}
+                alt={`${name} ${position}`}
+                className='absolute -top-12 aspect-square h-24 w-24 rounded-full object-cover'
+              />
+              <CardTitle className='text-center'>{name}</CardTitle>
+              <CardDescription className='text-primary'>{position}</CardDescription>
+            </CardHeader>
+            <CardFooter>
+              {socialNetworks.map(({ name, url }: SociaNetworkslProps) => (
+                <div key={name}>
+                  <a
+                    href={url}
+                    target='_blank'
+                    className={buttonVariants({
+                      variant: 'ghost',
+                      size: 'sm'
+                    })}
+                  >
+                    <span className='sr-only'>{name} icon</span>
+                    {socialIcon(name)}
+                  </a>
+                </div>
+              ))}
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     </section>
   )

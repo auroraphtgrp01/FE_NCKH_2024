@@ -5,18 +5,8 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/components/ui/command'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 interface ComboBoxPicker {
   value: any
@@ -28,37 +18,30 @@ export function Combobox({ value, setValue }: ComboBoxPicker) {
   const frameworks = [
     {
       value: 'next.js',
-      label: 'Next.js',
+      label: 'Next.js'
     },
     {
       value: 'sveltekit',
-      label: 'SvelteKit',
+      label: 'SvelteKit'
     },
     {
       value: 'nuxt.js',
-      label: 'Nuxt.js',
+      label: 'Nuxt.js'
     },
     {
       value: 'remix',
-      label: 'Remix',
+      label: 'Remix'
     },
     {
       value: 'astro',
-      label: 'Astro',
-    },
+      label: 'Astro'
+    }
   ]
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant='outline'
-          role='combobox'
-          aria-expanded={open}
-          className='w-full justify-between'
-        >
-          {value
-            ? frameworks.find((framework) => framework.value === value)?.label
-            : 'Select Account'}
+        <Button variant='outline' role='combobox' aria-expanded={open} className='w-full justify-between'>
+          {value ? frameworks.find((framework) => framework.value === value)?.label : 'Select Account'}
           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
       </PopoverTrigger>

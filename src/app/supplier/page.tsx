@@ -3,14 +3,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -39,10 +32,7 @@ export default function page() {
       <div className='mt-4 flex justify-between drop-shadow-2xl'>
         <div></div>
         <div className='flex'>
-          <Input
-            className='mr-4 w-[300px]'
-            placeholder='Search for supplier name...'
-          ></Input>
+          <Input className='mr-4 w-[300px]' placeholder='Search for supplier name...'></Input>
           <Button>Search</Button>
         </div>
       </div>
@@ -62,23 +52,15 @@ export default function page() {
                   }
                   style={{
                     aspectRatio: '400/300',
-                    objectFit: 'cover',
+                    objectFit: 'cover'
                   }}
                   width='400'
                 />
                 <div className='p-4'>
-                  <h3 className='mb-2 select-none text-lg font-semibold'>
-                    {item.name}
-                  </h3>
-                  <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>
-                    {item.description}
-                  </p>
-                  <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>
-                    Address: {item.address}
-                  </p>
-                  <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>
-                    TaxCode: {item.taxCode}
-                  </p>
+                  <h3 className='mb-2 select-none text-lg font-semibold'>{item.name}</h3>
+                  <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>{item.description}</p>
+                  <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>Address: {item.address}</p>
+                  <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>TaxCode: {item.taxCode}</p>
                 </div>
               </div>
             </Link>

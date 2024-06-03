@@ -4,9 +4,7 @@ import * as React from 'react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { type ThemeProviderProps } from 'next-themes/dist/types'
 
-const init = localStorage.getItem('user-info')
-  ? JSON.parse(localStorage.getItem('user-info') as string)
-  : null
+const init = localStorage.getItem('user-info') ? JSON.parse(localStorage.getItem('user-info') as string) : null
 
 interface AppContextValue {
   userInfo: any
@@ -37,7 +35,7 @@ export const AppProvider: React.FC<AppContextProps> = ({ children }) => {
     userInfo,
     setUserInfo,
     setDataCreateContract,
-    dataCreateContract,
+    dataCreateContract
   }
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

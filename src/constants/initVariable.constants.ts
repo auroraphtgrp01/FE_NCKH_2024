@@ -8,15 +8,16 @@ import {
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
-  cancelButton: true,
+  cancelButton: false,
   withdrawButton: true,
   transferButton: true,
   deployButton: true,
-  editContractButton: true,
+  editContractButton: false,
   signButton: true,
   confirmButtonSender: true,
   confirmButtonReceiver: true,
-  openDisputedButton: false
+  openDisputedButton: false,
+  inviteButton: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -28,7 +29,8 @@ export const initVisibleButton: IVisibleButton = {
   signButton: false,
   confirmButtonSender: false,
   confirmButtonReceiver: false,
-  openDisputedButton: true
+  openDisputedButton: true,
+  inviteButton: false
 }
 
 export const initResponseMessages: IResponseFunction = {
@@ -43,7 +45,7 @@ export const initPermission: IPermission = {
   INVITE_PARTICIPANT: false,
   CHANGE_STATUS_CONTRACT: false,
   SET_OWNER_PARTY: false,
-  ROLES: ERolesOfParticipant.PARTICIPANT
+  ROLES: 'PARTICIPANT' as ERolesOfParticipant
 }
 
 export const rolesTypeParticipant: { key: string; value: string }[] = Object.keys(ERolesOfParticipant).map((key) => ({

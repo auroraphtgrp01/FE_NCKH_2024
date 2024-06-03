@@ -30,15 +30,15 @@ export default function InvitationArea({
   const [isOpen, setOpen] = useState(false)
   const { toast } = useToast()
   function onAddInvitation(): void {
-    const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
-    if (!isEmail.test(invitationInput)) {
-      toast({
-        title: 'Error When Add Participant',
-        description: 'Email Is Invalid',
-        variant: 'destructive'
-      })
-      return
-    }
+    // const isEmail = RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
+    // if (!isEmail.test(invitationInput)) {
+    //   toast({
+    //     title: 'Error When Add Participant',
+    //     description: 'Email Is Invalid',
+    //     variant: 'destructive'
+    //   })
+    //   return
+    // }
     if (participant) {
       const isExist = participant.find((p: any) => p.email === invitationInput)
       if (isExist) {
@@ -56,6 +56,9 @@ export default function InvitationArea({
   function updatePermission(data: IPermission): void {
     invitation[indexPerson].permission = data
     setInvitation([...invitation])
+  }
+  function onDeleteInvitation(index: number) {
+    setInvitation([...invitation.filter((_, i) => i !== index)])
   }
   return (
     <div className='mt-5'>
@@ -104,7 +107,13 @@ export default function InvitationArea({
                       >
                         Grant
                       </Button>
-                      <Button variant={'destructive'} className='w-[50%]'>
+                      <Button
+                        variant={'destructive'}
+                        className='w-[50%]'
+                        onClick={() => {
+                          onDeleteInvitation(index)
+                        }}
+                      >
                         Delete
                       </Button>
                     </div>

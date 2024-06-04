@@ -11,6 +11,7 @@ import {
   IConfirmStageFunctionCallParams,
   IContractAttribute,
   IContractCreateParams,
+  IContractDisputeParams,
   IContractParticipant,
   IDisableButton,
   IIndividual,
@@ -20,6 +21,7 @@ import {
   IStage,
   ITransferMoneyFunctionCallParams,
   IVisibleButton,
+  IVotes,
   IWithdrawMoneyFunctionCallParams,
   InvitationItem,
   RSAKey,
@@ -95,9 +97,9 @@ const updateStateButton = (
       case 'SIGNED':
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
-            (item: any) =>
-              item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
-          )
+              (item: any) =>
+                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+            )
           : []
         const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -122,12 +124,12 @@ const updateStateButton = (
           fetchCompareButton: false,
           confirmButtonReceiver:
             participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
-              hasStageNotStarted.length > 0
+            hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-              hasStagePending.length > 0
+            hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -819,7 +821,7 @@ const handleCallFunctionOfBlockchain = async (
 }
 
 const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
-  console.log(dataParams);
+  console.log(dataParams)
 
   try {
     const res = await fetchAPI(
@@ -835,6 +837,32 @@ const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<
         status: 'success',
         description: 'Contract has been created successfully',
         contractId: res.data.contract.id
+      }
+    } else {
+      return {
+        message: 'Create contract failed',
+        status: 'destructive',
+        description: 'Error occurred while creating contract'
+      }
+    }
+  } catch (err) {
+    return {
+      message: 'Create contract failed',
+      status: 'destructive',
+      description: err?.toString()
+    }
+  }
+}
+
+const onOpenDisputeContract = async (dataParams: IContractDisputeParams): Promise<IResponseFunction> => {
+  try {
+    const res = await fetchAPI('/contracts/dispute-contract', 'POST', dataParams)
+    if (res.status === 201) {
+      return {
+        message: 'Create contract successfully',
+        status: 'success',
+        description: 'Contract has been created successfully',
+        contractId: res.data.id
       }
     } else {
       return {
@@ -876,14 +904,31 @@ const getDataToOpenDisputeContract = (
   }
 }
 
-const getIndividualFromParticipant = (participant: IContractParticipant[]) => {
+const getIndividualFromParticipant = (
+  participant: IContractParticipant[]
+): {
+  receiver: IContractParticipant | undefined
+  sender: IContractParticipant | undefined
+  arbitrators: IContractParticipant[]
+  votes: IVotes[]
+} => {
   const receiver = participant?.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
   const sender = participant?.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
   const arbitrators = participant?.filter((item) => item.permission?.ROLES == ('ARBITRATION' as ERolesOfParticipant))
+  const votes = arbitrators?.map((item) => {
+    console.log(item)
+
+    return {
+      vote: item.vote,
+      participantId: item.id,
+      userId: item.userId
+    }
+  })
   return {
     receiver,
     sender,
-    arbitrators
+    arbitrators,
+    votes
   }
 }
 
@@ -894,6 +939,27 @@ const getParticipantInfoLogin = (userInfo: UserInfoData, participant: IContractP
     : isMatch.sender?.userId === userInfo?.data?.id
       ? isMatch.sender
       : isMatch.arbitrators?.find((item) => item.userId === userInfo?.data?.id)
+}
+
+const calculateVoteRatio = (
+  votes: IVotes[]
+): {
+  sender: number
+  receiver: number
+} => {
+  if (votes?.length === 0) return { sender: 50, receiver: 50 }
+
+  let countA = votes?.filter((item) => item.vote === 'A').length
+  let countB = votes?.filter((item) => item.vote === 'B').length
+
+  let totalVotes = countA + countB
+  let ratioA = (countA / totalVotes) * 100
+  let ratioB = (countB / totalVotes) * 100
+
+  return {
+    sender: parseFloat(ratioA.toFixed(2)),
+    receiver: parseFloat(ratioB.toFixed(2))
+  }
 }
 
 export {
@@ -914,5 +980,7 @@ export {
   handleCallFunctionOfBlockchain,
   onCreateANewContract,
   getIndividualFromParticipant,
-  getParticipantInfoLogin
+  getParticipantInfoLogin,
+  calculateVoteRatio,
+  onOpenDisputeContract
 }

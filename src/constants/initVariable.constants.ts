@@ -3,7 +3,8 @@ import {
   IDisableButton,
   IPermission,
   IResponseFunction,
-  IVisibleButton
+  IVisibleButton,
+  IVoteRatio
 } from '@/interface/contract.i'
 import { updateUserInfoFromLocalStorage } from '@/utils/updateUserInfo'
 import { handleInstanceWeb3 } from '@/utils/web3Instance'
@@ -20,7 +21,9 @@ export const initDisableButton: IDisableButton = {
   confirmButtonReceiver: true,
   openDisputedButton: false,
   inviteButton: false,
-  voteButton: true
+  voteButton: true,
+  voteCustomerButton: false,
+  voteSupplierButton: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -60,4 +63,10 @@ export const rolesTypeParticipant: { key: string; value: string }[] = Object.key
 export const getUserInfo = async () => {
   const { balance } = await handleInstanceWeb3()
   return updateUserInfoFromLocalStorage({ key: 'balance', value: balance })
+}
+
+export const initRatioParticipant: IVoteRatio = {
+  receiver: 50,
+  sender: 50,
+  votes: []
 }

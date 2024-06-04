@@ -19,12 +19,13 @@ import {
   ERolesOfParticipant,
   IContractAttribute,
   IContractCreateParams,
+  IContractDisputeParams,
   IContractParticipant,
   IDisableButton,
   IIndividual,
   IVisibleButton,
-  InvitationItem,
-  RSAKey
+  IVoteRatio,
+  InvitationItem
 } from '@/interface/contract.i'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -50,6 +51,7 @@ import {
 } from '@/components/ui/dialog'
 import InvitationArea from '@/components/InvitationArea'
 import {
+  calculateVoteRatio,
   fetchDataWhenEntryPage,
   getIndividualFromParticipant,
   handleCallFunctionOfBlockchain,
@@ -66,10 +68,11 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { initDisableButton, initVisibleButton } from '@/constants/initVariable.constants'
+import { initDisableButton, initRatioParticipant, initVisibleButton } from '@/constants/initVariable.constants'
 import Dispute from './(component)/Dispute'
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
 import { initContractAttribute } from './(component)/(store)/storeContractData'
+import Voting from '@/app/contract/[idContract]/(component)/Voting'
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute)
@@ -101,7 +104,7 @@ export default function Dashboard() {
     receiver: IContractParticipant | undefined
     sender: IContractParticipant | undefined
   }>()
-
+  const [voteRatio, setVoteRatio] = useState<IVoteRatio>(initRatioParticipant)
   const [arbitratorUser, setArbitratorUser] = useState<IContractParticipant[]>()
   const [dialogInvite, setDialogInvite] = useState(false)
   const [stages, setStages] = useState<any[]>([
@@ -114,6 +117,9 @@ export default function Dashboard() {
   const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>()
   const [showChat, setShowChat] = useState(false)
   const { idContract } = useParams()
+  useEffect(() => {
+    console.log('voteRatio', voteRatio)
+  }, [voteRatio])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   // fetchDataWhenEntryPage
   useEffect(() => {
@@ -135,7 +141,11 @@ export default function Dashboard() {
         response?.contractBallance ? response?.contractBallance : 0,
         response?.contractData?.contract
       )
-      const { arbitrators } = getIndividualFromParticipant(response?.contractData.participants)
+      const { arbitrators, votes } = getIndividualFromParticipant(response?.contractData.participants)
+      setVoteRatio({
+        ...calculateVoteRatio(votes),
+        votes
+      })
       setArbitratorUser(arbitrators)
       setContractStatus(response?.contractData.contract.status)
       setDependentInfo(getIndividualFromParticipant(response?.contractData.participants))
@@ -288,24 +298,14 @@ export default function Dashboard() {
   const getDataToOpenDisputeContract = (
     participantContract: IContractParticipant[],
     addressWallet: string
-  ): IContractCreateParams => {
-    const invitations = participantContract.map((item) => {
-      if (
-        item.permission?.ROLES === ERolesOfParticipant.SENDER ||
-        item.permission?.ROLES === ERolesOfParticipant.RECEIVER
-      )
-        return {
-          email: item.email,
-          permission: item.permission,
-          messages: 'You have a invitation to join a dispute contract'
-        }
-    })
+  ): IContractDisputeParams => {
+    const { receiver, sender } = getIndividualFromParticipant(participantContract)
     return {
-      addressWallet,
-      name: 'Disputed Contract - Supply Chain Management',
-      type: 'DISPUTE',
-      templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d'
-      // invitation: invitations as InvitationItem[]
+      addressWallet: addressWallet,
+      customer: receiver?.User.addressWallet,
+      supplier: sender?.User.addressWallet,
+      disputedContractId: idContract as string,
+      totalAmount: Number(individual.totalAmount)
     }
   }
 
@@ -343,8 +343,8 @@ export default function Dashboard() {
                       <div>
                         From Contract:{' '}
                         <div className='mt-2 flex'>
-                          <Input className='me-2' value={contractData?.fromContract} />
-                          <Link href={`/contract/${contractData?.fromContract}`}>
+                          <Input className='me-2' value={contractData?.disputedContractId} />
+                          <Link href={`/contract/${contractData?.disputedContractId}`}>
                             <Button>Go To Contract</Button>
                           </Link>
                         </div>
@@ -577,11 +577,11 @@ export default function Dashboard() {
                           <div className='mb-1 font-semibold'>Supplier </div>
                         </div>
                         <div className='flex'>
-                          <Progress className='bg-yellow-400' value={75}></Progress>{' '}
+                          <Progress className='bg-yellow-400' value={voteRatio?.sender}></Progress>{' '}
                         </div>
                         <div className='flex justify-between'>
-                          <div className='mt-1 font-semibold'>75 %</div>
-                          <div className='mt-1 font-semibold'>25 %</div>
+                          <div className='mt-1 font-semibold'>{voteRatio?.sender} %</div>
+                          <div className='mt-1 font-semibold'>{voteRatio?.receiver} %</div>
                         </div>
                       </div>
                     </div>
@@ -608,73 +608,67 @@ export default function Dashboard() {
                 )}
 
                 <Separator className='my-4' />
-                <div className='flex'>
-                  {isVisibleButton.deployButton && (
-                    <Button
-                      disabled={isDisableButton.deployButton}
-                      variant={'orange'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsDeployContractAlert(true)
-                      }}
-                    >
-                      Deploy Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.voteButton && (
-                    <Button
-                      disabled={isDisableButton.voteButton}
-                      variant={'violet'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsDeployContractAlert(true)
-                      }}
-                    >
-                      Vote Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.signButton && (
-                    <Button
-                      disabled={isDisableButton.signButton}
-                      variant={'blue'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Sign Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.transferButton && (
-                    <Button
-                      disabled={isDisableButton.transferButton}
-                      variant={'destructive'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Transfer
-                    </Button>
-                  )}
-                  {isVisibleButton.withdrawButton && (
-                    <Button
-                      disabled={isDisableButton.withdrawButton}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Withdraw
-                    </Button>
-                  )}
-                </div>
+                {isVisibleButton.deployButton && (
+                  <Button
+                    disabled={isDisableButton.deployButton}
+                    variant={'orange'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsDeployContractAlert(true)
+                    }}
+                  >
+                    Deploy Contract
+                  </Button>
+                )}
+                <Voting
+                  isDisableButton={isDisableButton}
+                  isVisibleButton={isVisibleButton}
+                  votes={voteRatio}
+                  setVotes={setVoteRatio}
+                  setIsDisableButton={setIsDisableButton}
+                  userInfo={userInfo}
+                />
+                {isVisibleButton.signButton && (
+                  <Button
+                    disabled={isDisableButton.signButton}
+                    variant={'blue'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Sign Contract
+                  </Button>
+                )}
+                {isVisibleButton.transferButton && (
+                  <Button
+                    disabled={isDisableButton.transferButton}
+                    variant={'destructive'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Transfer
+                  </Button>
+                )}
+                {isVisibleButton.withdrawButton && (
+                  <Button
+                    disabled={isDisableButton.withdrawButton}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Withdraw
+                  </Button>
+                )}
                 <div className='flex gap-2'>
                   {isVisibleButton.confirmButtonSender && (
                     <Button
@@ -849,7 +843,6 @@ export default function Dashboard() {
                   If you forget the private key, you will not be able to recover
                 </b>
               </AlertDialogDescription>
-
               <div className='flex'>
                 <Select
                   onValueChange={(e) => {

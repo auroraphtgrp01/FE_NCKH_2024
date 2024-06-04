@@ -64,6 +64,7 @@ export interface IContractParticipant {
   User: User
   permission: IPermission
   completedStages: IStageContract[]
+  vote?: 'A' | 'B'
 }
 
 export interface IStageContract {
@@ -110,7 +111,7 @@ export interface ContractData {
   User: User
   stages: IStage[]
   type: EContractType
-  fromContract?: string
+  disputedContractId?: string
 }
 export interface IIndividual {
   receiverInd: string
@@ -143,6 +144,8 @@ export interface IDisableButton extends DynamicType {
   openDisputedButton: boolean
   inviteButton: boolean
   voteButton: boolean
+  voteSupplierButton: boolean
+  voteCustomerButton: boolean
 }
 export interface IStage {
   id?: string
@@ -268,7 +271,28 @@ export interface IResponseFunction {
 export interface IOpenDisputedComponentProps {
   isDisableButton: IDisableButton
   isVisibleButton: IVisibleButton
-  payload: IContractCreateParams
+  payload: IContractDisputeParams
+}
+
+export interface IContractVotingProps {
+  isDisableButton: IDisableButton
+  setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+  isVisibleButton: IVisibleButton
+  votes: IVoteRatio
+  setVotes: Dispatch<SetStateAction<IVoteRatio>>
+  userInfo: UserInfoData
+}
+
+export interface IVoteRatio {
+  sender: number
+  receiver: number
+  votes: IVotes[]
+}
+
+export interface IVotes {
+  participantId: string
+  vote: 'A' | 'B' | undefined
+  userId: string
 }
 
 export interface IStagesContract {
@@ -302,6 +326,13 @@ export interface IContractCreateParams {
   messagesForInvitation?: string
   type?: 'CONTRACT' | 'DISPUTE'
   rolesOfCreator?: ERolesOfParticipant
+}
+export interface IContractDisputeParams {
+  addressWallet: string
+  disputedContractId: string
+  customer: string | undefined
+  supplier: string | undefined
+  totalAmount: number
 }
 
 export interface IResponseFunctionFetchData {

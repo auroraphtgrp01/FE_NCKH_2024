@@ -1,4 +1,9 @@
-import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
+'use client'
+
+import {
+  onCreateANewContract,
+  onOpenDisputeContract
+} from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +20,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { EStageContractStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i'
 import { getDateNow } from '@/utils/dayjs'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 const stages: IStagesContract[] = [
@@ -54,14 +60,16 @@ const stages: IStagesContract[] = [
 
 export default function Dispute({ isDisableButton, isVisibleButton, payload }: IOpenDisputedComponentProps) {
   const { toast } = useToast()
+  const Router = useRouter()
   const handleOpenDisputeContract = () => {
-    console.log("??",payload)
-    onCreateANewContract(payload).then((res) => {
+    console.log('??', payload)
+    onOpenDisputeContract(payload).then((res) => {
       toast({
         title: res.message,
         description: res.description,
         variant: res.status
       })
+      Router.push(`/contract/${res.contractId}`)
     })
   }
   return (

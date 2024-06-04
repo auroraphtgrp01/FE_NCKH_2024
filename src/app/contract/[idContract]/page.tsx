@@ -304,8 +304,8 @@ export default function Dashboard() {
       addressWallet,
       name: 'Disputed Contract - Supply Chain Management',
       type: 'DISPUTE',
-      templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d',
-      invitation: invitations as InvitationItem[]
+      templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d'
+      // invitation: invitations as InvitationItem[]
     }
   }
 
@@ -482,10 +482,10 @@ export default function Dashboard() {
                           {arbitratorUser?.map((item, index) => (
                             <div className='mt-3 flex items-center'>
                               <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{item?.User.name}</p>
+                                <p className='text-sm font-medium leading-none'>{item?.User?.name || 'No Name'}</p>
                                 <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(item?.User.addressWallet.length - 30) +
-                                    item?.User.addressWallet.slice(-5)}
+                                  {'*'.repeat(item?.User?.addressWallet.length - 30) +
+                                    item?.User?.addressWallet.slice(-5)}
                                 </p>
                               </div>
                               <div className='ml-auto font-medium'>

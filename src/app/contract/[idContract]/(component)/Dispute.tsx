@@ -55,6 +55,7 @@ const stages: IStagesContract[] = [
 export default function Dispute({ isDisableButton, isVisibleButton, payload }: IOpenDisputedComponentProps) {
   const { toast } = useToast()
   const handleOpenDisputeContract = () => {
+    console.log("??",payload)
     onCreateANewContract(payload).then((res) => {
       toast({
         title: res.message,

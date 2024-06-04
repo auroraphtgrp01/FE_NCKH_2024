@@ -95,9 +95,9 @@ const updateStateButton = (
       case 'SIGNED':
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
-              (item: any) =>
-                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
-            )
+            (item: any) =>
+              item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+          )
           : []
         const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -122,12 +122,12 @@ const updateStateButton = (
           fetchCompareButton: false,
           confirmButtonReceiver:
             participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
-            hasStageNotStarted.length > 0
+              hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-            hasStagePending.length > 0
+              hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -819,6 +819,8 @@ const handleCallFunctionOfBlockchain = async (
 }
 
 const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
+  console.log(dataParams);
+
   try {
     const res = await fetchAPI(
       '/contracts',

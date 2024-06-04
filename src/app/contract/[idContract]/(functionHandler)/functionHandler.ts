@@ -4,6 +4,7 @@ import {
   DynamicType,
   EContractAttributeType,
   EContractStatus,
+  EContractType,
   EFunctionCall,
   ERolesOfParticipant,
   EStageContractStatus,
@@ -41,7 +42,10 @@ const updateStateButton = (
   contractData: ContractData
 ) => {
   const participantIsLogin = getParticipantInfoLogin(userInfo, contractParticipants)
-  if (contractParticipants.length > 0) {
+  const isDisputeContract = contractData?.type === EContractType.DISPUTE
+  const isUserArbitrator = participantIsLogin?.permission.ROLES === ('ARBITRATION' as ERolesOfParticipant)
+
+  if (contractParticipants?.length > 0) {
     const participantsLogin = contractParticipants?.find((participant: any) => {
       return participant.userId === userInfo?.data.id
     })
@@ -56,11 +60,15 @@ const updateStateButton = (
       case 'PARTICIPATED':
         setIsVisibleButton((prev: any) => ({
           ...prev,
-          deployButton: true
+          deployButton: !isDisputeContract,
+          openDisputedButton: !isDisputeContract,
+          voteButton: isUserArbitrator,
+          withdrawButton: isDisputeContract && !isUserArbitrator
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
-          cancelButton: false
+          cancelButton: false,
+          voteButton: false
         }))
         break
       case 'ENFORCE':
@@ -96,7 +104,6 @@ const updateStateButton = (
         const hasStageApproved = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.APPROVED)
           : []
-        console.log(hasStageApproved.length > 0)
 
         setIsVisibleButton((prev: any) => ({
           ...prev,
@@ -125,6 +132,11 @@ const updateStateButton = (
           editContractButton: true,
           inviteButton: true,
           withdrawButton: !(hasStageApproved.length > 0)
+        }))
+        break
+      case 'VOTED':
+        setIsVisibleButton((prev: any) => ({
+          ...prev
         }))
         break
       default:
@@ -861,18 +873,23 @@ const getDataToOpenDisputeContract = (
 }
 
 const getIndividualFromParticipant = (participant: IContractParticipant[]) => {
-  const receiver = participant.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
-  const sender = participant.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
+  const receiver = participant?.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
+  const sender = participant?.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
+  const arbitrators = participant?.filter((item) => item.permission?.ROLES == ('ARBITRATION' as ERolesOfParticipant))
   return {
     receiver,
-    sender
+    sender,
+    arbitrators
   }
 }
 
 const getParticipantInfoLogin = (userInfo: UserInfoData, participant: IContractParticipant[]) => {
-  console.log('>>', userInfo, participant)
   const isMatch = getIndividualFromParticipant(participant)
-  return isMatch.receiver?.userId === userInfo?.data?.id ? isMatch.receiver : isMatch.sender
+  return isMatch.receiver?.userId === userInfo?.data?.id
+    ? isMatch.receiver
+    : isMatch.sender?.userId === userInfo?.data?.id
+      ? isMatch.sender
+      : isMatch.arbitrators?.find((item) => item.userId === userInfo?.data?.id)
 }
 
 export {

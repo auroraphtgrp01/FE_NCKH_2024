@@ -82,7 +82,8 @@ export enum EContractStatus {
   ENFORCE = 'ENFORCE',
   SIGNED = 'SIGNED',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
+  VOTED = 'VOTED'
 }
 export interface DynamicType {
   [key: string]: any
@@ -108,6 +109,8 @@ export interface ContractData {
   deletedBy: string | null
   User: User
   stages: IStage[]
+  type: EContractType
+  fromContract?: string
 }
 export interface IIndividual {
   receiverInd: string
@@ -125,6 +128,7 @@ export interface IVisibleButton extends DynamicType {
   confirmButtonReceiver: boolean
   openDisputedButton: boolean
   inviteButton: boolean
+  voteButton: boolean
 }
 export interface IDisableButton extends DynamicType {
   fetchCompareButton: boolean
@@ -138,6 +142,7 @@ export interface IDisableButton extends DynamicType {
   confirmButtonReceiver: boolean
   openDisputedButton: boolean
   inviteButton: boolean
+  voteButton: boolean
 }
 export interface IStage {
   id?: string
@@ -311,4 +316,9 @@ export enum EStageContractStatus {
   ENFORCE = 'ENFORCE',
   WITHDRAWN = 'WITHDRAWN',
   OUT_OF_DATE = 'OUT_OF_DATE'
+}
+
+export enum EContractType {
+  CONTRACT = 'Contract',
+  DISPUTE = 'Dispute'
 }

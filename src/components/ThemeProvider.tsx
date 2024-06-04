@@ -12,7 +12,7 @@ interface AppContextValue {
   userInfo: any
   setUserInfo: (str: any) => void
   dataCreateContract: any
-  setDataCreateContract: (data: any) => void // Thêm prop mới
+  setDataCreateContract: (data: any) => void
 }
 
 interface AppContextProps {
@@ -33,7 +33,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 export const AppProvider: React.FC<AppContextProps> = ({ children }) => {
   const [dataCreateContract, setDataCreateContract] = React.useState({})
 
-  const [userInfo, setUserInfo] = React.useState<UserInfoData | undefined>()
+  const [userInfo, setUserInfo] = React.useState<UserInfoData>(init)
   React.useEffect(() => {
     getUserInfo().then((res) => {
       setUserInfo(res)

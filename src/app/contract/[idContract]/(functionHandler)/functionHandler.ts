@@ -43,7 +43,7 @@ const updateStateButton = (
   const participantIsLogin = getParticipantInfoLogin(userInfo, contractParticipants)
   if (contractParticipants.length > 0) {
     const participantsLogin = contractParticipants?.find((participant: any) => {
-      return participant.userId === userInfo.data.id
+      return participant.userId === userInfo?.data.id
     })
     switch (status) {
       case 'PENDING':
@@ -90,7 +90,7 @@ const updateStateButton = (
                 item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
             )
           : []
-        const hasStagePeding = contractData?.stages
+        const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
           : []
         const hasStageApproved = contractData?.stages
@@ -119,7 +119,7 @@ const updateStateButton = (
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-            hasStagePeding.length > 0
+            hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -237,7 +237,9 @@ const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): 
       .withDrawByPercent(dataParams.individual.receiverInd, stageWithdraw?.percent, dataParams.privateKey)
       .send({ from: dataParams.userInfo?.data?.addressWallet, gas: '1000000' })
 
-    const balance: number = parseFloat(instance.utils.fromWei(await contract.methods.getBalance().call(), 'ether'))
+    const balanceContract: number = parseFloat(
+      instance.utils.fromWei(await contract.methods.getBalance().call(), 'ether')
+    )
 
     if (stageWithdraw === undefined)
       return {
@@ -250,11 +252,19 @@ const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): 
       id: dataParams.contractData?.id,
       stage: { ...stageWithdraw, status: EStageContractStatus.WITHDRAWN }
     })
-    dataParams.setCurrentBalance(balance)
+    dataParams.setCurrentBalance(balanceContract)
     dataParams.setIsDisableButton((prev: any) => ({
       ...prev,
       withdrawButton: hasStageApproved && hasStageApproved.length > 0 ? false : true
     }))
+    const { balance } = await handleInstanceWeb3()
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
     return {
       message: 'Withdraw money from contract Successfully !',
       description: 'The contract was successfully received',
@@ -474,7 +484,13 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
     }
     dataParams.setContractParticipants(dataParams.contractParticipants)
     const { balance } = await handleInstanceWeb3()
-    dataParams.setUserInfo((prev: any) => ({ ...prev, balance }))
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
     if (response.data.contractStatus === 'SIGNED') {
       const isCondition =
         (dataParams.userInfo?.data?.addressWallet?.trim().toLowerCase() || '') ===
@@ -854,8 +870,9 @@ const getIndividualFromParticipant = (participant: IContractParticipant[]) => {
 }
 
 const getParticipantInfoLogin = (userInfo: UserInfoData, participant: IContractParticipant[]) => {
+  console.log('>>', userInfo, participant)
   const isMatch = getIndividualFromParticipant(participant)
-  return isMatch.receiver?.userId === userInfo.data.id ? isMatch.receiver : isMatch.sender
+  return isMatch.receiver?.userId === userInfo?.data?.id ? isMatch.receiver : isMatch.sender
 }
 
 export {

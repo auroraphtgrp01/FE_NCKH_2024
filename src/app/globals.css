@@ -66,8 +66,12 @@
     width: 100%;
     margin-right: auto;
     margin-left: auto;
-    padding-right: 1.5rem /* 32px */;
-    padding-left: 1.5rem /* 32px */;
+    padding-right: 1.5rem
+      /* 32px */
+    ;
+    padding-left: 1.5rem
+      /* 32px */
+    ;
   }
 }
 
@@ -78,5 +82,24 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.email-container {
+  width: fit-content;
+  animation: scroll-text 8s linear infinite;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(-200px);
+  }
+
+  50% {
+    transform: translateX(176px);
+  }
+
+  100% {
+    transform: translateX(-200px);
   }
 }

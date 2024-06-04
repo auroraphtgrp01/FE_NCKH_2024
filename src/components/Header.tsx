@@ -65,7 +65,7 @@ export default function Header() {
           duration: 2000
         })
       }
-    } catch (error) {}
+    } catch (error) { }
   }
   const checkLogin = () => {
     const isExist = JSON.parse(localStorage.getItem('user-info') as string)

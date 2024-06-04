@@ -282,7 +282,7 @@ export default function Dashboard() {
     setIsDeployContractAlert(false)
   }
 
-  async function handleCompareContractInformation() {}
+  async function handleCompareContractInformation() { }
 
   const getDataToOpenDisputeContract = (
     participantContract: IContractParticipant[],
@@ -319,8 +319,8 @@ export default function Dashboard() {
       </header>
       <div className='flex justify-center'>
         <main className='flex items-start py-4'>
-          <div className='flex min-w-[300px] flex-1 justify-end px-3'>
-            <Card className='h-[755px] w-[430px] overflow-hidden'>
+          <div className='min-w-[300px] flex flex-col px-3 h-[755px]  overflow-hidden rounded-xl '>
+            <Card className='w-[420px] flex flex-col h-full'>
               <CardHeader className='flex flex-row items-start'>
                 <div className='w-full'>
                   <CardTitle className='flex items-center text-lg'>Contract Information</CardTitle>
@@ -328,7 +328,7 @@ export default function Dashboard() {
                   <Separator className='mt-4' />
                 </div>
               </CardHeader>
-              <CardContent className='pl-[18px] text-sm'>
+              <CardContent className='pl-[18px] text-sm flex-1 grid'>
                 <div className='grid gap-3'>
                   <div className='font-semibold'>
                     Name of Contract: <span>{contractData?.contractTitle}</span>
@@ -407,14 +407,15 @@ export default function Dashboard() {
                     isVisibleButton={isVisibleButton}
                     payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
                   />
+
                   <div>
-                    <Card className='h-[215px]'>
+                    <Card className='max-h-max neban mb-1'>
                       <CardContent className='text-sm'>
                         <div className='mt-4 w-full'>
                           <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
                           <Separator className='mt-2' />
                         </div>
-                        <ScrollArea className='mt-2 h-[180px]'>
+                        <ScrollArea className='h-[100px]'>
                           {dependentInfo?.sender?.User?.name && (
                             <div className='mt-3 flex items-center'>
                               <div className='grid'>
@@ -455,21 +456,19 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
-          <div className='min-w-[640px] flex-1'>
-            <Card className=''>
-              <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
-            </Card>
-          </div>
-          <div className='h-[642px] min-w-[300px] flex-1 px-3'>
-            <Card className='h-[755px] w-[420px] overflow-hidden'>
+          <Card className='min-w-[640px] flex-1 h-[755px] rounded-xl'>
+            <PreviewContract contractAttribute={contractAttribute} setContractAttribute={setContractAttribute} />
+          </Card>
+          <div className='min-w-[300px] flex flex-col px-3 h-[755px]  overflow-hidden rounded-xl'>
+            <Card className='w-[420px] flex flex-col  h-full'>
               <CardHeader className='flex flex-row items-start'>
                 <div className='w-full'>
                   <CardTitle className='flex items-center text-lg'>Dependent Information</CardTitle>
                   <Separator className='mt-4' />
                 </div>
               </CardHeader>
-              <CardContent className='text-sm'>
-                <div className='mt-2 grid gap-3'>
+              <CardContent className='flex-1 grid text-sm'>
+                <div className='mt-2 grid gap-3 '>
                   <div className='flex align-middle'>
                     <div className='font-semibold'>Sender Representative:</div>
                     <div className='ms-2 translate-y-[-7px]'>
@@ -517,175 +516,177 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <Separator className='my-4' />
-                <div className='flex'>
-                  {isVisibleButton.deployButton && (
-                    <Button
-                      disabled={isDisableButton.deployButton}
-                      variant={'orange'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsDeployContractAlert(true)
-                      }}
-                    >
-                      Deploy Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.signButton && (
-                    <Button
-                      disabled={isDisableButton.signButton}
-                      variant={'blue'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Sign Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.transferButton && (
-                    <Button
-                      disabled={isDisableButton.transferButton}
-                      variant={'destructive'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Transfer
-                    </Button>
-                  )}
-                  {isVisibleButton.withdrawButton && (
-                    <Button
-                      disabled={isDisableButton.withdrawButton}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Withdraw
-                    </Button>
-                  )}
-                </div>
-                <div className='flex gap-2'>
-                  {isVisibleButton.confirmButtonSender && (
-                    <Button
-                      disabled={isDisableButton.confirmButtonSender}
-                      variant={'indigo'}
-                      className='mt-2 w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_SENDER)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Customer confirmation completed
-                    </Button>
-                  )}
-                  {isVisibleButton.confirmButtonReceiver && (
-                    <Button
-                      disabled={isDisableButton.confirmButtonReceiver}
-                      variant={'indigo'}
-                      className='mt-2 w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_RECEIVER)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Supplier confirmation completed
-                    </Button>
-                  )}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      {isVisibleButton.confirmButton && (
-                        <Button variant={'destructive'} className='mt-2 w-full'>
-                          Disputed
-                        </Button>
-                      )}
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure to create dispute contract?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          <div className='mx-auto max-w-md'>
-                            <div className='flex flex-col space-y-2'>
-                              <div className='flex'>
-                                <div className='w-40'>Stage:</div>
-                                <div className='flex-1'>
-                                  <b>...</b>
+                {isVisibleButton.deployButton && (
+                  <Button
+                    disabled={isDisableButton.deployButton}
+                    variant={'orange'}
+                    className='w-full '
+                    onClick={() => {
+                      setIsDeployContractAlert(true)
+                    }}
+                  >
+                    Deploy Contract
+                  </Button>
+
+                )}
+                {isVisibleButton.signButton && (
+                  <Button
+                    disabled={isDisableButton.signButton}
+                    variant={'blue'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Sign Contract
+                  </Button>
+                )}
+                {isVisibleButton.transferButton && (
+                  <Button
+                    disabled={isDisableButton.transferButton}
+                    variant={'destructive'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Transfer
+                  </Button>
+                )}
+                {isVisibleButton.withdrawButton && (
+                  <Button
+                    disabled={isDisableButton.withdrawButton}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Withdraw
+                  </Button>
+                )}
+                {isVisibleButton && (
+                  <div className='flex gap-2'>
+                    {isVisibleButton.confirmButtonSender && (
+                      <Button
+                        disabled={isDisableButton.confirmButtonSender}
+                        variant={'indigo'}
+                        className='mt-2 w-full'
+                        onClick={() => {
+                          setIsOpenEnterPrivateKey(true)
+                          setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_SENDER)
+                          setPrivateKey('')
+                        }}
+                      >
+                        Customer confirmation completed
+                      </Button>
+                    )}
+                    {isVisibleButton.confirmButtonReceiver && (
+                      <Button
+                        disabled={isDisableButton.confirmButtonReceiver}
+                        variant={'indigo'}
+                        className='mt-2 w-full'
+                        onClick={() => {
+                          setIsOpenEnterPrivateKey(true)
+                          setNameFunctionCall(EFunctionCall.CONFIRM_CONTRACT_RECEIVER)
+                          setPrivateKey('')
+                        }}
+                      >
+                        Supplier confirmation completed
+                      </Button>
+                    )}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        {isVisibleButton.confirmButton && (
+                          <Button variant={'destructive'} className='mt-2 w-full'>
+                            Disputed
+                          </Button>
+                        )}
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure to create dispute contract?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            <div className='mx-auto max-w-md'>
+                              <div className='flex flex-col space-y-2'>
+                                <div className='flex'>
+                                  <div className='w-40'>Stage:</div>
+                                  <div className='flex-1'>
+                                    <b>...</b>
+                                  </div>
+                                </div>
+                                <div className='flex'>
+                                  <div className='w-40'>Customer confirmed:</div>
+                                  <div className='flex-1'>
+                                    <b>...</b>
+                                  </div>
+                                </div>
+                                <div className='flex'>
+                                  <div className='w-40'>Supplier confirmed:</div>
+                                  <div className='flex-1'>
+                                    <b>...</b>
+                                  </div>
+                                </div>
+                                <div className='flex'>
+                                  <div className='w-40'>Total amount:</div>
+                                  <div className='flex-1'>
+                                    <b>...</b>
+                                  </div>
                                 </div>
                               </div>
-                              <div className='flex'>
-                                <div className='w-40'>Customer confirmed:</div>
-                                <div className='flex-1'>
-                                  <b>...</b>
-                                </div>
-                              </div>
-                              <div className='flex'>
-                                <div className='w-40'>Supplier confirmed:</div>
-                                <div className='flex-1'>
-                                  <b>...</b>
-                                </div>
-                              </div>
-                              <div className='flex'>
-                                <div className='w-40'>Total amount:</div>
-                                <div className='flex-1'>
-                                  <b>...</b>
-                                </div>
-                              </div>
+                            </div>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Close</AlertDialogCancel>
+                          <AlertDialogAction>Dispute</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                )}
+
+                <Separator className='mb-4' />
+                <Card className='max-h-max neban mb-1'>
+                  <CardHeader>
+                    <div className='flex justify-between'>
+                      <CardTitle className='mt-2'>Participants</CardTitle>
+                      <Button className='pt-2' variant={'outline'}>
+                        <Icons.userRoundPlus />
+                      </Button>
+                    </div>
+                    <Separator />
+                  </CardHeader>
+                  <ScrollArea className='h-[100px]'>
+                    <CardContent className='grid gap-8 px-5'>
+                      {contractParticipants.map((participant, index) => (
+                        <div className='flex items-center  justify-between' key={index}>
+                          <div className='grid w-44 overflow-hidden'>
+                            <p className='text-sm font-medium leading-none'>
+                              {participant?.User ? participant?.User?.name : 'No Name'}
+                            </p>
+                            <div className='email-container overflow-hidden'>
+                              <p className='text-sm text-muted-foreground '>{participant.email}</p>
                             </div>
                           </div>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Close</AlertDialogCancel>
-                        <AlertDialogAction>Dispute</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-                <Separator className='my-4' />
-                <div>
-                  <Card className='h-[350px]'>
-                    <CardHeader>
-                      <div className='flex justify-between'>
-                        <CardTitle className='mt-2'>Participants</CardTitle>
-                        <Button className='pt-2' variant={'outline'}>
-                          <Icons.userRoundPlus />
-                        </Button>
-                      </div>
-                      <Separator />
-                    </CardHeader>
-                    <ScrollArea className='h-[300px]'>
-                      <CardContent className='grid gap-8 px-5'>
-                        {contractParticipants.map((participant, index) => (
-                          <div className='flex items-center' key={index}>
-                            <div className='grid'>
-                              <p className='text-sm font-medium leading-none'>
-                                {participant?.User ? participant?.User?.name : 'No Name'}
-                              </p>
-                              <p className='text-sm text-muted-foreground'>{participant.email}</p>
-                            </div>
-                            <div className='ml-auto font-medium'>
-                              <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>
-                                {participant.status}
-                              </Badge>
-                              <Button className='px-2' variant={'destructive'}>
-                                <Icons.shieldPlus />
-                              </Button>
-                            </div>
+                          <div className='font-medium'>
+                            <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>
+                              {participant.status}
+                            </Badge>
+                            <Button className='px-2' variant={'destructive'}>
+                              <Icons.shieldPlus />
+                            </Button>
                           </div>
-                        ))}
-                      </CardContent>
-                    </ScrollArea>
-                  </Card>
-                </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </ScrollArea>
+                </Card>
               </CardContent>
             </Card>
           </div>
@@ -867,8 +868,8 @@ export default function Dashboard() {
               </div>
             </AlertDialogContent>
           </AlertDialog>
-        </main>
-      </div>
+        </main >
+      </div >
       <ChatBox showChat={showChat} setShowChat={setShowChat}></ChatBox>
       <Dialog onOpenChange={setDialogInvite} open={dialogInvite}>
         <DialogContent className='sm:max-w-[500px]'>
@@ -894,6 +895,6 @@ export default function Dashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   )
 }

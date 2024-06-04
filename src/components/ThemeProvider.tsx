@@ -3,6 +3,8 @@
 import * as React from 'react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { type ThemeProviderProps } from 'next-themes/dist/types'
+import { getUserInfo } from '@/constants/initVariable.constants'
+import { UserInfoData } from '@/interface/contract.i'
 
 const init = localStorage.getItem('user-info') ? JSON.parse(localStorage.getItem('user-info') as string) : null
 
@@ -30,7 +32,13 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 
 export const AppProvider: React.FC<AppContextProps> = ({ children }) => {
   const [dataCreateContract, setDataCreateContract] = React.useState({})
-  const [userInfo, setUserInfo] = React.useState(init)
+
+  const [userInfo, setUserInfo] = React.useState<UserInfoData | undefined>()
+  React.useEffect(() => {
+    getUserInfo().then((res) => {
+      setUserInfo(res)
+    })
+  }, [])
   const value: AppContextValue = {
     userInfo,
     setUserInfo,

@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import { EStageStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i'
+import { EStageContractStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i'
 import { getDateNow } from '@/utils/dayjs'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
 import React from 'react'
@@ -23,7 +23,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.PENDING,
+    status: EStageContractStatus.PENDING,
     dueDate: getDateNow()
   },
   {
@@ -31,7 +31,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.PENDING,
+    status: EStageContractStatus.PENDING,
     dueDate: getDateNow()
   },
   {
@@ -39,7 +39,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.PENDING,
+    status: EStageContractStatus.PENDING,
     dueDate: getDateNow()
   },
   {
@@ -47,7 +47,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.APPROVED,
+    status: EStageContractStatus.APPROVED,
     dueDate: getDateNow()
   }
 ]

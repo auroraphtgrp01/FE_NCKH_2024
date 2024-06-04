@@ -72,6 +72,7 @@ import { initDisableButton, initVisibleButton } from '@/constants/initVariable.c
 import Dispute from './(component)/Dispute'
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
 import { initContractAttribute } from './(component)/(store)/storeContractData'
+import { handleInstanceWeb3 } from '@/utils/web3Instance'
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute)
@@ -133,8 +134,7 @@ export default function Dashboard() {
         response?.contractData.participants,
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,
-        response?.contractData.contract.stages,
-        response?.contractData
+        response?.contractData?.contract
       )
       setContractStatus(response?.contractData.contract.status)
       setDependentInfo(getIndividualFromParticipant(response?.contractData.participants))
@@ -191,18 +191,6 @@ export default function Dashboard() {
     setDialogInvite(false)
   }
 
-  async function withdrawMoney() {
-    withdrawMoneyFunc(addressContract, userInfo, individual)
-      .then(() => {})
-      .catch((error) => {
-        toast({
-          title: 'Error occurred while withdrawing money',
-          description: error,
-          variant: 'destructive'
-        })
-      })
-  }
-
   async function onCallFunctionInBlockchain() {
     setIsOpenEnterPrivateKey(false)
     const responseMessage = await handleCallFunctionOfBlockchain(
@@ -239,8 +227,17 @@ export default function Dashboard() {
           individual,
           setIsDisableButton,
           setIsVisibleButton,
-          privateKey,
           contractParticipants,
+          contractData
+        },
+        withdrawMoneyFunctionParams: {
+          addressContract,
+          setCurrentBalance,
+          individual,
+          setUserInfo,
+          userInfo,
+          setIsVisibleButton,
+          setIsDisableButton,
           contractData
         }
       }
@@ -283,43 +280,6 @@ export default function Dashboard() {
       })
     })
     setIsDeployContractAlert(false)
-  }
-
-  // async function handleConfirmStages() {
-  //   handleConfirmStagesFunc(
-  //     addressContract,
-  //     userInfo,
-  //     individual,
-  //     setIsDisableButton,
-  //     setIsVisibleButton
-  //   )
-  //     .then(() => {
-  //       toast({
-  //         title: "Confirm successfully !",
-  //         description: "You have confirmed the stage",
-  //         variant: "success",
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       toast({
-  //         title: "Error occurred while confirming stage",
-  //         description: error,
-  //         variant: "destructive",
-  //       });
-  //     });
-  // }
-
-  async function handleCancelContract() {
-    try {
-      const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
-      const abi = privateCode.data.abi.abi
-      const web3 = new Web3(window.ethereum)
-      const contract = new web3.eth.Contract(abi, addressContract as string)
-      await contract.methods.setStatus(1).send({ from: userInfo?.data?.addressWallet })
-      setIsCancelContractAlert(false)
-    } catch (error) {
-      console.log(error)
-    }
   }
 
   async function handleCompareContractInformation() {}

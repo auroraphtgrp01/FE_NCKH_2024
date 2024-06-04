@@ -72,7 +72,7 @@ export interface IStageContract {
   requestBy: string
   requestTo: string
   description?: string
-  status: EStageStatus
+  status: EStageContractStatus
   createdAt: Date
 }
 
@@ -230,6 +230,18 @@ export interface ITransferMoneyFunctionCallParams {
   privateKey?: string
 }
 
+export interface IWithdrawMoneyFunctionCallParams {
+  addressContract: string
+  setCurrentBalance: Dispatch<SetStateAction<number>>
+  individual: IIndividual
+  userInfo: UserInfoData
+  setUserInfo: Dispatch<SetStateAction<UserInfoData>>
+  setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
+  setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+  contractData: ContractData | undefined
+  privateKey?: string
+}
+
 export interface IConfirmStageFunctionCallParams {
   addressContract: string
   userInfo: UserInfoData
@@ -237,9 +249,9 @@ export interface IConfirmStageFunctionCallParams {
   individual: IIndividual
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
-  privateKey?: string
   contractParticipants: IContractParticipant[]
   contractData: ContractData | undefined
+  privateKey?: string
 }
 export interface IResponseFunction {
   status: 'success' | 'destructive'
@@ -260,15 +272,8 @@ export interface IStagesContract {
   requestBy: string
   requestTo: string
   description?: string
-  status: EStageStatus
+  status: EStageContractStatus
   dueDate: string | Date
-}
-
-export enum EStageStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  OUT_OF_DATE = 'OUT_OF_DATE'
 }
 
 export interface ITemplateContract {
@@ -304,5 +309,6 @@ export enum EStageContractStatus {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
   ENFORCE = 'ENFORCE',
-  WITHDRAWN = 'WITHDRAWN'
+  WITHDRAWN = 'WITHDRAWN',
+  OUT_OF_DATE = 'OUT_OF_DATE'
 }

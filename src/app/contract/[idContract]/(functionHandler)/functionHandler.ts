@@ -19,11 +19,13 @@ import {
   IStage,
   ITransferMoneyFunctionCallParams,
   IVisibleButton,
+  IWithdrawMoneyFunctionCallParams,
   InvitationItem,
   RSAKey,
   UserInfoData
 } from '@/interface/contract.i'
 import { fetchAPI } from '@/utils/fetchAPI'
+import { updateUserInfoFromLocalStorage } from '@/utils/updateUserInfo'
 import { handleInstanceWeb3 } from '@/utils/web3Instance'
 import NodeRSA from 'node-rsa'
 import { Dispatch, SetStateAction } from 'react'
@@ -36,7 +38,6 @@ const updateStateButton = (
   contractParticipants: IContractParticipant[],
   userInfo: UserInfoData,
   currentBalance: number,
-  stages: any[],
   contractData: ContractData
 ) => {
   const participantIsLogin = getParticipantInfoLogin(userInfo, contractParticipants)
@@ -83,13 +84,27 @@ const updateStateButton = (
         }
         break
       case 'SIGNED':
-        const hasStageNotStarted = stages.filter((item: any) => item.status === EStageContractStatus.ENFORCE)
+        const hasStageNotStarted = contractData?.stages
+          ? contractData?.stages.filter(
+              (item: any) =>
+                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+            )
+          : []
+        const hasStagePeding = contractData?.stages
+          ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
+          : []
+        const hasStageApproved = contractData?.stages
+          ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.APPROVED)
+          : []
+        console.log(hasStageApproved.length > 0)
+
         setIsVisibleButton((prev: any) => ({
           ...prev,
           signButton: false,
           confirmButtonSender: participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
           confirmButtonReceiver: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant),
-          transferButton: participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
+          transferButton:
+            currentBalance > 0 ? false : participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
           withdrawButton: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)
         }))
         setIsDisableButton((prev: any) => ({
@@ -98,13 +113,18 @@ const updateStateButton = (
           cancelButton: true,
           fetchCompareButton: false,
           confirmButtonReceiver:
-            participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant) && hasStageNotStarted
+            participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
+            hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
-            (participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)) !== undefined ? false : true,
+            (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
+            hasStagePeding.length > 0
+              ? false
+              : true,
           editContractButton: true,
-          inviteButton: true
+          inviteButton: true,
+          withdrawButton: !(hasStageApproved.length > 0)
         }))
         break
       default:
@@ -129,10 +149,10 @@ const fetchDataWhenEntryPage = async (
     if (contract.contractAddress !== null) {
       const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
       const abi = privateCode.data.abi.abi
-      const web3 = new Web3(window.ethereum)
-      const contractInstance = new web3.eth.Contract(abi, contract.contractAddress)
+      const { instance } = await handleInstanceWeb3()
+      const contractInstance = new instance.eth.Contract(abi, contract.contractAddress)
       const contractBallance: number = parseFloat(
-        web3.utils.fromWei(await contractInstance.methods.getBalance().call(), 'ether')
+        instance.utils.fromWei(await contractInstance.methods.getBalance().call(), 'ether')
       )
       setCurrentBalance(contractBallance)
       response.contractBallance = contractBallance
@@ -196,27 +216,58 @@ const inviteNewParticipant = async (
   }
 }
 
-const withdrawMoneyFunc = async (addressContract: string, userInfo: UserInfoData, individual: IIndividual) => {
+const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): Promise<IResponseFunction> => {
   try {
+    const hasStageApproved = dataParams.contractData?.stages.filter(
+      (item: any) => item.status === EStageContractStatus.APPROVED
+    )
+    const stageWithdraw = hasStageApproved && hasStageApproved.length > 0 ? hasStageApproved[0] : undefined
+    if (stageWithdraw !== undefined)
+      hasStageApproved?.map((item: any) => {
+        if (item.id === stageWithdraw.id) hasStageApproved.splice(item, 1)
+      })
     const {
       data: {
         abi: { abi }
       }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, addressContract as string)
-    const fromAddress = userInfo?.data?.addressWallet
-    const gasLimit = '1000000'
-    const gasPrice = '1000000000'
-    const transactionOptions = {
-      from: fromAddress,
-      gas: gasLimit,
-      gasPrice: gasPrice
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
+    await contract.methods
+      .withDrawByPercent(dataParams.individual.receiverInd, stageWithdraw?.percent, dataParams.privateKey)
+      .send({ from: dataParams.userInfo?.data?.addressWallet, gas: '1000000' })
+
+    const balance: number = parseFloat(instance.utils.fromWei(await contract.methods.getBalance().call(), 'ether'))
+
+    if (stageWithdraw === undefined)
+      return {
+        message: 'Withdraw money from contract Failed !',
+        description: 'No stage has been completed',
+        status: 'destructive'
+      }
+
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams.contractData?.id,
+      stage: { ...stageWithdraw, status: EStageContractStatus.WITHDRAWN }
+    })
+    dataParams.setCurrentBalance(balance)
+    dataParams.setIsDisableButton((prev: any) => ({
+      ...prev,
+      withdrawButton: hasStageApproved && hasStageApproved.length > 0 ? false : true
+    }))
+    return {
+      message: 'Withdraw money from contract Successfully !',
+      description: 'The contract was successfully received',
+      status: 'success'
     }
-    await contract.methods.withDrawByPercent(individual.receiverInd, 100).send(transactionOptions)
-    // const balance = await contract.methods.getBalance().call();
   } catch (error) {
-    throw error
+    console.log(error?.toString())
+
+    return {
+      message: 'Withdraw money from contract Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
   }
 }
 
@@ -224,25 +275,29 @@ const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): 
   try {
     const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
     const abi = privateCode.data.abi.abi
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
     await contract.methods.sendToSmartContract(dataParams.privateKey).send({
       from: dataParams.userInfo.data.addressWallet,
-      value: web3.utils.toWei(dataParams.individual.totalAmount, 'ether'),
+      value: instance.utils.toWei(dataParams.individual.totalAmount, 'ether'),
       gas: '1000000'
     })
 
-    const balance: string = await contract.methods.getBalance().call()
-    dataParams.setCurrentBalance(parseFloat(web3.utils.fromWei(balance, 'ether')))
+    const balanceContract: string = await contract.methods.getBalance().call()
+    dataParams.setCurrentBalance(parseFloat(instance.utils.fromWei(balanceContract, 'ether')))
     dataParams.setIsVisibleButton((prevState: any) => ({
       ...prevState,
-      transferButton: false
+      transferButton: false,
+      confirmButtonSender: true
     }))
-    dataParams.setIsDisableButton((prev: any) => ({
-      ...prev,
-      confirmButtonSender: false
-    }))
-
+    const { balance } = await handleInstanceWeb3()
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
     return {
       message: 'Transfer money to contract Successfully !',
       description: 'The contract was successfully received',
@@ -270,8 +325,8 @@ const handleConfirmStagesFuncOfSupplier = async (
         abi: { abi }
       }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
 
     await contract.methods.confirmStage(dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
@@ -282,29 +337,12 @@ const handleConfirmStagesFuncOfSupplier = async (
       return participant.userId === dataParams?.userInfo.data.id
     })
     const stageEnforce = dataParams.contractData?.stages.filter(
-      (item: any) => item.status === EStageContractStatus.ENFORCE
+      (item: any) => item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
     )
     const stageChange = stageEnforce && stageEnforce.length > 0 ? stageEnforce[0] : undefined
-    let stageUpdateParticipant = undefined
     if (stageChange !== undefined) {
       stageEnforce?.map((item: any) => {
         if (item === stageChange) stageEnforce.splice(item, 1)
-      })
-      const { id, ...rest } = stageChange
-      stageUpdateParticipant = { ...rest }
-      console.log({
-        ...stageUpdateParticipant,
-        status: EStageContractStatus.PENDING,
-        stageContractId: stageChange.id
-      })
-
-      await fetchAPI('/participants', 'PATCH', {
-        id: participantsLogin?.id,
-        stage: {
-          ...stageUpdateParticipant,
-          status: EStageContractStatus.PENDING,
-          stageContractId: stageChange.id
-        }
       })
       await fetchAPI('/contracts', 'PATCH', {
         id: dataParams?.contractData?.id,
@@ -339,78 +377,38 @@ const handleConfirmStagesFuncOfCustomer = async (
   dataParams: IConfirmStageFunctionCallParams
 ): Promise<IResponseFunction> => {
   try {
-    // const {
-    //   data: {
-    //     abi: { abi }
-    //   }
-    // } = await fetchAPI('/smart-contracts/abi', 'GET')
-    // const web3 = new Web3(window.ethereum)
-    // const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+    const {
+      data: {
+        abi: { abi }
+      }
+    } = await fetchAPI('/smart-contracts/abi', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
 
-    // await contract.methods.confirmStage(dataParams.privateKey).send({
-    //   from: dataParams.userInfo?.data?.addressWallet,
-    //   gas: '1000000'
-    // })
-
-    const participantsLogin = dataParams.contractParticipants?.find((participant: any) => {
-      return participant.userId === dataParams?.userInfo.data.id
+    await contract.methods.confirmStage(dataParams.privateKey).send({
+      from: dataParams.userInfo?.data?.addressWallet,
+      gas: '1000000'
     })
-    const receiver = dataParams.contractParticipants.find(
-      (item) => item?.permission?.ROLES === ERolesOfParticipant.RECEIVER
+
+    const hasStagePending = dataParams.contractData?.stages.filter(
+      (item: any) => (item.status = EStageContractStatus.PENDING)
     )
-    const hasStagePending =
-      receiver && receiver.completedStages.length > 0
-        ? receiver.completedStages.filter((item: any) => item.status === EStageContractStatus.PENDING)
-        : undefined
 
     const stageChange = hasStagePending && hasStagePending.length > 0 ? hasStagePending[0] : undefined
     if (stageChange !== undefined) {
       hasStagePending?.map((item: any) => {
         if (item === stageChange) hasStagePending.splice(item, 1)
       })
-      console.log('stageChange', stageChange)
-      //       id
-      // :
-      // "9e2179e6-3e53-40be-a8db-a4a3c30ed5db"
-      // percent
-      // :
-      // 100
-      // requestBy
-      // :
-      // "aca0da6e-9f42-47c4-8af8-7ed8ffdc3341"
-      // requestTo
-      // :
-      // "e13fcf5f-5773-4913-9448-d9507319100f"
-      // stageContractId
-      // :
-      // "000f96fd-da29-4571-81e2-9019d596c62c"
-      // status
-      // :
-      // "PENDING"
-      dataParams
-      // await fetchAPI('/participants', 'PATCH', {
-      //   id: participantsLogin?.id,
-      //   stage: {
-      //     ...stageChange,
-      //     status: EStageContractStatus.APPROVED
-      //   }
-      // })
-      // await fetchAPI('/contracts', 'PATCH', {
-      //   id: dataParams?.contractData?.id,
-      //   stage: { ...stageChange, status: EStageContractStatus.APPROVED }
-      // })
+      await fetchAPI('/contracts', 'PATCH', {
+        id: dataParams?.contractData?.id,
+        stage: { ...stageChange, status: EStageContractStatus.APPROVED }
+      })
     }
 
-    // dataParams.setIsDisableButton((prev: any) => ({
-    //   ...prev,
-    //   confirmButtonReceiver: stageEnforce?.length === 0 ? true : false
-    // }))
-
-    //  if (userInfo?.data?.addressWallet === individual.senderInd) {
-    //      setIsDisableButton({ ...isDisableButton });
-    //  } else {
-    //      setIsDisableButton({ ...isDisableButton });
-    //  }
+    dataParams.setIsDisableButton((prev: any) => ({
+      ...prev,
+      confirmButtonSender: hasStagePending?.length === 0 ? true : false
+    }))
     return {
       message: 'Confirm Successfully !',
       description: 'Stage has been confirmed successfully',
@@ -428,7 +426,7 @@ const handleConfirmStagesFuncOfCustomer = async (
 async function handleCompareContractInformationFunc(setIsCompareContractAlert: any) {
   // try {
   //     const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
-  //     const web3 = new Web3(window.ethereum);
+  //     const { instance } = await handleInstanceWeb3();
   //     const contract = new web3.eth.Contract(abi, addressContract as string);
   //     const compare: string[] = await contract.methods.getContractInformation(privateKey)
   //         .call({ from: userInfo?.data?.addressWallet });
@@ -456,8 +454,8 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
         abi: { abi }
       }
     } = await fetchAPI('/smart-contracts/abi', 'GET')
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract)
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract)
     await contract.methods.sign(dataParams.userInfo?.data?.addressWallet.toString(), dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
       gas: '1000000'
@@ -491,7 +489,8 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
         }))
         dataParams.setIsDisableButton((prevState: any) => ({
           ...prevState,
-          transferButton: false
+          transferButton: false,
+          confirmButtonSender: true
         }))
       } else {
         dataParams.setIsVisibleButton((prevState: any) => ({
@@ -581,7 +580,13 @@ const handleOnDeployContractFunc = async (
         from: userInfo?.data?.addressWallet
       })
     const { balance } = await handleInstanceWeb3()
-    setUserInfo((prev: any) => ({ ...prev, balance }))
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      setUserInfo
+    )
     setAddressContract(deployTransaction?.options?.address as string)
     setIsVisibleButton((prevState: any) => ({
       ...prevState,
@@ -716,6 +721,7 @@ const handleCallFunctionOfBlockchain = async (
     signContractParams?: ISignContractFunctionCallParams
     transferFunctionParams?: ITransferMoneyFunctionCallParams
     confirmFunctionParams?: IConfirmStageFunctionCallParams
+    withdrawMoneyFunctionParams?: IWithdrawMoneyFunctionCallParams
   }
 ): Promise<IResponseFunction> => {
   if (dataAuthentication.privateKey === '' && dataAuthentication.filePrivateKey === undefined) {
@@ -746,6 +752,10 @@ const handleCallFunctionOfBlockchain = async (
       break
     case EFunctionCall.WITHDRAW_CONTRACT:
       console.log('Withdraw Contract')
+      responseMessages = await withdrawMoneyFunc({
+        ...dataFunctionCall.withdrawMoneyFunctionParams,
+        privateKey
+      } as IWithdrawMoneyFunctionCallParams)
       break
     case EFunctionCall.TRANSFER_CONTRACT:
       console.log('Transfer Contract')
@@ -783,7 +793,9 @@ const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<
     const res = await fetchAPI(
       '/contracts',
       'POST',
-      dataParams.templateId === '' ? (({ templateId, ...rest }) => rest)(dataParams) : dataParams
+      dataParams.templateId === ''
+        ? (({ templateId, ...rest }) => rest)(dataParams)
+        : { ...dataParams, isCreateAttributeValue: true }
     )
     if (res.status === 201) {
       return {

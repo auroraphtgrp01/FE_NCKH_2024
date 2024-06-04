@@ -124,6 +124,7 @@ export interface IVisibleButton extends DynamicType {
   confirmButtonSender: boolean
   confirmButtonReceiver: boolean
   openDisputedButton: boolean
+  inviteButton: boolean
 }
 export interface IDisableButton extends DynamicType {
   fetchCompareButton: boolean
@@ -136,6 +137,7 @@ export interface IDisableButton extends DynamicType {
   confirmButtonSender: boolean
   confirmButtonReceiver: boolean
   openDisputedButton: boolean
+  inviteButton: boolean
 }
 export interface IStage {
   id?: string

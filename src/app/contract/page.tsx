@@ -1,14 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -47,7 +40,7 @@ export interface Participant {
 export type Contract = {
   id: string
   contractAddress: string
-  name: string // Contract Title
+  name: string
   status: string
   type: string
   email: string
@@ -70,7 +63,6 @@ export default function DataTableDemo() {
       }
     })
   }, [])
-  // api-> khi click vào nút participant trên dataTable
   async function handleOpenParticipant(contractId: string) {
     const response = await fetchAPI(`/participants/find-all/${contractId}`, 'GET')
     console.log(response.data)
@@ -86,7 +78,6 @@ export default function DataTableDemo() {
       })
     )
     setParticipants(data)
-    // setParticipants(sampleParticipants);
     setIsOpen(true)
   }
 

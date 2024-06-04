@@ -8,15 +8,16 @@ import {
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
-  cancelButton: true,
+  cancelButton: false,
   withdrawButton: true,
   transferButton: true,
   deployButton: true,
-  editContractButton: true,
+  editContractButton: false,
   signButton: true,
   confirmButtonSender: true,
   confirmButtonReceiver: true,
-  openDisputedButton: false
+  openDisputedButton: false,
+  inviteButton: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -28,7 +29,8 @@ export const initVisibleButton: IVisibleButton = {
   signButton: false,
   confirmButtonSender: false,
   confirmButtonReceiver: false,
-  openDisputedButton: true
+  openDisputedButton: true,
+  inviteButton: false
 }
 
 export const initResponseMessages: IResponseFunction = {

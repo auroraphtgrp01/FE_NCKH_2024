@@ -52,6 +52,7 @@ import {
 import InvitationArea from '@/components/InvitationArea'
 import {
   fetchDataWhenEntryPage,
+  getIndividualFromParticipant,
   handleCallFunctionOfBlockchain,
   handleOnDeployContractFunc,
   inviteNewParticipant,
@@ -76,7 +77,6 @@ export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute)
   const [currentBalance, setCurrentBalance] = useState<number>(0)
   const [contractParticipants, setContractParticipants] = useState<IContractParticipant[]>([])
-
   const [contractData, setContractData] = useState<ContractData>()
   const [individual, setIndividual] = useState<IIndividual>({
     receiverInd: '',
@@ -99,6 +99,10 @@ export default function Dashboard() {
   const { toast } = useToast()
   const [isDisableButton, setIsDisableButton] = useState<IDisableButton>(initDisableButton)
   const [isVisibleButton, setIsVisibleButton] = useState<IVisibleButton>(initVisibleButton)
+  const [dependentInfo, setDependentInfo] = useState<{
+    receiver: IContractParticipant | undefined
+    sender: IContractParticipant | undefined
+  }>()
   const [dialogInvite, setDialogInvite] = useState(false)
   const [stages, setStages] = useState<any[]>([
     {
@@ -124,10 +128,8 @@ export default function Dashboard() {
     ).then((response) => {
       updateStateButton(
         response?.contractData.contract.status,
-        response?.contractData.contractAttributes,
         setIsVisibleButton,
         setIsDisableButton,
-        individual,
         response?.contractData.participants,
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,
@@ -135,38 +137,7 @@ export default function Dashboard() {
         response?.contractData
       )
       setContractStatus(response?.contractData.contract.status)
-      // response?.contractData.participants.map((participant: any) => {
-      //   if (participant?.userId === userInfo?.data?.id) {
-      //     if (participant?.status === "SIGNED") {
-      //       setIsDisableButton((prev: any) => ({
-      //         ...prev,
-      //         signButton: true,
-      //       }));
-      //     }
-      //   }
-      // });
-      // const addressMatch = (type: any) =>
-      //   (
-      //     response?.contractData.contractAttributes.find(
-      //       (item: any) => item.type === type
-      //     )?.value || ""
-      //   ).toLowerCase() === userInfo.data.addressWallet.toLowerCase();
-      // if (
-      //   response?.contractData.contract.status === "SIGNED" ||
-      //   response?.contractData.contract.status === "ENFORCE"
-      // ) {
-      //   setIsDisableButton((prev: any) => ({
-      //     ...prev,
-      //     cancelButton: false,
-      //     fetchCompareButton: false,
-      //     withdrawButton: !addressMatch(
-      //       EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-      //     ),
-      //     transferButton: !addressMatch(
-      //       EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND
-      //     ),
-      //   }));
-      // }
+      setDependentInfo(getIndividualFromParticipant(response?.contractData.participants))
     })
   }, [])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
@@ -397,7 +368,7 @@ export default function Dashboard() {
                   <Separator className='mt-4' />
                 </div>
               </CardHeader>
-              <CardContent className='text-sm'>
+              <CardContent className='pl-[18px] text-sm'>
                 <div className='grid gap-3'>
                   <div className='font-semibold'>
                     Name of Contract: <span>{contractData?.contractTitle}</span>
@@ -407,13 +378,7 @@ export default function Dashboard() {
                   </div>
                   <div className='font-semibold'>
                     Address Contract:
-                    <Input readOnly className='mt-2' value={addressContract} />
-                  </div>
-                  <div className='mt-1 flex align-middle'>
-                    <div className='font-semibold'>Funds locked in a Contract:</div>
-                    <div className='ms-3 translate-y-[-15px]'>
-                      <Input readOnly className='mt-2 w-[155px]' value={currentBalance + ' ETH'} />
-                    </div>
+                    <Input readOnly className='mt-2' value={addressContract} placeholder='Address Contract Empty' />
                   </div>
                   <div>
                     <div className='font-semibold'>Contract Progress </div>
@@ -433,11 +398,9 @@ export default function Dashboard() {
                   </div>
                   <Separator className='' />
                   <div className='flex items-center justify-center text-center'>
-                    <Link href={`/contract/${idContract}/edit`}>
-                      <Button className='' variant={'violet'}>
-                        Edit contract
-                      </Button>
-                    </Link>
+                    <Button className='' disabled={isDisableButton.editContractButton} variant={'violet'}>
+                      <Link href={`/contract/${idContract}/edit`}>Edit contract</Link>
+                    </Button>
                     <Button
                       onClick={() => setShowChat(!showChat)}
                       className='ms-2 w-full rounded-md border border-none bg-blue-500 px-2 py-2 text-sm text-white shadow outline-none hover:bg-blue-500/90 dark:text-white'
@@ -469,6 +432,7 @@ export default function Dashboard() {
                       Fetch Blockchain to Compare Database
                     </Button>
                     <Button
+                      disabled={isDisableButton.inviteButton}
                       variant={'orange'}
                       className='ms-2 w-full'
                       onClick={() => {
@@ -484,27 +448,45 @@ export default function Dashboard() {
                     payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
                   />
                   <div>
-                    <Card>
+                    <Card className='h-[215px]'>
                       <CardContent className='text-sm'>
                         <div className='mt-4 w-full'>
                           <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
                           <Separator className='mt-2' />
                         </div>
-                        <ScrollArea className='h-[80px]'>
-                          <div className='mt-3 flex items-center'>
-                            <div className='grid'>
-                              <p className='text-sm font-medium leading-none'>Name</p>
-                              <p className='text-sm text-muted-foreground'>
-                                {'*'.repeat('0x1366441c4a37C946dCbEe7d8dda1D6Ab108A635d'.length - 30) +
-                                  '0x1366441c4a37C946dCbEe7d8dda1D6Ab108A635d'.slice(-5)}
-                              </p>
+                        <ScrollArea className='mt-2 h-[180px]'>
+                          {dependentInfo?.sender?.User?.name && (
+                            <div className='mt-3 flex items-center'>
+                              <div className='grid'>
+                                <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
+                                <p className='text-sm text-muted-foreground'>
+                                  {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
+                                    dependentInfo.sender?.User.addressWallet.slice(-5)}
+                                </p>
+                              </div>
+                              <div className='ml-auto font-medium'>
+                                <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
+                                  Sender User
+                                </Badge>
+                              </div>
                             </div>
-                            <div className='ml-auto font-medium'>
-                              <Badge variant={'default'} className='me-1 translate-y-[-5px]'>
-                                Sender User
-                              </Badge>
+                          )}
+                          {dependentInfo?.receiver?.User?.name && (
+                            <div className='mt-3 flex items-center'>
+                              <div className='grid'>
+                                <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User?.name}</p>
+                                <p className='text-sm text-muted-foreground'>
+                                  {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
+                                    dependentInfo.receiver.User?.addressWallet.slice(-5)}
+                                </p>
+                              </div>
+                              <div className='ml-auto font-medium'>
+                                <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
+                                  Receiver User
+                                </Badge>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </ScrollArea>
                       </CardContent>
                     </Card>
@@ -555,7 +537,7 @@ export default function Dashboard() {
                 </div>
                 <div className='mt-2 grid gap-3'>
                   <div className='flex align-middle'>
-                    <div className='font-semibold'>Total Amount of Money:</div>
+                    <div className='font-semibold'>Total Value Of Contract: </div>
                     <div className='translate-x-[15px] translate-y-[-7px]'>
                       <Input
                         readOnly
@@ -563,6 +545,14 @@ export default function Dashboard() {
                         placeholder='Total Amount of Money'
                         defaultValue={`${individual?.totalAmount ? individual?.totalAmount + ' ETH' : ''}`}
                       />
+                    </div>
+                  </div>
+                </div>
+                <div className='mt-2 grid gap-3'>
+                  <div className='flex align-middle'>
+                    <div className='font-semibold'>Funds locked in Contract:</div>
+                    <div className='translate-x-[5px] translate-y-[-7px]'>
+                      <Input readOnly className='w-[180px]' value={currentBalance + ' ETH'} />
                     </div>
                   </div>
                 </div>
@@ -702,18 +692,18 @@ export default function Dashboard() {
                 </div>
                 <Separator className='my-4' />
                 <div>
-                  <Card x-chunk='dashboard-01-chunk-5'>
+                  <Card className='h-[350px]'>
                     <CardHeader>
                       <div className='flex justify-between'>
                         <CardTitle className='mt-2'>Participants</CardTitle>
-                        <Button className='px-2' variant={'outline'}>
+                        <Button className='pt-2' variant={'outline'}>
                           <Icons.userRoundPlus />
                         </Button>
                       </div>
-                      <Separator className='mb-2' />
+                      <Separator />
                     </CardHeader>
                     <ScrollArea className='h-[300px]'>
-                      <CardContent className='grid gap-8 p-5'>
+                      <CardContent className='grid gap-8 px-5'>
                         {contractParticipants.map((participant, index) => (
                           <div className='flex items-center' key={index}>
                             <div className='grid'>

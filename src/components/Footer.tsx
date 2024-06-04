@@ -1,6 +1,6 @@
 export const Footer = () => {
   return (
-    <footer className='fixed bottom-0 left-0 right-0 z-[9999] ms-[55px] backdrop-blur'>
+    <footer className='fixed bottom-0 left-0 right-0 z-[999] ms-[55px] backdrop-blur'>
       <hr className='' />
       <section className='container pb-4 text-center'>
         <h3 className='ml-auto mr-auto mt-2'>

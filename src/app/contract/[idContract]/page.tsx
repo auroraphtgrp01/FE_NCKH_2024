@@ -484,8 +484,8 @@ export default function Dashboard() {
                               <div className='grid'>
                                 <p className='text-sm font-medium leading-none'>{item?.User?.name || 'No Name'}</p>
                                 <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(item?.User?.addressWallet.length - 30) +
-                                    item?.User?.addressWallet.slice(-5)}
+                                  {'*'.repeat(item?.User.addressWallet.length - 30) +
+                                    item?.User.addressWallet.slice(-5)}
                                 </p>
                               </div>
                               <div className='ml-auto font-medium'>

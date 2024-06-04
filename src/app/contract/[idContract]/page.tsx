@@ -758,7 +758,7 @@ export default function Dashboard() {
                   <Card className='h-[350px]'>
                     <CardHeader>
                       <div className='flex justify-between'>
-                        <CardTitle className='mt-2'>Participants</CardTitle>
+                        <CardTitle className='mt-2 text-lg'>Participants</CardTitle>
                         <Button className='pt-2' variant={'outline'}>
                           <Icons.userRoundPlus />
                         </Button>
@@ -873,6 +873,7 @@ export default function Dashboard() {
                   <Input
                     placeholder='Fill your private key'
                     className='ms-2 w-full'
+                    type='password'
                     onChange={(e) => {
                       setPrivateKey(e.target.value)
                     }}

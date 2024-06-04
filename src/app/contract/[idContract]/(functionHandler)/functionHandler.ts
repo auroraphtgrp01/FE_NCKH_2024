@@ -75,7 +75,8 @@ const updateStateButton = (
         setIsVisibleButton((prev: any) => ({
           ...prev,
           deployButton: false,
-          signButton: true
+          signButton: true,
+          openDisputedButton: false
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
@@ -513,7 +514,8 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
           ...prevState,
           signButton: false,
           transferButton: true,
-          confirmButtonSender: true
+          confirmButtonSender: true,
+          openDisputedButton: true
         }))
         dataParams.setIsDisableButton((prevState: any) => ({
           ...prevState,

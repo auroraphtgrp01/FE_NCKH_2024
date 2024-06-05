@@ -130,8 +130,8 @@ export default function page() {
           </div>
         </div>
       </header>
-      <div className='container flex w-full'>
-        <div className='flex py-4'>
+      <div className='container flex w-full min-h-screen'>
+        <div className='flex py-4 h-[755px]'>
           <Card className='min-w-[320px]'>
             <CardHeader>
               <CardTitle>Create a new Contract</CardTitle>
@@ -215,7 +215,7 @@ export default function page() {
             </CardFooter>
           </Card>
         </div>
-        <div className='ms-4 flex py-4'>
+        <div className='ms-4 flex py-4 h-[755px]'>
           <Card className='min-w-[450px]'>
             <CardHeader>
               <CardTitle>Information of Contract</CardTitle>
@@ -239,7 +239,7 @@ export default function page() {
             </CardFooter>
           </Card>
         </div>
-        <div className='ms-4 flex py-4'>
+        <div className='ms-4 flex py-4 h-[755px]'>
           <Card className='min-w-[600px]'>
             <CardHeader>
               <CardTitle className='text-center text-lg font-semibold'>{template[current]?.name}</CardTitle>

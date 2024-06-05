@@ -408,50 +408,48 @@ export default function Dashboard() {
                     payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
                   />
 
-                  <div>
-                    <Card className='max-h-max neban mb-1'>
-                      <CardContent className='text-sm'>
-                        <div className='mt-4 w-full'>
-                          <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
-                          <Separator className='mt-2' />
-                        </div>
-                        <ScrollArea className='h-[100px]'>
-                          {dependentInfo?.sender?.User?.name && (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
-                                    dependentInfo.sender?.User.addressWallet.slice(-5)}
-                                </p>
-                              </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
-                                  Sender User
-                                </Badge>
-                              </div>
+                  <Card className='max-h-max'>
+                    <CardContent className='text-sm'>
+                      <div className='mt-4 w-full'>
+                        <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
+                        <Separator className='mt-2' />
+                      </div>
+                      <ScrollArea className='h-[100px]'>
+                        {dependentInfo?.sender?.User?.name && (
+                          <div className='mt-3 flex items-center'>
+                            <div className='grid'>
+                              <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
+                              <p className='text-sm text-muted-foreground'>
+                                {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
+                                  dependentInfo.sender?.User.addressWallet.slice(-5)}
+                              </p>
                             </div>
-                          )}
-                          {dependentInfo?.receiver?.User?.name && (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User?.name}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
-                                    dependentInfo.receiver.User?.addressWallet.slice(-5)}
-                                </p>
-                              </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
-                                  Receiver User
-                                </Badge>
-                              </div>
+                            <div className='ml-auto font-medium'>
+                              <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
+                                Sender User
+                              </Badge>
                             </div>
-                          )}
-                        </ScrollArea>
-                      </CardContent>
-                    </Card>
-                  </div>
+                          </div>
+                        )}
+                        {dependentInfo?.receiver?.User?.name && (
+                          <div className='mt-3 flex items-center'>
+                            <div className='grid'>
+                              <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User?.name}</p>
+                              <p className='text-sm text-muted-foreground'>
+                                {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
+                                  dependentInfo.receiver.User?.addressWallet.slice(-5)}
+                              </p>
+                            </div>
+                            <div className='ml-auto font-medium'>
+                              <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
+                                Receiver User
+                              </Badge>
+                            </div>
+                          </div>
+                        )}
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>
@@ -467,7 +465,7 @@ export default function Dashboard() {
                   <Separator className='mt-4' />
                 </div>
               </CardHeader>
-              <CardContent className='flex-1 grid text-sm'>
+              <CardContent className='flex-1 grid text-sm px-4'>
                 <div className='mt-2 grid gap-3 '>
                   <div className='flex align-middle'>
                     <div className='font-semibold'>Sender Representative:</div>
@@ -652,7 +650,7 @@ export default function Dashboard() {
                 )}
 
                 <Separator className='mb-4' />
-                <Card className='max-h-max neban mb-1'>
+                <Card className='max-h-max neban'>
                   <CardHeader>
                     <div className='flex justify-between'>
                       <CardTitle className='mt-2'>Participants</CardTitle>

@@ -97,9 +97,9 @@ const updateStateButton = (
       case 'SIGNED':
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
-              (item: any) =>
-                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
-            )
+            (item: any) =>
+              item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+          )
           : []
         const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -124,12 +124,12 @@ const updateStateButton = (
           fetchCompareButton: false,
           confirmButtonReceiver:
             participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
-            hasStageNotStarted.length > 0
+              hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-            hasStagePending.length > 0
+              hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -878,7 +878,7 @@ const onOpenDisputeContract = async (dataParams: IContractDisputeParams): Promis
     await contract.methods
       .transferTokenToDisputeContract(
         deployTransaction?.options?.address as string,
-        instance.utils.toWei(1, 'ether'),
+        instance.utils.toWei(dataParams?.totalAmount, 'ether'),
         dataParams.privateKey
       )
       .send({ from: dataParams.userInfo?.data?.addressWallet, gas: '1000000' })

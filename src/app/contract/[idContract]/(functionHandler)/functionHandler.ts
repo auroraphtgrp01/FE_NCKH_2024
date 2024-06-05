@@ -97,9 +97,9 @@ const updateStateButton = (
       case 'SIGNED':
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
-            (item: any) =>
-              item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
-          )
+              (item: any) =>
+                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+            )
           : []
         const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -124,12 +124,12 @@ const updateStateButton = (
           fetchCompareButton: false,
           confirmButtonReceiver:
             participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
-              hasStageNotStarted.length > 0
+            hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-              hasStagePending.length > 0
+            hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -162,7 +162,12 @@ const fetchDataWhenEntryPage = async (
     const response: IResponseFunctionFetchData = { contractData: res.data }
     const { contract, participants, contractAttributes } = res.data
     if (contract.contractAddress !== null) {
-      const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+      const privateCode = await fetchAPI(
+        contract.type === EContractType.DISPUTE
+          ? '/smart-contracts/abi?type=disputed'
+          : '/smart-contracts/abi?type=supplyChain',
+        'GET'
+      )
       const abi = privateCode.data.abi.abi
       const { instance } = await handleInstanceWeb3()
       const contractInstance = new instance.eth.Contract(abi, contract.contractAddress)
@@ -286,8 +291,6 @@ const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): 
       status: 'success'
     }
   } catch (error) {
-
-
     return {
       message: 'Withdraw money from contract Failed !',
       description: error?.toString(),
@@ -652,8 +655,6 @@ const handleOnDeployContractFunc = async (
       status: 'success'
     }
   } catch (error) {
-
-
     return {
       message: 'Deploy Failed',
       description: error,
@@ -777,20 +778,16 @@ const handleCallFunctionOfBlockchain = async (
   let responseMessages: IResponseFunction = initResponseMessages
   switch (dataFunctionCall.nameFunctionCall) {
     case EFunctionCall.FETCH_COMPARE_CONTRACT:
-
       break
     case EFunctionCall.CANCEL_CONTRACT:
-
       break
     case EFunctionCall.WITHDRAW_CONTRACT:
-
       responseMessages = await withdrawMoneyFunc({
         ...dataFunctionCall.withdrawMoneyFunctionParams,
         privateKey
       } as IWithdrawMoneyFunctionCallParams)
       break
     case EFunctionCall.TRANSFER_CONTRACT:
-
       responseMessages = await transferMoneyFunc({
         ...dataFunctionCall.transferFunctionParams,
         privateKey
@@ -803,14 +800,12 @@ const handleCallFunctionOfBlockchain = async (
       } as ISignContractFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_SENDER:
-
       responseMessages = await handleConfirmStagesFuncOfCustomer({
         ...dataFunctionCall.confirmFunctionParams,
         privateKey
       } as IConfirmStageFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
-
       responseMessages = await handleConfirmStagesFuncOfSupplier({
         ...dataFunctionCall.confirmFunctionParams,
         privateKey
@@ -821,8 +816,6 @@ const handleCallFunctionOfBlockchain = async (
 }
 
 const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
-
-
   try {
     const res = await fetchAPI(
       '/contracts',
@@ -916,8 +909,6 @@ const getIndividualFromParticipant = (
   const sender = participant?.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
   const arbitrators = participant?.filter((item) => item.permission?.ROLES == ('ARBITRATION' as ERolesOfParticipant))
   const votes = arbitrators?.map((item) => {
-
-
     return {
       vote: item.vote,
       participantId: item.id,
@@ -947,26 +938,17 @@ const calculateVoteRatio = (
   sender: number
   receiver: number
 } => {
-  console.log('votes', votes);
-
-  let countA = votes.filter((item) => item.vote === 'A').length
-  let countB = votes.filter((item) => item.vote === 'B').length
-  let countUnd = votes.filter((item) => item.vote === null).length
-  let total = countA + countB
+  let countA = votes?.filter((item) => item.vote === 'A').length
+  let countB = votes?.filter((item) => item.vote === 'B').length
+  let countUnd = votes?.filter((item) => item.vote === null).length
+  let total = countA + countB + countUnd
   let ratioA = (countA / total) * 100
   let ratioB = (countB / total) * 100
-  let undVotes = countUnd
-  let totalVote = countA + countB + countUnd
-  console.log('totalVote', totalVote);
-  
-  console.log('ratioA', ratioA, 'ratioB', ratioB, 'undVotes', undVotes);
-
   return {
-    sender: !isNaN(ratioA) ? parseFloat(ratioA.toFixed(2)) : 50.00,
-    receiver: !isNaN(ratioB) ? parseFloat(ratioB.toFixed(2)) : 50.00
+    sender: parseFloat(ratioA.toFixed(2)),
+    receiver: parseFloat(ratioB.toFixed(2))
   }
 }
-
 
 export {
   updateStateButton,

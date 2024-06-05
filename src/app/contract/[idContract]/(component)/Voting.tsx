@@ -73,22 +73,33 @@ export default function Voting({
           <AlertDialogHeader>
             <AlertDialogTitle className='text-center'>Please choose to vote for the party</AlertDialogTitle>
             <AlertDialogDescription className=''>
-              <div className='mb-4'>
-                <div className='mb-2'>
-                  <div className='flex justify-between'>
-                    <div className='mb-1 font-semibold'>Customer </div>
-                    <div className='mb-1 font-semibold'>Supplier </div>
-                  </div>
-                  <div className='flex'>
-                    <Progress className='bg-yellow-400' value={cloneVotes?.sender}></Progress>{' '}
-                  </div>
+              <div className='mb-2'>
+                <div className='flex justify-between'>
+                  <div className='mb-1 font-semibold'>Customer </div>
                   <div className='flex justify-between'>
                     <div className='mt-1 font-semibold'>{cloneVotes?.sender} %</div>
+                  </div>
+                </div>
+                <div className='flex'>
+                  <Progress value={cloneVotes?.sender}></Progress>{' '}
+                </div>
+              </div>
+              <div className='mt-2'>
+                <div className='flex justify-between'>
+                  <div className='mb-1 font-semibold'>Supplier </div>
+                  <div className='flex justify-between'>
                     <div className='mt-1 font-semibold'>{cloneVotes?.receiver} %</div>
                   </div>
                 </div>
+                <div className='flex'>
+                  <Progress
+                    color='bg-destructive'
+                    className='bg-destructive/20'
+                    value={cloneVotes?.receiver}
+                  ></Progress>{' '}
+                </div>
               </div>
-              <div className='flex items-center justify-center'>
+              <div className='mt-3 flex items-center justify-center'>
                 <Button
                   disabled={isDisableButton.voteCustomerButton}
                   variant={'default'}
@@ -101,8 +112,8 @@ export default function Voting({
                 </Button>
                 <Button
                   disabled={isDisableButton.voteSupplierButton}
-                  variant={'yellow'}
-                  className='w-[50%] font-semibold'
+                  variant={'destructive'}
+                  className='ms-1 w-[50%] font-semibold'
                   onClick={() => {
                     handleOnClickVote('B')
                   }}

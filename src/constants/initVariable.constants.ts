@@ -66,7 +66,7 @@ export const getUserInfo = async () => {
 }
 
 export const initRatioParticipant: IVoteRatio = {
-  sender: parseFloat(Number(50).toFixed(2)),
-  receiver: parseFloat(Number(50).toFixed(2)),
+  sender: parseFloat(Number(0).toFixed(2)),
+  receiver: parseFloat(Number(0).toFixed(2)),
   votes: []
 }

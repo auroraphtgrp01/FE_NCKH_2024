@@ -580,14 +580,27 @@ export default function Dashboard() {
                       <div className='mb-2'>
                         <div className='flex justify-between'>
                           <div className='mb-1 font-semibold'>Customer </div>
-                          <div className='mb-1 font-semibold'>Supplier </div>
+                          <div className='flex justify-between'>
+                            <div className='mt-1 font-semibold'>{voteRatio?.sender} %</div>
+                          </div>
                         </div>
                         <div className='flex'>
-                          <Progress className='bg-yellow-400' value={voteRatio?.sender}></Progress>{' '}
+                          <Progress value={voteRatio?.sender}></Progress>{' '}
                         </div>
+                      </div>
+                      <div className='mt-2'>
                         <div className='flex justify-between'>
-                          <div className='mt-1 font-semibold'>{voteRatio?.sender} %</div>
-                          <div className='mt-1 font-semibold'>{voteRatio?.receiver} %</div>
+                          <div className='mb-1 font-semibold'>Supplier </div>
+                          <div className='flex justify-between'>
+                            <div className='mt-1 font-semibold'>{voteRatio?.receiver} %</div>
+                          </div>
+                        </div>
+                        <div className='flex'>
+                          <Progress
+                            color='bg-destructive'
+                            className='bg-destructive/20'
+                            value={voteRatio?.receiver}
+                          ></Progress>{' '}
                         </div>
                       </div>
                     </div>
@@ -765,7 +778,7 @@ export default function Dashboard() {
                       </div>
                       <Separator />
                     </CardHeader>
-                    <ScrollArea className='h-[300px]'>
+                    <ScrollArea className='px h-[250px] px-1'>
                       <CardContent className='grid gap-8 px-5'>
                         {contractParticipants.map((participant, index) => (
                           <div className='flex items-center' key={index}>

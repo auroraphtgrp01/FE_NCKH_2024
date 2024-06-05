@@ -35,6 +35,7 @@ export const AppProvider: React.FC<AppContextProps> = ({ children }) => {
 
   const [userInfo, setUserInfo] = React.useState<UserInfoData>(init)
   React.useEffect(() => {
+    if (!init) return
     getUserInfo().then((res) => {
       setUserInfo(res)
     })

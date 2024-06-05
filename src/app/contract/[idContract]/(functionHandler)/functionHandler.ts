@@ -162,7 +162,7 @@ const fetchDataWhenEntryPage = async (
     const response: IResponseFunctionFetchData = { contractData: res.data }
     const { contract, participants, contractAttributes } = res.data
     if (contract.contractAddress !== null) {
-      const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+      const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
       const abi = privateCode.data.abi.abi
       const { instance } = await handleInstanceWeb3()
       const contractInstance = new instance.eth.Contract(abi, contract.contractAddress)
@@ -245,7 +245,7 @@ const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): 
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
     await contract.methods
@@ -298,7 +298,7 @@ const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): 
 
 const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): Promise<IResponseFunction> => {
   try {
-    const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+    const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const abi = privateCode.data.abi.abi
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
@@ -349,7 +349,7 @@ const handleConfirmStagesFuncOfSupplier = async (
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
 
@@ -406,7 +406,7 @@ const handleConfirmStagesFuncOfCustomer = async (
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
 
@@ -478,7 +478,7 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi, dataParams.addressContract)
     await contract.methods.sign(dataParams.userInfo?.data?.addressWallet.toString(), dataParams.privateKey).send({
@@ -580,7 +580,7 @@ const handleOnDeployContractFunc = async (
     }
   }
   try {
-    const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+    const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const abi = privateCode.data.abi.abi
     const byteCode = privateCode.data.abi.bytecode
     const { instance } = await handleInstanceWeb3()

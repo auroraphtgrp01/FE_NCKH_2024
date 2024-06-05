@@ -302,8 +302,8 @@ export default function Dashboard() {
     const { receiver, sender } = getIndividualFromParticipant(participantContract)
     return {
       addressWallet: addressWallet,
-      customer: receiver?.User.addressWallet,
-      supplier: sender?.User.addressWallet,
+      customer: receiver?.User?.addressWallet,
+      supplier: sender?.User?.addressWallet,
       disputedContractId: idContract as string,
       totalAmount: Number(individual.totalAmount)
     }

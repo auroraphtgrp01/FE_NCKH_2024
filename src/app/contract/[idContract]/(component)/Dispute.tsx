@@ -83,12 +83,7 @@ export default function Dispute({
       <AlertDialog>
         <AlertDialogTrigger asChild>
           {isVisibleButton.openDisputedButton && (
-            <Button
-              disabled={isDisableButton.fetchCompareButton}
-              className='w-full'
-              onClick={() => {}}
-              variant={'destructive'}
-            >
+            <Button className='w-full' onClick={() => {}} variant={'destructive'}>
               Open Dispute Contract
             </Button>
           )}

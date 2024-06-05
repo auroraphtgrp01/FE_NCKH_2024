@@ -23,7 +23,8 @@ export const initDisableButton: IDisableButton = {
   inviteButton: false,
   voteButton: true,
   voteCustomerButton: false,
-  voteSupplierButton: false
+  voteSupplierButton: false,
+  setIsVotedAll: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -37,7 +38,8 @@ export const initVisibleButton: IVisibleButton = {
   confirmButtonReceiver: false,
   openDisputedButton: true,
   inviteButton: false,
-  voteButton: false
+  voteButton: false,
+  goToDisputeButton: false
 }
 
 export const initResponseMessages: IResponseFunction = {

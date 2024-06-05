@@ -1,8 +1,4 @@
-import {
-  calculateVoteRatio,
-  getIndividualFromParticipant,
-  onCreateANewContract
-} from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
+import { calculateVoteRatio } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +13,8 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
-import { IContractVotingProps, IVoteRatio } from '@/interface/contract.i'
+import { IContractVotingProps, IVoteRatio, IVotes } from '@/interface/contract.i'
+import { fetchAPI } from '@/utils/fetchAPI'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
 import React, { useEffect } from 'react'
 
@@ -27,10 +24,12 @@ export default function Voting({
   votes,
   setVotes,
   setIsDisableButton,
-  userInfo
+  userInfo,
+  individual
 }: IContractVotingProps) {
   const { toast } = useToast()
   const [cloneVotes, setCloneVotes] = React.useState<IVoteRatio>(votes)
+  const [userLogin, setUserLogin] = React.useState<IVotes>()
   useEffect(() => {
     setCloneVotes(votes)
   }, [votes])
@@ -38,6 +37,7 @@ export default function Voting({
     let voteArr = cloneVotes.votes
     const indexOfParticipant = voteArr.findIndex((item) => item.userId === userInfo?.data.id)
     voteArr[indexOfParticipant] = { ...voteArr[indexOfParticipant], vote: selected }
+    setUserLogin(voteArr[indexOfParticipant])
     setCloneVotes({
       votes: voteArr,
       ...calculateVoteRatio(voteArr)
@@ -48,10 +48,24 @@ export default function Voting({
       voteSupplierButton: selected === 'B'
     }))
   }
-  const handleOnSave = () => {
+  const handleOnSave = async () => {
     if (isDisableButton.voteCustomerButton || isDisableButton.voteSupplierButton) {
       setVotes(cloneVotes)
-      // goi api update participant
+      const res = await fetchAPI('/participants', 'PATCH', {
+        id: userLogin?.participantId,
+        vote: userLogin?.vote,
+        individual: {
+          sender: individual.senderInd,
+          receiver: individual.receiverInd
+        }
+      })
+      if (res.data.isVotedAll) {
+        setIsDisableButton((prev) => ({
+          ...prev,
+          voteButton: true,
+          setIsVotedAll: true
+        }))
+      }
       toast({
         variant: 'success',
         title: 'Voting successfully',

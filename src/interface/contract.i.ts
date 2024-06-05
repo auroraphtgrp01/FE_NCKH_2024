@@ -84,7 +84,8 @@ export enum EContractStatus {
   SIGNED = 'SIGNED',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
-  VOTED = 'VOTED'
+  VOTED = 'VOTED',
+  DISPUTED = 'DISPUTED'
 }
 export interface DynamicType {
   [key: string]: any
@@ -111,7 +112,10 @@ export interface ContractData {
   User: User
   stages: IStage[]
   type: EContractType
+  parentId?: string
   disputedContractId?: string
+  winnerAddressWallet?: string
+  contractAddress?: string
 }
 export interface IIndividual {
   receiverInd: string
@@ -130,6 +134,7 @@ export interface IVisibleButton extends DynamicType {
   openDisputedButton: boolean
   inviteButton: boolean
   voteButton: boolean
+  goToDisputeButton: boolean
 }
 export interface IDisableButton extends DynamicType {
   fetchCompareButton: boolean
@@ -146,6 +151,7 @@ export interface IDisableButton extends DynamicType {
   voteButton: boolean
   voteSupplierButton: boolean
   voteCustomerButton: boolean
+  setIsVotedAll: boolean
 }
 export interface IStage {
   id?: string
@@ -285,6 +291,7 @@ export interface IContractVotingProps {
   votes: IVoteRatio
   setVotes: Dispatch<SetStateAction<IVoteRatio>>
   userInfo: UserInfoData
+  individual: IIndividual
 }
 
 export interface IVoteRatio {
@@ -333,7 +340,7 @@ export interface IContractCreateParams {
 }
 export interface IContractDisputeParams {
   addressWallet: string
-  disputedContractId: string
+  parentId: string
   customer: string | undefined
   supplier: string | undefined
   totalAmount: number
@@ -359,4 +366,13 @@ export enum EStageContractStatus {
 export enum EContractType {
   CONTRACT = 'Contract',
   DISPUTE = 'Dispute'
+}
+
+export interface IWithdrawMoneyDisputeContractParams {
+  addressWallet: string
+  addressContract: string
+  setCurrentBalance: Dispatch<SetStateAction<number>>
+  setUserInfo: Dispatch<SetStateAction<UserInfoData>>
+  setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+  contractData: ContractData
 }

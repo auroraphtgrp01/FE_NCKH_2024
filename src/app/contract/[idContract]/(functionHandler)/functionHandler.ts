@@ -22,6 +22,7 @@ import {
   ITransferMoneyFunctionCallParams,
   IVisibleButton,
   IVotes,
+  IWithdrawMoneyDisputeContractParams,
   IWithdrawMoneyFunctionCallParams,
   InvitationItem,
   RSAKey,
@@ -46,7 +47,7 @@ const updateStateButton = (
   const participantIsLogin = getParticipantInfoLogin(userInfo, contractParticipants)
   const isDisputeContract = contractData?.type === EContractType.DISPUTE
   const isUserArbitrator = participantIsLogin?.permission.ROLES === ('ARBITRATION' as ERolesOfParticipant)
-
+  const isArbitrator = participantIsLogin?.permission.ROLES === ('ARBITRATION' as ERolesOfParticipant)
   if (contractParticipants?.length > 0) {
     const participantsLogin = contractParticipants?.find((participant: any) => {
       return participant.userId === userInfo?.data.id
@@ -97,9 +98,9 @@ const updateStateButton = (
       case 'SIGNED':
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
-            (item: any) =>
-              item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
-          )
+              (item: any) =>
+                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+            )
           : []
         const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -124,12 +125,12 @@ const updateStateButton = (
           fetchCompareButton: false,
           confirmButtonReceiver:
             participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
-              hasStageNotStarted.length > 0
+            hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-              hasStagePending.length > 0
+            hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -137,11 +138,49 @@ const updateStateButton = (
           withdrawButton: !(hasStageApproved.length > 0)
         }))
         break
-      case 'VOTED':
+      case 'DISPUTED':
         setIsVisibleButton((prev: any) => ({
-          ...prev
+          ...prev,
+          openDisputedButton: !(contractData.status === EContractStatus.DISPUTED),
+          goToDisputeButton: contractData.status === EContractStatus.DISPUTED,
+          editContractButton: true,
+          transferButton: true
+        }))
+        setIsDisableButton((prev) => ({
+          ...prev,
+          cancelButton: true,
+          fetchCompareButton: false,
+          inviteButton: true,
+          editContractButton: true,
+          transferButton: true
         }))
         break
+      case 'VOTED':
+        const isWinner =
+          contractData.winnerAddressWallet?.toLowerCase().trim() === userInfo?.data.addressWallet?.toLowerCase().trim()
+        setIsVisibleButton((prev) => ({
+          ...prev,
+          voteButton: isArbitrator,
+          openDisputedButton: false,
+          withdrawButton: !isArbitrator
+        }))
+        setIsDisableButton((prev) => ({
+          ...prev,
+          voteButton: true,
+          withdrawButton: !isWinner
+        }))
+      case 'COMPLETED':
+        setIsVisibleButton((prev) => ({
+          ...prev,
+          voteButton: isArbitrator,
+          openDisputedButton: false,
+          withdrawButton: !isArbitrator
+        }))
+        setIsDisableButton((prev) => ({
+          ...prev,
+          voteButton: true,
+          withdrawButton: true
+        }))
       default:
         break
     }
@@ -887,7 +926,11 @@ const onOpenDisputeContract = async (dataParams: IContractDisputeParams): Promis
       ...dataParams,
       contractAddress: deployTransaction?.options?.address
     })
-
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams.parentId,
+      disputedContractId: res.data.id,
+      status: 'DISPUTED'
+    })
     if (res.status === 201) {
       return {
         message: 'Create contract successfully',
@@ -985,7 +1028,53 @@ const calculateVoteRatio = (
   return {
     sender: !isNaN(ratioA) ? parseFloat(ratioA.toFixed(2)) : 0,
     receiver: !isNaN(ratioB) ? parseFloat(ratioB.toFixed(2)) : 0
-  };
+  }
+}
+
+const withdrawMoneyDispute = async (dataParams: IWithdrawMoneyDisputeContractParams): Promise<IResponseFunction> => {
+  try {
+    const {
+      data: {
+        abi: { abi }
+      }
+    } = await fetchAPI('/smart-contracts/abi?type=disputed', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract)
+    await contract.methods.withdraw(dataParams.addressWallet).send({ from: dataParams.addressWallet, gas: '1000000' })
+
+    const balanceContract: number = parseFloat(
+      instance.utils.fromWei(await contract.methods.getBalance().call(), 'ether')
+    )
+    dataParams.setCurrentBalance(balanceContract)
+
+    const { balance } = await handleInstanceWeb3()
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
+    dataParams.setIsDisableButton((prev) => ({
+      ...prev,
+      withdrawButton: true
+    }))
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams.contractData?.id,
+      status: 'COMPLETED'
+    })
+    return {
+      message: 'Withdraw Money From Contract Successfully !',
+      description: 'The contract was successfully received',
+      status: 'success'
+    }
+  } catch (error) {
+    return {
+      message: 'Withdraw Money From Contract Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
+  }
 }
 
 export {
@@ -1008,5 +1097,6 @@ export {
   getIndividualFromParticipant,
   getParticipantInfoLogin,
   calculateVoteRatio,
-  onOpenDisputeContract
+  onOpenDisputeContract,
+  withdrawMoneyDispute
 }

@@ -57,7 +57,8 @@ import {
   handleCallFunctionOfBlockchain,
   handleOnDeployContractFunc,
   inviteNewParticipant,
-  updateStateButton
+  updateStateButton,
+  withdrawMoneyDispute
 } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   Select,
@@ -309,7 +310,7 @@ export default function Dashboard() {
       addressWallet: addressWallet,
       customer: sender?.User?.addressWallet,
       supplier: receiver?.User?.addressWallet,
-      disputedContractId: idContract as string,
+      parentId: idContract as string,
       totalAmount: Number(individual.totalAmount),
       userInfo,
       addressContract
@@ -350,8 +351,8 @@ export default function Dashboard() {
                       <div>
                         From Contract:{' '}
                         <div className='mt-2 flex'>
-                          <Input className='me-2' value={contractData?.disputedContractId} />
-                          <Link href={`/contract/${contractData?.disputedContractId}`}>
+                          <Input className='me-2' value={contractData?.parentId} />
+                          <Link href={`/contract/${contractData?.parentId}`}>
                             <Button>Go To Contract</Button>
                           </Link>
                         </div>
@@ -370,6 +371,9 @@ export default function Dashboard() {
                       {contractStatus === 'PARTICIPATED' && <Progress value={25} className='my-2' />}
                       {contractStatus === 'ENFORCE' && <Progress value={50} className='my-2' />}
                       {contractStatus === 'SIGNED' && <Progress value={75} className='my-2' />}
+                      {contractStatus === 'DISPUTED' && (
+                        <Progress value={75} className='my-2 bg-destructive/20' color='bg-destructive' />
+                      )}
                       {contractStatus === 'COMPLETED' && <Progress value={100} className='my-2' />}
                       <div className='flex'>
                         <div className='ms-1 text-center font-semibold'>Participated</div>
@@ -383,15 +387,17 @@ export default function Dashboard() {
                   ) : (
                     <div>
                       <div className='font-semibold'>Contract Dispute Progress </div>
-                      {contractStatus === 'PARTICIPATED' && <Progress value={25} className='my-2' />}
-                      {contractStatus === 'VOTED' && <Progress value={50} className='my-2' />}
-                      {contractStatus === 'SIGNED' && <Progress value={75} className='my-2' />}
+                      {contractStatus === 'PARTICIPATED' && isDisableButton.setIsVotedAll === false && (
+                        <Progress value={25} className='my-2' />
+                      )}
+                      {(contractStatus === 'VOTED' || isDisableButton.setIsVotedAll === true) && (
+                        <Progress value={55} className='my-2' />
+                      )}
                       {contractStatus === 'COMPLETED' && <Progress value={100} className='my-2' />}
                       <div className='flex'>
                         <div className='ms-1 text-center font-semibold'>Participated</div>
-                        <div className='ms-16 text-center font-semibold'>Voted</div>
-                        <div className='ms-10 text-center font-semibold'>Signed Contract</div>
-                        <div className='ms-5 text-center font-semibold'>Completed</div>
+                        <div className='ms-20 text-center font-semibold'>Voted</div>
+                        <div className='ms-24 text-center font-semibold'>Completed</div>
                       </div>
                     </div>
                   )}
@@ -441,14 +447,23 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
-                  <Dispute
-                    isDisableButton={isDisableButton}
-                    isVisibleButton={isVisibleButton}
-                    payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
-                    setIsOpenEnterPrivateKey={setIsOpenEnterPrivateKey}
-                    setNameFunctionCall={setNameFunctionCall}
-                    setPrivateKey={setPrivateKey}
-                  />
+                  {isVisibleButton.openDisputedButton && (
+                    <Dispute
+                      isDisableButton={isDisableButton}
+                      isVisibleButton={isVisibleButton}
+                      payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
+                      setIsOpenEnterPrivateKey={setIsOpenEnterPrivateKey}
+                      setNameFunctionCall={setNameFunctionCall}
+                      setPrivateKey={setPrivateKey}
+                    />
+                  )}
+                  {isVisibleButton.goToDisputeButton && (
+                    <Link href={`/contract/${contractData?.disputedContractId}`}>
+                      <Button variant={'violet'} className='w-full'>
+                        Go To Dispute Contract
+                      </Button>
+                    </Link>
+                  )}
                   <div>
                     <Card className='h-[215px]'>
                       <CardContent className='text-sm'>
@@ -624,10 +639,26 @@ export default function Dashboard() {
                       <div className='flex align-middle'>
                         <div className='font-semibold'>Winner: </div>
                         <div className='ms-4 w-full translate-y-[-7px]'>
-                          <Input readOnly placeholder='Address Wallet' />
+                          <Input
+                            readOnly
+                            placeholder='Address Wallet'
+                            defaultValue={
+                              contractData.status !== 'VOTED' && contractData.status !== 'COMPLETED'
+                                ? 'Waiting for the result'
+                                : voteRatio.receiver > voteRatio.sender
+                                  ? individual.receiverInd
+                                  : individual.senderInd
+                            }
+                          />
                         </div>
                         <div className='w-[40%]'>
-                          <Badge className='ms-2 h-[20px] text-center'>Unknown</Badge>
+                          <Badge className='ms-2 h-[20px] text-center'>
+                            {contractData.status !== 'VOTED' && contractData.status !== 'COMPLETED'
+                              ? 'Unknown'
+                              : voteRatio.receiver > voteRatio.sender
+                                ? 'Supplier'
+                                : 'Customer'}
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -650,6 +681,7 @@ export default function Dashboard() {
                 <Voting
                   isDisableButton={isDisableButton}
                   isVisibleButton={isVisibleButton}
+                  individual={individual}
                   votes={voteRatio}
                   setVotes={setVoteRatio}
                   setIsDisableButton={setIsDisableButton}
@@ -688,9 +720,26 @@ export default function Dashboard() {
                     disabled={isDisableButton.withdrawButton}
                     className='w-full'
                     onClick={() => {
-                      setIsOpenEnterPrivateKey(true)
-                      setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
-                      setPrivateKey('')
+                      if (contractData?.type === EContractType.DISPUTE) {
+                        withdrawMoneyDispute({
+                          addressWallet: contractData?.winnerAddressWallet as string,
+                          addressContract: contractData?.contractAddress as string,
+                          contractData: contractData,
+                          setCurrentBalance,
+                          setIsDisableButton,
+                          setUserInfo
+                        }).then((response) => {
+                          toast({
+                            title: response.message,
+                            variant: response.status,
+                            description: response.description
+                          })
+                        })
+                      } else {
+                        setIsOpenEnterPrivateKey(true)
+                        setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
+                        setPrivateKey('')
+                      }
                     }}
                   >
                     Withdraw
@@ -794,7 +843,7 @@ export default function Dashboard() {
                               <p className='text-sm font-medium leading-none'>
                                 {participant?.User ? participant?.User?.name : 'No Name'}
                               </p>
-                              <p className='text-sm text-muted-foreground'>{participant.email}</p>
+                              <p className='text-[0.7rem] text-muted-foreground'>{participant.email}</p>
                             </div>
                             <div className='ml-auto font-medium'>
                               <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>

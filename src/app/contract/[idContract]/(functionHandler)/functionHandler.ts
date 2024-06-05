@@ -983,9 +983,9 @@ const calculateVoteRatio = (
   let ratioA = (countA / total) * 100
   let ratioB = (countB / total) * 100
   return {
-    sender: parseFloat(ratioA.toFixed(2)),
-    receiver: parseFloat(ratioB.toFixed(2))
-  }
+    sender: !isNaN(ratioA) ? parseFloat(ratioA.toFixed(2)) : 0,
+    receiver: !isNaN(ratioB) ? parseFloat(ratioB.toFixed(2)) : 0
+  };
 }
 
 export {

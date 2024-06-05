@@ -17,7 +17,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import { EStageContractStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i'
+import {
+  EFunctionCall,
+  EStageContractStatus,
+  IOpenDisputedComponentProps,
+  IStagesContract
+} from '@/interface/contract.i'
 import { getDateNow } from '@/utils/dayjs'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
 import { useRouter } from 'next/navigation'
@@ -58,19 +63,20 @@ const stages: IStagesContract[] = [
   }
 ]
 
-export default function Dispute({ isDisableButton, isVisibleButton, payload }: IOpenDisputedComponentProps) {
+export default function Dispute({
+  isDisableButton,
+  isVisibleButton,
+  payload,
+  setIsOpenEnterPrivateKey,
+  setNameFunctionCall,
+  setPrivateKey
+}: IOpenDisputedComponentProps) {
   const { toast } = useToast()
   const Router = useRouter()
   const handleOpenDisputeContract = () => {
-    console.log('??', payload)
-    onOpenDisputeContract(payload).then((res) => {
-      toast({
-        title: res.message,
-        description: res.description,
-        variant: res.status
-      })
-      Router.push(`/contract/${res.contractId}`)
-    })
+    setIsOpenEnterPrivateKey(true)
+    setNameFunctionCall(EFunctionCall.ON_OPEN_DISPUTE_CONTRACT)
+    setPrivateKey('')
   }
   return (
     <div>

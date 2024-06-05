@@ -755,6 +755,7 @@ const handleCallFunctionOfBlockchain = async (
     transferFunctionParams?: ITransferMoneyFunctionCallParams
     confirmFunctionParams?: IConfirmStageFunctionCallParams
     withdrawMoneyFunctionParams?: IWithdrawMoneyFunctionCallParams
+    openDisputeFunctionParams?: IContractDisputeParams
   }
 ): Promise<IResponseFunction> => {
   if (dataAuthentication.privateKey === '' && dataAuthentication.filePrivateKey === undefined) {
@@ -811,6 +812,11 @@ const handleCallFunctionOfBlockchain = async (
         privateKey
       } as IConfirmStageFunctionCallParams)
       break
+    case EFunctionCall.ON_OPEN_DISPUTE_CONTRACT:
+      responseMessages = await onOpenDisputeContract({
+        ...dataFunctionCall.openDisputeFunctionParams,
+        privateKey
+      } as IContractDisputeParams)
   }
   return responseMessages
 }
@@ -849,7 +855,39 @@ const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<
 
 const onOpenDisputeContract = async (dataParams: IContractDisputeParams): Promise<IResponseFunction> => {
   try {
-    const res = await fetchAPI('/contracts/dispute-contract', 'POST', dataParams)
+    const privateCodeDispute = await fetchAPI('/smart-contracts/abi?type=disputed', 'GET')
+    const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+    const abiDispute = privateCodeDispute.data.abi.abi
+    const abi = privateCode.data.abi.abi
+    const byteCodeDispute = privateCodeDispute.data.abi.bytecode
+
+    const { instance } = await handleInstanceWeb3()
+    const contractDispute = new instance.eth.Contract(abiDispute)
+    const contract = new instance.eth.Contract(abi, dataParams?.addressContract as string)
+    const _user = dataParams.customer
+    const _supplier = dataParams.supplier
+    const deployTransaction = await contractDispute
+      .deploy({
+        data: byteCodeDispute,
+        arguments: [_supplier, _user]
+      })
+      .send({
+        from: dataParams.userInfo?.data?.addressWallet,
+        gas: '1000000'
+      })
+    await contract.methods
+      .transferTokenToDisputeContract(
+        deployTransaction?.options?.address as string,
+        instance.utils.toWei(1, 'ether'),
+        dataParams.privateKey
+      )
+      .send({ from: dataParams.userInfo?.data?.addressWallet, gas: '1000000' })
+
+    const res = await fetchAPI('/contracts/dispute-contract', 'POST', {
+      ...dataParams,
+      contractAddress: deployTransaction?.options?.address
+    })
+
     if (res.status === 201) {
       return {
         message: 'Create contract successfully',

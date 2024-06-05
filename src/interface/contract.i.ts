@@ -212,7 +212,8 @@ export enum EFunctionCall {
   TRANSFER_CONTRACT = 'TRANSFER_CONTRACT',
   SIGN_CONTRACT = 'SIGN_CONTRACT',
   CONFIRM_CONTRACT_SENDER = 'CONFIRM_CONTRACT_SENDER',
-  CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER'
+  CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER',
+  ON_OPEN_DISPUTE_CONTRACT = 'ON_OPEN_DISPUTE_CONTRACT'
 }
 
 export interface ISignContractFunctionCallParams {
@@ -272,6 +273,9 @@ export interface IOpenDisputedComponentProps {
   isDisableButton: IDisableButton
   isVisibleButton: IVisibleButton
   payload: IContractDisputeParams
+  setIsOpenEnterPrivateKey: Dispatch<SetStateAction<boolean>>
+  setNameFunctionCall: Dispatch<SetStateAction<EFunctionCall | undefined>>
+  setPrivateKey: Dispatch<SetStateAction<string>>
 }
 
 export interface IContractVotingProps {
@@ -333,6 +337,9 @@ export interface IContractDisputeParams {
   customer: string | undefined
   supplier: string | undefined
   totalAmount: number
+  userInfo: UserInfoData | undefined
+  addressContract: string
+  privateKey?: string
 }
 
 export interface IResponseFunctionFetchData {

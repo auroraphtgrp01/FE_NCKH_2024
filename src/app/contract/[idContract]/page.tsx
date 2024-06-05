@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Icons } from '@/components/ui/icons'
 import ChatBox from '@/components/ChatBox'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import {
   ContractData,
@@ -117,6 +117,7 @@ export default function Dashboard() {
   const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>()
   const [showChat, setShowChat] = useState(false)
   const { idContract } = useParams()
+  const Router = useRouter()
   useEffect(() => {
     console.log('voteRatio', voteRatio)
   }, [voteRatio])
@@ -252,9 +253,11 @@ export default function Dashboard() {
           setIsVisibleButton,
           setIsDisableButton,
           contractData
-        }
+        },
+        openDisputeFunctionParams: getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)
       }
     )
+    if (responseMessage.contractId) Router.push(`/contract/${responseMessage.contractId}`)
     toast({
       title: responseMessage.message,
       variant: responseMessage.status,
@@ -307,7 +310,9 @@ export default function Dashboard() {
       customer: sender?.User?.addressWallet,
       supplier: receiver?.User?.addressWallet,
       disputedContractId: idContract as string,
-      totalAmount: Number(individual.totalAmount)
+      totalAmount: Number(individual.totalAmount),
+      userInfo,
+      addressContract
     }
   }
 
@@ -440,6 +445,9 @@ export default function Dashboard() {
                     isDisableButton={isDisableButton}
                     isVisibleButton={isVisibleButton}
                     payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
+                    setIsOpenEnterPrivateKey={setIsOpenEnterPrivateKey}
+                    setNameFunctionCall={setNameFunctionCall}
+                    setPrivateKey={setPrivateKey}
                   />
                   <div>
                     <Card className='h-[215px]'>
@@ -485,7 +493,7 @@ export default function Dashboard() {
                               </div>
                             )}
                             {arbitratorUser?.map((item, index) => (
-                              <div className='mt-3 flex items-center'>
+                              <div className='mt-3 flex items-center' key={index}>
                                 <div className='grid'>
                                   <p className='text-sm font-medium leading-none'>{item?.User?.name || 'No Name'}</p>
                                   <p className='text-sm text-muted-foreground'>

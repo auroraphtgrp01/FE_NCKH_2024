@@ -142,6 +142,8 @@ export default function Dashboard() {
         response?.contractData?.contract
       )
       const { arbitrators, votes } = getIndividualFromParticipant(response?.contractData.participants)
+      console.log('>>>', calculateVoteRatio(votes))
+
       setVoteRatio({
         ...calculateVoteRatio(votes),
         votes
@@ -302,8 +304,8 @@ export default function Dashboard() {
     const { receiver, sender } = getIndividualFromParticipant(participantContract)
     return {
       addressWallet: addressWallet,
-      customer: receiver?.User?.addressWallet,
-      supplier: sender?.User?.addressWallet,
+      customer: sender?.User?.addressWallet,
+      supplier: receiver?.User?.addressWallet,
       disputedContractId: idContract as string,
       totalAmount: Number(individual.totalAmount)
     }
@@ -446,55 +448,59 @@ export default function Dashboard() {
                           <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
                           <Separator className='mt-2' />
                         </div>
-                        <ScrollArea className='mt-2 h-[180px]'>
-                          {dependentInfo?.sender?.User?.name && (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
-                                    dependentInfo.sender?.User.addressWallet.slice(-5)}
-                                </p>
+                        <ScrollArea className='mt-2 h-[140px]'>
+                          <div className='px-2'>
+                            {dependentInfo?.sender?.User?.name && (
+                              <div className='mt-3 flex items-center'>
+                                <div className='grid'>
+                                  <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
+                                  <p className='text-sm text-muted-foreground'>
+                                    {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
+                                      dependentInfo.sender?.User.addressWallet.slice(-5)}
+                                  </p>
+                                </div>
+                                <div className='ml-auto font-medium'>
+                                  <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
+                                    Customer
+                                  </Badge>
+                                </div>
                               </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
-                                  Customer
-                                </Badge>
+                            )}
+                            {dependentInfo?.receiver?.User?.name && (
+                              <div className='mt-3 flex items-center'>
+                                <div className='grid'>
+                                  <p className='text-sm font-medium leading-none'>
+                                    {dependentInfo.receiver.User?.name}
+                                  </p>
+                                  <p className='text-sm text-muted-foreground'>
+                                    {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
+                                      dependentInfo.receiver.User?.addressWallet.slice(-5)}
+                                  </p>
+                                </div>
+                                <div className='ml-auto font-medium'>
+                                  <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
+                                    Supplier
+                                  </Badge>
+                                </div>
                               </div>
-                            </div>
-                          )}
-                          {dependentInfo?.receiver?.User?.name && (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User?.name}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
-                                    dependentInfo.receiver.User?.addressWallet.slice(-5)}
-                                </p>
+                            )}
+                            {arbitratorUser?.map((item, index) => (
+                              <div className='mt-3 flex items-center'>
+                                <div className='grid'>
+                                  <p className='text-sm font-medium leading-none'>{item?.User?.name || 'No Name'}</p>
+                                  <p className='text-sm text-muted-foreground'>
+                                    {'*'.repeat(item?.User?.addressWallet.length - 30) +
+                                      item?.User?.addressWallet.slice(-5)}
+                                  </p>
+                                </div>
+                                <div className='ml-auto font-medium'>
+                                  <Badge variant={'default'} className='me-1 translate-y-[-5px]'>
+                                    Arbitrator
+                                  </Badge>
+                                </div>
                               </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
-                                  Supplier
-                                </Badge>
-                              </div>
-                            </div>
-                          )}
-                          {arbitratorUser?.map((item, index) => (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{item?.User?.name || 'No Name'}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(item?.User.addressWallet.length - 30) +
-                                    item?.User.addressWallet.slice(-5)}
-                                </p>
-                              </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'default'} className='me-1 translate-y-[-5px]'>
-                                  Arbitrator
-                                </Badge>
-                              </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </ScrollArea>
                       </CardContent>
                     </Card>

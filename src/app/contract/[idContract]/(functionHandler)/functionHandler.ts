@@ -97,9 +97,9 @@ const updateStateButton = (
       case 'SIGNED':
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
-              (item: any) =>
-                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
-            )
+            (item: any) =>
+              item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+          )
           : []
         const hasStagePending = contractData?.stages
           ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
@@ -124,12 +124,12 @@ const updateStateButton = (
           fetchCompareButton: false,
           confirmButtonReceiver:
             participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
-            hasStageNotStarted.length > 0
+              hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
             (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
-            hasStagePending.length > 0
+              hasStagePending.length > 0
               ? false
               : true,
           editContractButton: true,
@@ -286,7 +286,7 @@ const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): 
       status: 'success'
     }
   } catch (error) {
-    console.log(error?.toString())
+
 
     return {
       message: 'Withdraw money from contract Failed !',
@@ -652,7 +652,7 @@ const handleOnDeployContractFunc = async (
       status: 'success'
     }
   } catch (error) {
-    console.log('error', error)
+
 
     return {
       message: 'Deploy Failed',
@@ -777,20 +777,20 @@ const handleCallFunctionOfBlockchain = async (
   let responseMessages: IResponseFunction = initResponseMessages
   switch (dataFunctionCall.nameFunctionCall) {
     case EFunctionCall.FETCH_COMPARE_CONTRACT:
-      console.log('Fetch Compare Contract')
+
       break
     case EFunctionCall.CANCEL_CONTRACT:
-      console.log('Cancel Contract')
+
       break
     case EFunctionCall.WITHDRAW_CONTRACT:
-      console.log('Withdraw Contract')
+
       responseMessages = await withdrawMoneyFunc({
         ...dataFunctionCall.withdrawMoneyFunctionParams,
         privateKey
       } as IWithdrawMoneyFunctionCallParams)
       break
     case EFunctionCall.TRANSFER_CONTRACT:
-      console.log('Transfer Contract')
+
       responseMessages = await transferMoneyFunc({
         ...dataFunctionCall.transferFunctionParams,
         privateKey
@@ -803,14 +803,14 @@ const handleCallFunctionOfBlockchain = async (
       } as ISignContractFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_SENDER:
-      console.log('Confirm Contract Sender')
+
       responseMessages = await handleConfirmStagesFuncOfCustomer({
         ...dataFunctionCall.confirmFunctionParams,
         privateKey
       } as IConfirmStageFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
-      console.log('Confirm Contract Receiver')
+
       responseMessages = await handleConfirmStagesFuncOfSupplier({
         ...dataFunctionCall.confirmFunctionParams,
         privateKey
@@ -821,7 +821,7 @@ const handleCallFunctionOfBlockchain = async (
 }
 
 const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<IResponseFunction> => {
-  console.log(dataParams)
+
 
   try {
     const res = await fetchAPI(
@@ -916,7 +916,7 @@ const getIndividualFromParticipant = (
   const sender = participant?.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
   const arbitrators = participant?.filter((item) => item.permission?.ROLES == ('ARBITRATION' as ERolesOfParticipant))
   const votes = arbitrators?.map((item) => {
-    console.log(item)
+
 
     return {
       vote: item.vote,
@@ -947,20 +947,26 @@ const calculateVoteRatio = (
   sender: number
   receiver: number
 } => {
-  if (votes?.length === 0) return { sender: 50, receiver: 50 }
+  console.log('votes', votes);
 
-  let countA = votes?.filter((item) => item.vote === 'A').length
-  let countB = votes?.filter((item) => item.vote === 'B').length
-
-  let totalVotes = countA + countB
-  let ratioA = (countA / totalVotes) * 100
-  let ratioB = (countB / totalVotes) * 100
+  let countA = votes.filter((item) => item.vote === 'A').length
+  let countB = votes.filter((item) => item.vote === 'B').length
+  let countUnd = votes.filter((item) => item.vote === null).length
+  let total = countA + countB
+  let ratioA = (countA / total) * 100
+  let ratioB = (countB / total) * 100
+  let undVotes = countUnd
+  let totalVote = countA + countB + countUnd
+  console.log('totalVote', totalVote);
+  
+  console.log('ratioA', ratioA, 'ratioB', ratioB, 'undVotes', undVotes);
 
   return {
-    sender: parseFloat(ratioA.toFixed(2)),
-    receiver: parseFloat(ratioB.toFixed(2))
+    sender: !isNaN(ratioA) ? parseFloat(ratioA.toFixed(2)) : 50.00,
+    receiver: !isNaN(ratioB) ? parseFloat(ratioB.toFixed(2)) : 50.00
   }
 }
+
 
 export {
   updateStateButton,

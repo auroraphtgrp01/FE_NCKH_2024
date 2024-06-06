@@ -78,10 +78,10 @@ export interface DataTableProps<TData extends DataWithName> {
   setData: React.Dispatch<React.SetStateAction<TData>>
 }
 export interface Product {
-  id: number
+  id: string
   name: string
   description: string
-  idSupplier: number
+  idSupplier: string
 }
 
 export default function Page() {
@@ -94,8 +94,6 @@ export default function Page() {
   })
   const { id } = useParams<{ id: string }>()
   const [dataOrder, setDataOrder] = useState<any>({})
-  const [endDate, setEndate] = useState('')
-  const [delivery, setDelivery] = useState('')
   const [isDisableButton, setIsDisableButton] = useState({
     isDisableButtonSendRq: false,
     isDisableButtonResendRq: false,
@@ -116,16 +114,15 @@ export default function Page() {
   // xxxxxx
   useEffect(() => {
     getDataOrders()
-    console.log(isDisableButton.isDisableButtonSendRq)
-    console.log(isDisableButton.isDisableButtonResendRq)
-
     const info = JSON.parse(localStorage.getItem('user-info') as string)
     setUserInfo(info)
     if (info.data.role === 'Customer') setIsCustomer(true)
   }, [])
 
   async function sendRequestToSupplier() {
-    await fetchAPI(`/orders/send-request/${dataOrder.id}`, 'GET')
+    console.log('dataOrder', dataOrder)
+
+    await fetchAPI(`/orders/send-request/${dataOrder?.order.id}`, 'GET')
       .then((res) => {
         toast({
           title: res.data.message,
@@ -218,8 +215,6 @@ export default function Page() {
     fetchAPI(`/orders/${id}`, 'GET')
       .then((res) => {
         setDataOrder(res.data)
-        if (res.data.order.endDate !== null) setEndate(res.data.order.endDate.split('T')[0])
-        if (res.data.order.executeDate !== null) setDelivery(res.data.order.executeDate.split('T')[0])
         const { products, ...rest } = res.data.order
         setIsDisableButton({
           ...isDisableButton,
@@ -275,18 +270,6 @@ export default function Page() {
             disabled
           ></Input>
         </div>
-        <div className='flex'>
-          <div className='mt-2 w-32 text-sm font-semibold'>End date</div>
-          <Input
-            className='ml-4 w-[50%]'
-            type='date'
-            placeholder='Tên, Email, hoặc Tham chiếu'
-            defaultValue={endDate}
-            onBlur={(e) => {
-              updateOrder(e, 'endDate')
-            }}
-          ></Input>
-        </div>
       </div>
       <div className='grid grid-cols-2'>
         <div className='flex'>
@@ -296,18 +279,6 @@ export default function Page() {
             placeholder='xxxx-xxxx-xxxx'
             defaultValue={dataOrder.supplier?.taxCode}
             disabled
-          ></Input>
-        </div>
-        <div className='flex'>
-          <div className='w-32 text-sm font-semibold'>Delivery date</div>
-          <Input
-            className='ml-4 w-[50.5%]'
-            type='date'
-            placeholder='Tên, Email, hoặc Tham chiếu'
-            defaultValue={delivery}
-            onBlur={(e) => {
-              updateOrder(e, 'delivery')
-            }}
           ></Input>
         </div>
       </div>

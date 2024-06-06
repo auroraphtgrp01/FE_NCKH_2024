@@ -195,7 +195,7 @@ export function DataTable<TData extends DataWithName>({ data, getDataOrders, set
                       <SelectContent>
                         <SelectGroup>
                           {ListSelectProduct.map((value, index) => (
-                            <SelectItem value={value.name} key={index}>
+                            <SelectItem value={value.id} key={index}>
                               {value.name}
                             </SelectItem>
                           ))}

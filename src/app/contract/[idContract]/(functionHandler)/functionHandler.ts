@@ -648,7 +648,7 @@ const handleOnDeployContractFunc = async (
     const deployTransaction = await contract
       .deploy({
         data: byteCode,
-        arguments: [_user, _supplier, _total, _stages, _privateKey]
+        arguments: [_user, _supplier, instance.utils.toWei(_total, 'ether'), _stages, _privateKey]
       })
       .send({
         from: userInfo?.data?.addressWallet
@@ -694,6 +694,8 @@ const handleOnDeployContractFunc = async (
       status: 'success'
     }
   } catch (error) {
+    console.log('Error occurred while deploying contract:', error)
+
     return {
       message: 'Deploy Failed',
       description: error,

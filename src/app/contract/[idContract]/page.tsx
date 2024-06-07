@@ -144,7 +144,6 @@ export default function Dashboard() {
         response?.contractData?.contract
       )
       const { arbitrators, votes } = getIndividualFromParticipant(response?.contractData.participants)
-      console.log('>>>', calculateVoteRatio(votes))
 
       setVoteRatio({
         ...calculateVoteRatio(votes),
@@ -255,7 +254,10 @@ export default function Dashboard() {
           setIsDisableButton,
           contractData
         },
-        openDisputeFunctionParams: getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)
+        openDisputeFunctionParams: getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet),
+        compareContractFunctionParams: {
+          idContract: idContract as string
+        }
       }
     )
     if (responseMessage.contractId) Router.push(`/contract/${responseMessage.contractId}`)

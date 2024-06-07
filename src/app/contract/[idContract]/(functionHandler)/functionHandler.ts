@@ -8,6 +8,7 @@ import {
   EFunctionCall,
   ERolesOfParticipant,
   EStageContractStatus,
+  ICompareContractParams,
   IConfirmStageFunctionCallParams,
   IContractAttribute,
   IContractCreateParams,
@@ -96,6 +97,8 @@ const updateStateButton = (
         }
         break
       case 'SIGNED':
+        const isDisputeContract = contractData?.type === EContractType.DISPUTE
+
         const hasStageNotStarted = contractData?.stages
           ? contractData?.stages.filter(
               (item: any) =>
@@ -116,7 +119,8 @@ const updateStateButton = (
           confirmButtonReceiver: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant),
           transferButton:
             currentBalance > 0 ? false : participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
-          withdrawButton: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)
+          withdrawButton: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant),
+          openDisputedButton: !isDisputeContract && currentBalance > 0
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
@@ -167,8 +171,10 @@ const updateStateButton = (
         setIsDisableButton((prev) => ({
           ...prev,
           voteButton: true,
-          withdrawButton: !isWinner
+          withdrawButton: !isWinner,
+          fetchCompareButton: false
         }))
+        break
       case 'COMPLETED':
         setIsVisibleButton((prev) => ({
           ...prev,
@@ -179,7 +185,8 @@ const updateStateButton = (
         setIsDisableButton((prev) => ({
           ...prev,
           voteButton: true,
-          withdrawButton: true
+          withdrawButton: true,
+          fetchCompareButton: false
         }))
       default:
         break
@@ -355,7 +362,8 @@ const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): 
     dataParams.setIsVisibleButton((prevState: any) => ({
       ...prevState,
       transferButton: false,
-      confirmButtonSender: true
+      confirmButtonSender: true,
+      openDisputedButton: true
     }))
     const { balance } = await handleInstanceWeb3()
     updateUserInfoFromLocalStorage(
@@ -490,29 +498,47 @@ const handleConfirmStagesFuncOfCustomer = async (
   }
 }
 
-async function handleCompareContractInformationFunc(setIsCompareContractAlert: any) {
-  // try {
-  //     const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
-  //     const { instance } = await handleInstanceWeb3();
-  //     const contract = new web3.eth.Contract(abi, addressContract as string);
-  //     const compare: string[] = await contract.methods.getContractInformation(privateKey)
-  //         .call({ from: userInfo?.data?.addressWallet });
-  //     const contractAttributesFromBlockchain = JSON.parse(compare[1]);
-  //     if (JSON.stringify(contractAttributesFromBlockchain) === JSON.stringify(contractAttribute)) {
-  //         toast({
-  //             title: "Contract is same",
-  //             variant: "success",
-  //         });
-  //     } else {
-  //         toast({
-  //             title: "Contract is different",
-  //             variant: "destructive",
-  //         });
-  //     }
-  //     setIsCompareContractAlert(false);
-  // } catch (error) {
-  //     console.error("Error occurred while comparing contract information:", error);
-  // }
+async function handleCompareContractInformationFunc(dataParams: ICompareContractParams): Promise<IResponseFunction> {
+  try {
+    const res = await fetchAPI(`/contracts/compare-attribute/${dataParams.idContract}`, 'GET')
+    if (res.data.result) {
+      return {
+        message: 'Compare data contract success !',
+        description: 'Match contract data',
+        status: 'success'
+      }
+    } else {
+      return {
+        message: 'Compare data contract Failed !',
+        description: 'Contract data does not match',
+        status: 'destructive'
+      }
+    }
+    // const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
+    // const { instance } = await handleInstanceWeb3();
+    // const contract = new instance.eth.Contract(abi, addressContract as string);
+    // const compare: string[] = await contract.methods.getContractInformation(privateKey)
+    //     .call({ from: userInfo?.data?.addressWallet });
+    // const contractAttributesFromBlockchain = JSON.parse(compare[1]);
+    // if (JSON.stringify(contractAttributesFromBlockchain) === JSON.stringify(contractAttribute)) {
+    //     toast({
+    //         title: "Contract is same",
+    //         variant: "success",
+    //     });
+    // } else {
+    //     toast({
+    //         title: "Contract is different",
+    //         variant: "destructive",
+    //     });
+    // }
+    // setIsCompareContractAlert(false);
+  } catch (error) {
+    return {
+      message: 'Compare data contract Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
+  }
 }
 const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParams): Promise<IResponseFunction> => {
   try {
@@ -797,6 +823,7 @@ const handleCallFunctionOfBlockchain = async (
     confirmFunctionParams?: IConfirmStageFunctionCallParams
     withdrawMoneyFunctionParams?: IWithdrawMoneyFunctionCallParams
     openDisputeFunctionParams?: IContractDisputeParams
+    compareContractFunctionParams?: ICompareContractParams
   }
 ): Promise<IResponseFunction> => {
   if (dataAuthentication.privateKey === '' && dataAuthentication.filePrivateKey === undefined) {
@@ -820,6 +847,10 @@ const handleCallFunctionOfBlockchain = async (
   let responseMessages: IResponseFunction = initResponseMessages
   switch (dataFunctionCall.nameFunctionCall) {
     case EFunctionCall.FETCH_COMPARE_CONTRACT:
+      console.log('Fetch compare contract')
+      responseMessages = await handleCompareContractInformationFunc({
+        ...dataFunctionCall.compareContractFunctionParams
+      } as ICompareContractParams)
       break
     case EFunctionCall.CANCEL_CONTRACT:
       break

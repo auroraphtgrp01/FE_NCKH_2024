@@ -349,6 +349,10 @@ export interface IContractDisputeParams {
   privateKey?: string
 }
 
+export interface ICompareContractParams {
+  idContract: string
+}
+
 export interface IResponseFunctionFetchData {
   contractData: any
   contractBallance?: number

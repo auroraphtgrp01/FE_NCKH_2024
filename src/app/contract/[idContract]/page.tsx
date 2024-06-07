@@ -405,7 +405,7 @@ export default function Dashboard() {
                   )}
                   <Separator className='' />
                   <div className='flex items-center justify-center text-center'>
-                    <Button className='' disabled={isDisableButton.editContractButton} variant={'violet'}>
+                    <Button className='' disabled={false} variant={'violet'}>
                       <Link href={`/contract/${idContract}/edit`}>Edit contract</Link>
                     </Button>
                     <Button

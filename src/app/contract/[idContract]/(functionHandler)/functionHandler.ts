@@ -4,12 +4,15 @@ import {
   DynamicType,
   EContractAttributeType,
   EContractStatus,
+  EContractType,
   EFunctionCall,
   ERolesOfParticipant,
   EStageContractStatus,
+  ICompareContractParams,
   IConfirmStageFunctionCallParams,
   IContractAttribute,
   IContractCreateParams,
+  IContractDisputeParams,
   IContractParticipant,
   IDisableButton,
   IIndividual,
@@ -19,11 +22,15 @@ import {
   IStage,
   ITransferMoneyFunctionCallParams,
   IVisibleButton,
+  IVotes,
+  IWithdrawMoneyDisputeContractParams,
+  IWithdrawMoneyFunctionCallParams,
   InvitationItem,
   RSAKey,
   UserInfoData
 } from '@/interface/contract.i'
 import { fetchAPI } from '@/utils/fetchAPI'
+import { updateUserInfoFromLocalStorage } from '@/utils/updateUserInfo'
 import { handleInstanceWeb3 } from '@/utils/web3Instance'
 import NodeRSA from 'node-rsa'
 import { Dispatch, SetStateAction } from 'react'
@@ -36,12 +43,15 @@ const updateStateButton = (
   contractParticipants: IContractParticipant[],
   userInfo: UserInfoData,
   currentBalance: number,
-  stages: any[]
+  contractData: ContractData
 ) => {
   const participantIsLogin = getParticipantInfoLogin(userInfo, contractParticipants)
-  if (contractParticipants.length > 0) {
+  const isDisputeContract = contractData?.type === EContractType.DISPUTE
+  const isUserArbitrator = participantIsLogin?.permission.ROLES === ('ARBITRATION' as ERolesOfParticipant)
+  const isArbitrator = participantIsLogin?.permission.ROLES === ('ARBITRATION' as ERolesOfParticipant)
+  if (contractParticipants?.length > 0) {
     const participantsLogin = contractParticipants?.find((participant: any) => {
-      return participant.userId === userInfo.data.id
+      return participant.userId === userInfo?.data.id
     })
     switch (status) {
       case 'PENDING':
@@ -54,18 +64,23 @@ const updateStateButton = (
       case 'PARTICIPATED':
         setIsVisibleButton((prev: any) => ({
           ...prev,
-          deployButton: true
+          deployButton: !isDisputeContract,
+          openDisputedButton: !isDisputeContract,
+          voteButton: isUserArbitrator,
+          withdrawButton: isDisputeContract && !isUserArbitrator
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
-          cancelButton: false
+          cancelButton: false,
+          voteButton: false
         }))
         break
       case 'ENFORCE':
         setIsVisibleButton((prev: any) => ({
           ...prev,
           deployButton: false,
-          signButton: true
+          signButton: true,
+          openDisputedButton: false
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
@@ -82,14 +97,30 @@ const updateStateButton = (
         }
         break
       case 'SIGNED':
-        const hasStageNotStarted = stages.filter((item: any) => item.status === EStageContractStatus.ENFORCE)
+        const isDisputeContract = contractData?.type === EContractType.DISPUTE
+
+        const hasStageNotStarted = contractData?.stages
+          ? contractData?.stages.filter(
+              (item: any) =>
+                item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+            )
+          : []
+        const hasStagePending = contractData?.stages
+          ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.PENDING)
+          : []
+        const hasStageApproved = contractData?.stages
+          ? contractData?.stages.filter((item: any) => item.status === EStageContractStatus.APPROVED)
+          : []
+
         setIsVisibleButton((prev: any) => ({
           ...prev,
           signButton: false,
           confirmButtonSender: participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
           confirmButtonReceiver: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant),
-          transferButton: participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
-          withdrawButton: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)
+          transferButton:
+            currentBalance > 0 ? false : participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant),
+          withdrawButton: participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant),
+          openDisputedButton: !isDisputeContract && currentBalance > 0
         }))
         setIsDisableButton((prev: any) => ({
           ...prev,
@@ -97,15 +128,66 @@ const updateStateButton = (
           cancelButton: true,
           fetchCompareButton: false,
           confirmButtonReceiver:
-            participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant) && hasStageNotStarted
+            participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant) &&
+            hasStageNotStarted.length > 0
               ? false
               : true,
           confirmButtonSender:
-            (participantIsLogin?.permission.ROLES === ('RECEIVER' as ERolesOfParticipant)) !== undefined ? false : true,
+            (participantIsLogin?.permission.ROLES === ('SENDER' as ERolesOfParticipant)) !== undefined &&
+            hasStagePending.length > 0
+              ? false
+              : true,
           editContractButton: true,
-          inviteButton: true
+          inviteButton: true,
+          withdrawButton: !(hasStageApproved.length > 0)
         }))
         break
+      case 'DISPUTED':
+        setIsVisibleButton((prev: any) => ({
+          ...prev,
+          openDisputedButton: !(contractData.status === EContractStatus.DISPUTED),
+          goToDisputeButton: contractData.status === EContractStatus.DISPUTED,
+          editContractButton: true,
+          transferButton: true
+        }))
+        setIsDisableButton((prev) => ({
+          ...prev,
+          cancelButton: true,
+          fetchCompareButton: false,
+          inviteButton: true,
+          editContractButton: true,
+          transferButton: true
+        }))
+        break
+      case 'VOTED':
+        const isWinner =
+          contractData.winnerAddressWallet?.toLowerCase().trim() === userInfo?.data.addressWallet?.toLowerCase().trim()
+        setIsVisibleButton((prev) => ({
+          ...prev,
+          voteButton: isArbitrator,
+          openDisputedButton: false,
+          withdrawButton: !isArbitrator
+        }))
+        setIsDisableButton((prev) => ({
+          ...prev,
+          voteButton: true,
+          withdrawButton: !isWinner,
+          fetchCompareButton: false
+        }))
+        break
+      case 'COMPLETED':
+        setIsVisibleButton((prev) => ({
+          ...prev,
+          voteButton: isArbitrator,
+          openDisputedButton: false,
+          withdrawButton: !isArbitrator
+        }))
+        setIsDisableButton((prev) => ({
+          ...prev,
+          voteButton: true,
+          withdrawButton: true,
+          fetchCompareButton: false
+        }))
       default:
         break
     }
@@ -126,12 +208,17 @@ const fetchDataWhenEntryPage = async (
     const response: IResponseFunctionFetchData = { contractData: res.data }
     const { contract, participants, contractAttributes } = res.data
     if (contract.contractAddress !== null) {
-      const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+      const privateCode = await fetchAPI(
+        contract.type === EContractType.DISPUTE
+          ? '/smart-contracts/abi?type=disputed'
+          : '/smart-contracts/abi?type=supplyChain',
+        'GET'
+      )
       const abi = privateCode.data.abi.abi
-      const web3 = new Web3(window.ethereum)
-      const contractInstance = new web3.eth.Contract(abi, contract.contractAddress)
+      const { instance } = await handleInstanceWeb3()
+      const contractInstance = new instance.eth.Contract(abi, contract.contractAddress)
       const contractBallance: number = parseFloat(
-        web3.utils.fromWei(await contractInstance.methods.getBalance().call(), 'ether')
+        instance.utils.fromWei(await contractInstance.methods.getBalance().call(), 'ether')
       )
       setCurrentBalance(contractBallance)
       response.contractBallance = contractBallance
@@ -195,53 +282,97 @@ const inviteNewParticipant = async (
   }
 }
 
-const withdrawMoneyFunc = async (addressContract: string, userInfo: UserInfoData, individual: IIndividual) => {
+const withdrawMoneyFunc = async (dataParams: IWithdrawMoneyFunctionCallParams): Promise<IResponseFunction> => {
   try {
+    const hasStageApproved = dataParams.contractData?.stages.filter(
+      (item: any) => item.status === EStageContractStatus.APPROVED
+    )
+    const stageWithdraw = hasStageApproved && hasStageApproved.length > 0 ? hasStageApproved[0] : undefined
+    if (stageWithdraw !== undefined)
+      hasStageApproved?.map((item: any) => {
+        if (item.id === stageWithdraw.id) hasStageApproved.splice(item, 1)
+      })
     const {
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, addressContract as string)
-    const fromAddress = userInfo?.data?.addressWallet
-    const gasLimit = '1000000'
-    const gasPrice = '1000000000'
-    const transactionOptions = {
-      from: fromAddress,
-      gas: gasLimit,
-      gasPrice: gasPrice
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
+    await contract.methods
+      .withDrawByPercent(dataParams.individual.receiverInd, stageWithdraw?.percent, dataParams.privateKey)
+      .send({ from: dataParams.userInfo?.data?.addressWallet, gas: '1000000' })
+
+    const balanceContract: number = parseFloat(
+      instance.utils.fromWei(await contract.methods.getBalance().call(), 'ether')
+    )
+
+    if (stageWithdraw === undefined)
+      return {
+        message: 'Withdraw money from contract Failed !',
+        description: 'No stage has been completed',
+        status: 'destructive'
+      }
+
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams.contractData?.id,
+      stage: { ...stageWithdraw, status: EStageContractStatus.WITHDRAWN }
+    })
+    dataParams.setCurrentBalance(balanceContract)
+    dataParams.setIsDisableButton((prev: any) => ({
+      ...prev,
+      withdrawButton: hasStageApproved && hasStageApproved.length > 0 ? false : true
+    }))
+    const { balance } = await handleInstanceWeb3()
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
+    return {
+      message: 'Withdraw money from contract Successfully !',
+      description: 'The contract was successfully received',
+      status: 'success'
     }
-    await contract.methods.withDrawByPercent(individual.receiverInd, 100).send(transactionOptions)
-    // const balance = await contract.methods.getBalance().call();
   } catch (error) {
-    throw error
+    return {
+      message: 'Withdraw money from contract Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
   }
 }
 
 const transferMoneyFunc = async (dataParams: ITransferMoneyFunctionCallParams): Promise<IResponseFunction> => {
   try {
-    const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+    const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const abi = privateCode.data.abi.abi
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
     await contract.methods.sendToSmartContract(dataParams.privateKey).send({
       from: dataParams.userInfo.data.addressWallet,
-      value: web3.utils.toWei(dataParams.individual.totalAmount, 'ether'),
+      value: instance.utils.toWei(dataParams.individual.totalAmount, 'ether'),
       gas: '1000000'
     })
 
-    const balance: string = await contract.methods.getBalance().call()
-    dataParams.setCurrentBalance(parseFloat(web3.utils.fromWei(balance, 'ether')))
+    const balanceContract: string = await contract.methods.getBalance().call()
+    dataParams.setCurrentBalance(parseFloat(instance.utils.fromWei(balanceContract, 'ether')))
     dataParams.setIsVisibleButton((prevState: any) => ({
       ...prevState,
-      transferButton: false
+      transferButton: false,
+      confirmButtonSender: true,
+      openDisputedButton: true
     }))
-    dataParams.setIsDisableButton((prev: any) => ({
-      ...prev,
-      confirmButtonSender: false
-    }))
-
+    const { balance } = await handleInstanceWeb3()
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
     return {
       message: 'Transfer money to contract Successfully !',
       description: 'The contract was successfully received',
@@ -260,26 +391,49 @@ const handleDateStringToUint = (date: string): number => {
   return new Date(date).getTime()
 }
 
-const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallParams): Promise<IResponseFunction> => {
+const handleConfirmStagesFuncOfSupplier = async (
+  dataParams: IConfirmStageFunctionCallParams
+): Promise<IResponseFunction> => {
   try {
     const {
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract as string)
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
+
     await contract.methods.confirmStage(dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
       gas: '1000000'
     })
-    //xxxxxxxxxxxxxxxxx
 
-    // if (userInfo?.data?.addressWallet === individual.senderInd) {
-    //     setIsDisableButton({ ...isDisableButton });
-    // } else {
-    //     setIsDisableButton({ ...isDisableButton });
-    // }
+    const participantsLogin = dataParams.contractParticipants?.find((participant: any) => {
+      return participant.userId === dataParams?.userInfo.data.id
+    })
+    const stageEnforce = dataParams.contractData?.stages.filter(
+      (item: any) => item.status === EStageContractStatus.ENFORCE || item.status === EStageContractStatus.OUT_OF_DATE
+    )
+    const stageChange = stageEnforce && stageEnforce.length > 0 ? stageEnforce[0] : undefined
+    if (stageChange !== undefined) {
+      stageEnforce?.map((item: any) => {
+        if (item === stageChange) stageEnforce.splice(item, 1)
+      })
+      await fetchAPI('/contracts', 'PATCH', {
+        id: dataParams?.contractData?.id,
+        stage: { ...stageChange, status: EStageContractStatus.PENDING }
+      })
+    } else
+      return {
+        message: 'Confirm Failed !',
+        description: 'All stages have been completed',
+        status: 'destructive'
+      }
+
+    dataParams.setIsDisableButton((prev: any) => ({
+      ...prev,
+      confirmButtonReceiver: stageEnforce?.length === 0 ? true : false
+    }))
     return {
       message: 'Confirm Successfully !',
       description: 'Stage has been confirmed successfully',
@@ -294,29 +448,97 @@ const handleConfirmStagesFunc = async (dataParams: IConfirmStageFunctionCallPara
   }
 }
 
-async function handleCompareContractInformationFunc(setIsCompareContractAlert: any) {
-  // try {
-  //     const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
-  //     const web3 = new Web3(window.ethereum);
-  //     const contract = new web3.eth.Contract(abi, addressContract as string);
-  //     const compare: string[] = await contract.methods.getContractInformation(privateKey)
-  //         .call({ from: userInfo?.data?.addressWallet });
-  //     const contractAttributesFromBlockchain = JSON.parse(compare[1]);
-  //     if (JSON.stringify(contractAttributesFromBlockchain) === JSON.stringify(contractAttribute)) {
-  //         toast({
-  //             title: "Contract is same",
-  //             variant: "success",
-  //         });
-  //     } else {
-  //         toast({
-  //             title: "Contract is different",
-  //             variant: "destructive",
-  //         });
-  //     }
-  //     setIsCompareContractAlert(false);
-  // } catch (error) {
-  //     console.error("Error occurred while comparing contract information:", error);
-  // }
+const handleConfirmStagesFuncOfCustomer = async (
+  dataParams: IConfirmStageFunctionCallParams
+): Promise<IResponseFunction> => {
+  try {
+    const {
+      data: {
+        abi: { abi }
+      }
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract as string)
+
+    await contract.methods.confirmStage(dataParams.privateKey).send({
+      from: dataParams.userInfo?.data?.addressWallet,
+      gas: '1000000'
+    })
+
+    const hasStagePending = dataParams.contractData?.stages.filter(
+      (item: any) => (item.status = EStageContractStatus.PENDING)
+    )
+
+    const stageChange = hasStagePending && hasStagePending.length > 0 ? hasStagePending[0] : undefined
+    if (stageChange !== undefined) {
+      hasStagePending?.map((item: any) => {
+        if (item === stageChange) hasStagePending.splice(item, 1)
+      })
+      await fetchAPI('/contracts', 'PATCH', {
+        id: dataParams?.contractData?.id,
+        stage: { ...stageChange, status: EStageContractStatus.APPROVED }
+      })
+    }
+
+    dataParams.setIsDisableButton((prev: any) => ({
+      ...prev,
+      confirmButtonSender: hasStagePending?.length === 0 ? true : false
+    }))
+    return {
+      message: 'Confirm Successfully !',
+      description: 'Stage has been confirmed successfully',
+      status: 'success'
+    }
+  } catch (error) {
+    return {
+      message: 'Confirm Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
+  }
+}
+
+async function handleCompareContractInformationFunc(dataParams: ICompareContractParams): Promise<IResponseFunction> {
+  try {
+    const res = await fetchAPI(`/contracts/compare-attribute/${dataParams.idContract}`, 'GET')
+    if (res.data.result) {
+      return {
+        message: 'Compare data contract success !',
+        description: 'Match contract data',
+        status: 'success'
+      }
+    } else {
+      return {
+        message: 'Compare data contract Failed !',
+        description: 'Contract data does not match',
+        status: 'destructive'
+      }
+    }
+    // const { data: { abi: { abi } } } = await fetchAPI("/smart-contracts/abi", "GET");
+    // const { instance } = await handleInstanceWeb3();
+    // const contract = new instance.eth.Contract(abi, addressContract as string);
+    // const compare: string[] = await contract.methods.getContractInformation(privateKey)
+    //     .call({ from: userInfo?.data?.addressWallet });
+    // const contractAttributesFromBlockchain = JSON.parse(compare[1]);
+    // if (JSON.stringify(contractAttributesFromBlockchain) === JSON.stringify(contractAttribute)) {
+    //     toast({
+    //         title: "Contract is same",
+    //         variant: "success",
+    //     });
+    // } else {
+    //     toast({
+    //         title: "Contract is different",
+    //         variant: "destructive",
+    //     });
+    // }
+    // setIsCompareContractAlert(false);
+  } catch (error) {
+    return {
+      message: 'Compare data contract Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
+  }
 }
 const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParams): Promise<IResponseFunction> => {
   try {
@@ -324,9 +546,9 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
       data: {
         abi: { abi }
       }
-    } = await fetchAPI('/smart-contracts/abi', 'GET')
-    const web3 = new Web3(window.ethereum)
-    const contract = new web3.eth.Contract(abi, dataParams.addressContract)
+    } = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract)
     await contract.methods.sign(dataParams.userInfo?.data?.addressWallet.toString(), dataParams.privateKey).send({
       from: dataParams.userInfo?.data?.addressWallet,
       gas: '1000000'
@@ -345,7 +567,13 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
     }
     dataParams.setContractParticipants(dataParams.contractParticipants)
     const { balance } = await handleInstanceWeb3()
-    dataParams.setUserInfo((prev: any) => ({ ...prev, balance }))
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
     if (response.data.contractStatus === 'SIGNED') {
       const isCondition =
         (dataParams.userInfo?.data?.addressWallet?.trim().toLowerCase() || '') ===
@@ -356,11 +584,13 @@ const handleSignContractFunc = async (dataParams: ISignContractFunctionCallParam
           ...prevState,
           signButton: false,
           transferButton: true,
-          confirmButtonSender: true
+          confirmButtonSender: true,
+          openDisputedButton: true
         }))
         dataParams.setIsDisableButton((prevState: any) => ({
           ...prevState,
-          transferButton: false
+          transferButton: false,
+          confirmButtonSender: true
         }))
       } else {
         dataParams.setIsVisibleButton((prevState: any) => ({
@@ -418,14 +648,14 @@ const handleOnDeployContractFunc = async (
     }
   }
   try {
-    const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
+    const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
     const abi = privateCode.data.abi.abi
     const byteCode = privateCode.data.abi.bytecode
     const { instance } = await handleInstanceWeb3()
     const contract = new instance.eth.Contract(abi)
-    const _user = [individual.senderInd]
+    const _user = [individual.senderInd.trim().toLowerCase()]
     const _total = individual.totalAmount
-    const _supplier = individual.receiverInd
+    const _supplier = individual.receiverInd.trim().toLowerCase()
     const { publicKey } = signMessage(privateKey)
     const _privateKey = await hashStringWithSHA512(privateKey)
 
@@ -444,13 +674,19 @@ const handleOnDeployContractFunc = async (
     const deployTransaction = await contract
       .deploy({
         data: byteCode,
-        arguments: [_user, _supplier, _total, _stages, _privateKey]
+        arguments: [_user, _supplier, instance.utils.toWei(_total, 'ether'), _stages, _privateKey]
       })
       .send({
         from: userInfo?.data?.addressWallet
       })
     const { balance } = await handleInstanceWeb3()
-    setUserInfo((prev: any) => ({ ...prev, balance }))
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      setUserInfo
+    )
     setAddressContract(deployTransaction?.options?.address as string)
     setIsVisibleButton((prevState: any) => ({
       ...prevState,
@@ -484,7 +720,7 @@ const handleOnDeployContractFunc = async (
       status: 'success'
     }
   } catch (error) {
-    console.log('error', error)
+    console.log('Error occurred while deploying contract:', error)
 
     return {
       message: 'Deploy Failed',
@@ -585,10 +821,11 @@ const handleCallFunctionOfBlockchain = async (
     signContractParams?: ISignContractFunctionCallParams
     transferFunctionParams?: ITransferMoneyFunctionCallParams
     confirmFunctionParams?: IConfirmStageFunctionCallParams
+    withdrawMoneyFunctionParams?: IWithdrawMoneyFunctionCallParams
+    openDisputeFunctionParams?: IContractDisputeParams
+    compareContractFunctionParams?: ICompareContractParams
   }
 ): Promise<IResponseFunction> => {
-  console.log(dataFunctionCall.confirmFunctionParams)
-
   if (dataAuthentication.privateKey === '' && dataAuthentication.filePrivateKey === undefined) {
     return {
       description: 'Please fill your private key or upload your signature',
@@ -610,16 +847,20 @@ const handleCallFunctionOfBlockchain = async (
   let responseMessages: IResponseFunction = initResponseMessages
   switch (dataFunctionCall.nameFunctionCall) {
     case EFunctionCall.FETCH_COMPARE_CONTRACT:
-      console.log('Fetch Compare Contract')
+      console.log('Fetch compare contract')
+      responseMessages = await handleCompareContractInformationFunc({
+        ...dataFunctionCall.compareContractFunctionParams
+      } as ICompareContractParams)
       break
     case EFunctionCall.CANCEL_CONTRACT:
-      console.log('Cancel Contract')
       break
     case EFunctionCall.WITHDRAW_CONTRACT:
-      console.log('Withdraw Contract')
+      responseMessages = await withdrawMoneyFunc({
+        ...dataFunctionCall.withdrawMoneyFunctionParams,
+        privateKey
+      } as IWithdrawMoneyFunctionCallParams)
       break
     case EFunctionCall.TRANSFER_CONTRACT:
-      console.log('Transfer Contract')
       responseMessages = await transferMoneyFunc({
         ...dataFunctionCall.transferFunctionParams,
         privateKey
@@ -632,15 +873,22 @@ const handleCallFunctionOfBlockchain = async (
       } as ISignContractFunctionCallParams)
       break
     case EFunctionCall.CONFIRM_CONTRACT_SENDER:
-      console.log('Confirm Contract Sender')
-      break
-    case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
-      console.log('Confirm Contract Receiver')
-      responseMessages = await handleConfirmStagesFunc({
+      responseMessages = await handleConfirmStagesFuncOfCustomer({
         ...dataFunctionCall.confirmFunctionParams,
         privateKey
       } as IConfirmStageFunctionCallParams)
       break
+    case EFunctionCall.CONFIRM_CONTRACT_RECEIVER:
+      responseMessages = await handleConfirmStagesFuncOfSupplier({
+        ...dataFunctionCall.confirmFunctionParams,
+        privateKey
+      } as IConfirmStageFunctionCallParams)
+      break
+    case EFunctionCall.ON_OPEN_DISPUTE_CONTRACT:
+      responseMessages = await onOpenDisputeContract({
+        ...dataFunctionCall.openDisputeFunctionParams,
+        privateKey
+      } as IContractDisputeParams)
   }
   return responseMessages
 }
@@ -650,7 +898,9 @@ const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<
     const res = await fetchAPI(
       '/contracts',
       'POST',
-      dataParams.templateId === '' ? (({ templateId, ...rest }) => rest)(dataParams) : dataParams
+      dataParams.templateId === ''
+        ? (({ templateId, ...rest }) => rest)(dataParams)
+        : { ...dataParams, isCreateAttributeValue: true }
     )
     if (res.status === 201) {
       return {
@@ -658,6 +908,68 @@ const onCreateANewContract = async (dataParams: IContractCreateParams): Promise<
         status: 'success',
         description: 'Contract has been created successfully',
         contractId: res.data.contract.id
+      }
+    } else {
+      return {
+        message: 'Create contract failed',
+        status: 'destructive',
+        description: 'Error occurred while creating contract'
+      }
+    }
+  } catch (err) {
+    return {
+      message: 'Create contract failed',
+      status: 'destructive',
+      description: err?.toString()
+    }
+  }
+}
+
+const onOpenDisputeContract = async (dataParams: IContractDisputeParams): Promise<IResponseFunction> => {
+  try {
+    const privateCodeDispute = await fetchAPI('/smart-contracts/abi?type=disputed', 'GET')
+    const privateCode = await fetchAPI('/smart-contracts/abi?type=supplyChain', 'GET')
+    const abiDispute = privateCodeDispute.data.abi.abi
+    const abi = privateCode.data.abi.abi
+    const byteCodeDispute = privateCodeDispute.data.abi.bytecode
+
+    const { instance } = await handleInstanceWeb3()
+    const contractDispute = new instance.eth.Contract(abiDispute)
+    const contract = new instance.eth.Contract(abi, dataParams?.addressContract as string)
+    const _user = dataParams.customer
+    const _supplier = dataParams.supplier
+    const deployTransaction = await contractDispute
+      .deploy({
+        data: byteCodeDispute,
+        arguments: [_supplier, _user]
+      })
+      .send({
+        from: dataParams.userInfo?.data?.addressWallet,
+        gas: '1000000'
+      })
+    await contract.methods
+      .transferTokenToDisputeContract(
+        deployTransaction?.options?.address as string,
+        instance.utils.toWei(dataParams?.totalAmount, 'ether'),
+        dataParams.privateKey
+      )
+      .send({ from: dataParams.userInfo?.data?.addressWallet, gas: '1000000' })
+
+    const res = await fetchAPI('/contracts/dispute-contract', 'POST', {
+      ...dataParams,
+      contractAddress: deployTransaction?.options?.address
+    })
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams.parentId,
+      disputedContractId: res.data.id,
+      status: 'DISPUTED'
+    })
+    if (res.status === 201) {
+      return {
+        message: 'Create contract successfully',
+        status: 'success',
+        description: 'Contract has been created successfully',
+        contractId: res.data.id
       }
     } else {
       return {
@@ -699,18 +1011,103 @@ const getDataToOpenDisputeContract = (
   }
 }
 
-const getIndividualFromParticipant = (participant: IContractParticipant[]) => {
-  const receiver = participant.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
-  const sender = participant.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
+const getIndividualFromParticipant = (
+  participant: IContractParticipant[]
+): {
+  receiver: IContractParticipant | undefined
+  sender: IContractParticipant | undefined
+  arbitrators: IContractParticipant[]
+  votes: IVotes[]
+} => {
+  const receiver = participant?.find((item) => item.permission?.ROLES == ('RECEIVER' as ERolesOfParticipant))
+  const sender = participant?.find((item) => item.permission?.ROLES == ('SENDER' as ERolesOfParticipant))
+  const arbitrators = participant?.filter((item) => item.permission?.ROLES == ('ARBITRATION' as ERolesOfParticipant))
+  const votes = arbitrators?.map((item) => {
+    return {
+      vote: item.vote,
+      participantId: item.id,
+      userId: item.userId
+    }
+  })
   return {
     receiver,
-    sender
+    sender,
+    arbitrators,
+    votes
   }
 }
 
 const getParticipantInfoLogin = (userInfo: UserInfoData, participant: IContractParticipant[]) => {
   const isMatch = getIndividualFromParticipant(participant)
-  return isMatch.receiver?.userId === userInfo.data.id ? isMatch.receiver : isMatch.sender
+  return isMatch.receiver?.userId === userInfo?.data?.id
+    ? isMatch.receiver
+    : isMatch.sender?.userId === userInfo?.data?.id
+      ? isMatch.sender
+      : isMatch.arbitrators?.find((item) => item.userId === userInfo?.data?.id)
+}
+
+const calculateVoteRatio = (
+  votes: IVotes[]
+): {
+  sender: number
+  receiver: number
+} => {
+  let countA = votes?.filter((item) => item.vote === 'A').length
+  let countB = votes?.filter((item) => item.vote === 'B').length
+  let countUnd = votes?.filter((item) => item.vote === null).length
+  let total = countA + countB + countUnd
+  let ratioA = (countA / total) * 100
+  let ratioB = (countB / total) * 100
+  return {
+    sender: !isNaN(ratioA) ? parseFloat(ratioA.toFixed(2)) : 0,
+    receiver: !isNaN(ratioB) ? parseFloat(ratioB.toFixed(2)) : 0
+  }
+}
+
+const withdrawMoneyDispute = async (dataParams: IWithdrawMoneyDisputeContractParams): Promise<IResponseFunction> => {
+  try {
+    const {
+      data: {
+        abi: { abi }
+      }
+    } = await fetchAPI('/smart-contracts/abi?type=disputed', 'GET')
+    const { instance } = await handleInstanceWeb3()
+    const contract = new instance.eth.Contract(abi, dataParams.addressContract)
+    await contract.methods.withdraw(dataParams.addressWallet).send({ from: dataParams.addressWallet, gas: '1000000' })
+
+    const balanceContract: number = parseFloat(
+      instance.utils.fromWei(await contract.methods.getBalance().call(), 'ether')
+    )
+    dataParams.setCurrentBalance(balanceContract)
+
+    const { balance } = await handleInstanceWeb3()
+    updateUserInfoFromLocalStorage(
+      {
+        key: 'balance',
+        value: balance
+      },
+      dataParams.setUserInfo
+    )
+    dataParams.setIsDisableButton((prev) => ({
+      ...prev,
+      withdrawButton: true
+    }))
+    await fetchAPI('/contracts', 'PATCH', {
+      id: dataParams.contractData?.id,
+      status: 'COMPLETED'
+    })
+    return {
+      message: 'Withdraw Money From Contract Successfully !',
+      description: 'The contract was successfully received',
+      status: 'success'
+    }
+  } catch (error) {
+    return {
+      message: 'Withdraw Money From Contract Failed !',
+      description: error?.toString(),
+      status: 'destructive'
+    }
+  }
 }
 
 export {
@@ -720,7 +1117,8 @@ export {
   withdrawMoneyFunc,
   transferMoneyFunc,
   handleDateStringToUint,
-  handleConfirmStagesFunc,
+  handleConfirmStagesFuncOfCustomer,
+  handleConfirmStagesFuncOfSupplier,
   handleCompareContractInformationFunc,
   handleSignContractFunc,
   handleOnDeployContractFunc,
@@ -730,5 +1128,8 @@ export {
   handleCallFunctionOfBlockchain,
   onCreateANewContract,
   getIndividualFromParticipant,
-  getParticipantInfoLogin
+  getParticipantInfoLogin,
+  calculateVoteRatio,
+  onOpenDisputeContract,
+  withdrawMoneyDispute
 }

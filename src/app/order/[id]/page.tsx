@@ -4,98 +4,40 @@ import React, { useEffect, useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card } from '@/components/ui/card'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-// import { columns } from "../columns";
 import { DataTable } from '../data-table'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { useParams } from 'next/navigation'
-//
 import { useAppContext } from '@/components/ThemeProvider'
-import { Router } from 'lucide-react'
-export type TData = {
-  id: string
-  name: string
-  unit: string
-  image: string
-  price: number
-  discount: number
-  quantity: number
-  taxPrice: number
-  description: string
-  idSupplier: string
-  idOrder: string // Thuộc tính idOrder cần phải có
-}
+import { DataWithName, IDataOrder } from '@/interface/order.i'
+import { useRouter } from 'next/navigation'
 
-export interface OrderDetail {
-  id: string
-  name: string
-  description?: string
-  quantity?: number
-  price: number
-  image: string
-  taxPrice?: number
-  discount?: number
-  taxExclude?: number
-  unit: string
-  idOrder: string
-  idSupplier: string
-  orderStatus: string
-}
-
-export interface DataWithName {
-  status: string
-  orderDetails: OrderDetail[]
-}
-
-export interface UserInfo {
-  access_token: string
-  addressWallet: string
-  email: string
-  id: string
-  name: string
-  refresh_token: string
-  role: string
-}
 export interface DataTableProps<TData extends DataWithName> {
   data: TData
   getDataOrders: () => void
   setData: React.Dispatch<React.SetStateAction<TData>>
 }
 export interface Product {
-  id: number
+  id: string
   name: string
   description: string
-  idSupplier: number
+  idSupplier: string
 }
 
 export default function Page() {
+  const Router = useRouter()
   const { toast } = useToast()
-  const router = useRouter()
-  const { dataCreateContract, setDataCreateContract }: any = useAppContext()
+  const [dataOrder, setDataOrder] = useState<IDataOrder | null>(null)
   const [data, setData] = useState<DataWithName>({
+    id: '',
+    orderCode: '',
+    userId: '',
+    products: [],
     status: '',
-    orderDetails: []
+    suppliersId: ''
   })
   const { id } = useParams<{ id: string }>()
-  const [dataOrder, setDataOrder] = useState<any>({})
-  const [endDate, setEndate] = useState('')
-  const [delivery, setDelivery] = useState('')
   const [isDisableButton, setIsDisableButton] = useState({
     isDisableButtonSendRq: false,
     isDisableButtonResendRq: false,
@@ -104,144 +46,98 @@ export default function Page() {
     isDisableButtonRefuseSurvey: false
   })
   const [isCustomer, setIsCustomer] = useState(false)
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    access_token: '',
-    addressWallet: '',
-    email: '',
-    id: '',
-    refresh_token: '',
-    name: '',
-    role: ''
-  })
-  // xxxxxx
+  const { userInfo }: any = useAppContext()
+
   useEffect(() => {
     getDataOrders()
-    console.log(isDisableButton.isDisableButtonSendRq)
-    console.log(isDisableButton.isDisableButtonResendRq)
-
-    const info = JSON.parse(localStorage.getItem('user-info') as string)
-    setUserInfo(info)
-    if (info.data.role === 'Customer') setIsCustomer(true)
+    if (userInfo.data.role === 'Customer') setIsCustomer(true)
   }, [])
 
   async function sendRequestToSupplier() {
-    await fetchAPI(`/orders/send-request/${dataOrder.id}`, 'GET')
-      .then((res) => {
-        toast({
-          title: res.data.message,
-          variant: 'success'
-        })
+    if (!dataOrder) return
 
-        setIsDisableButton({
-          ...isDisableButton,
-          isDisableButtonSendRq: true
-        })
-        getDataOrders()
+    try {
+      const res = await fetchAPI(`/orders/send-request/${dataOrder.order.id}`, 'GET')
+      toast({
+        title: res.data.message,
+        variant: 'success'
       })
-      .catch((err) =>
-        toast({
-          title: err.message,
-          variant: 'destructive'
-        })
-      )
+
+      setIsDisableButton((prevState) => ({
+        ...prevState,
+        isDisableButtonSendRq: true
+      }))
+      getDataOrders()
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   async function resendSurveyToCustomer() {
-    await fetchAPI(`/orders/resend-request/${dataOrder.id}`, 'GET')
-      .then((res) => {
-        toast({
-          title: res.data.message,
-          variant: 'success'
-        })
+    if (!dataOrder) {
+      return
+    }
 
-        setIsDisableButton({
-          ...isDisableButton,
-          isDisableButtonResendRq: true
-        })
-        getDataOrders()
+    try {
+      const res = await fetchAPI(`/orders/resend-request/${dataOrder.order.id}`, 'GET')
+      toast({
+        title: res.data.message,
+        variant: 'success'
       })
-      .catch((err) =>
-        toast({
-          title: err.message,
-          variant: 'destructive'
-        })
-      )
-  }
 
-  async function createContract() {
-    setDataCreateContract({
-      supplierId: dataOrder.order.suppliersId,
-      userId: dataOrder.order.userId,
-      orderId: dataOrder.order.id
-    })
-
-    router.push('/contract/create')
-  }
-
-  async function updateOrder(e: any, type: string) {
-    let payload = {}
-    const dateValue = new Date(e.target.value)
-    if (!isNaN(dateValue.getTime())) {
-      const isoDate = dateValue.toISOString()
-      if (type === 'endDate') {
-        payload = {
-          id: id,
-          endDate: isoDate
-        }
-      } else if (type === 'delivery') {
-        payload = {
-          id: id,
-          executeDate: isoDate
-        }
-      }
-      if (payload) {
-        try {
-          await fetchAPI('/orders', 'PATCH', payload).then((res) => {
-            getDataOrders()
-            toast({
-              title: `Update thành công`,
-              variant: 'success'
-            })
-          })
-        } catch (err) {
-          toast({
-            title: `Update không thành công`,
-            variant: 'destructive'
-          })
-        }
-      }
-    } else {
-      console.log('Chưa nhập xong')
+      setIsDisableButton((prevState) => ({
+        ...prevState,
+        isDisableButtonResendRq: true
+      }))
+      getDataOrders()
+    } catch (err) {
+      console.log(err)
     }
   }
-  function getDataOrders() {
-    fetchAPI(`/orders/${id}`, 'GET')
-      .then((res) => {
-        setDataOrder(res.data)
-        if (res.data.order.endDate !== null) setEndate(res.data.order.endDate.split('T')[0])
-        if (res.data.order.executeDate !== null) setDelivery(res.data.order.executeDate.split('T')[0])
-        const { products, ...rest } = res.data.order
-        setIsDisableButton({
-          ...isDisableButton,
-          isDisableButtonSendRq: res.data.order.status !== 'Pending',
-          isDisableButtonResendRq: res.data.order.status === 'Completed' || res.data.order.status === 'Cancelled',
-          isDisableButtonCreateContract: res.data.order.status !== 'Completed',
-          isDisableButtonRefuseSurvey: res.data.order.status !== 'In Progress',
-          isDisableButtonDeleteSurvey: res.data.order.status !== 'Pending'
-        })
 
-        const productOrder = res.data.order.products.map((product: any) => {
-          return {
-            ...product,
-            priceWithoutTax: product.price * product.quantity - product.discount,
-            idSupplier: res.data.supplier.id,
-            idOrder: id
-          }
-        })
+  async function getDataOrders() {
+    try {
+      const res = await fetchAPI(`/orders/${id}`, 'GET')
+      const orderData = res.data.order
+      orderData.products = orderData.products.map((product: any) => ({
+        ...product,
+        priceWithoutTax: product.price * product.quantity - product.discount,
+        total: (product.price + product.taxPrice) * product.quantity - product.discount
+      }))
+      setData(orderData)
+      setDataOrder(res.data)
 
-        setData({ status: rest.status, orderDetails: productOrder })
+      setIsDisableButton({
+        isDisableButtonSendRq: orderData.status !== 'Pending',
+        isDisableButtonResendRq: orderData.status === 'Completed' || orderData.status === 'Cancelled',
+        isDisableButtonCreateContract: orderData.status !== 'Completed',
+        isDisableButtonRefuseSurvey: orderData.status !== 'In Progress',
+        isDisableButtonDeleteSurvey: orderData.status !== 'Pending'
       })
-      .catch((error) => console.error('Lỗi khi lấy dữ liệu sản phẩm:', error))
+    } catch (err) {
+      console.log('Error : ' + err)
+    }
+  }
+
+  async function handleCreateContract() {
+    await fetchAPI(`/contracts/create-by-survey`, 'POST', {
+      surveyId: dataOrder?.order.id
+    })
+      .then((res) => {
+        if (res.status === 201 || res.status === 200) {
+          toast({
+            title: `Tạo hợp đồng thành công`,
+            variant: 'success'
+          })
+          Router.push(`/contract/${res.data.contract.id}`)
+        }
+      })
+      .catch((err) => {
+        toast({
+          title: err.toString(),
+          variant: 'destructive'
+        })
+      })
   }
 
   return (
@@ -271,21 +167,9 @@ export default function Page() {
           <Input
             className='ml-4 w-[50%]'
             placeholder='Tên, Email, hoặc Tham chiếu'
-            defaultValue={dataOrder.supplier?.name}
+            defaultValue={dataOrder?.supplier?.name}
             disabled
-          ></Input>
-        </div>
-        <div className='flex'>
-          <div className='mt-2 w-32 text-sm font-semibold'>End date</div>
-          <Input
-            className='ml-4 w-[50%]'
-            type='date'
-            placeholder='Tên, Email, hoặc Tham chiếu'
-            defaultValue={endDate}
-            onBlur={(e) => {
-              updateOrder(e, 'endDate')
-            }}
-          ></Input>
+          />
         </div>
       </div>
       <div className='grid grid-cols-2'>
@@ -294,31 +178,18 @@ export default function Page() {
           <Input
             className='ml-4 w-[50.5%]'
             placeholder='xxxx-xxxx-xxxx'
-            defaultValue={dataOrder.supplier?.taxCode}
+            defaultValue={dataOrder?.supplier?.taxCode}
             disabled
-          ></Input>
-        </div>
-        <div className='flex'>
-          <div className='w-32 text-sm font-semibold'>Delivery date</div>
-          <Input
-            className='ml-4 w-[50.5%]'
-            type='date'
-            placeholder='Tên, Email, hoặc Tham chiếu'
-            defaultValue={delivery}
-            onBlur={(e) => {
-              updateOrder(e, 'delivery')
-            }}
-          ></Input>
+          />
         </div>
       </div>
       <Tabs defaultValue='products' className='mb-5 w-full'>
         <TabsContent value='products'>
-          {/* columns={columns} */}
           <DataTable data={data} setData={setData} getDataOrders={getDataOrders} />
         </TabsContent>
       </Tabs>
       <div className='flex justify-end'>
-        {isCustomer === false ? (
+        {!isCustomer ? (
           <div>
             <Button
               className='mr-1 px-2 py-2'
@@ -338,23 +209,9 @@ export default function Page() {
           </div>
         ) : (
           <div>
-            <Button
-              className='mr-1 px-2 py-2'
-              variant={'outline'}
-              // disabled={isDisableButton.isDisableButtonCreateContract}
-              onClick={createContract}
-            >
+            <Button className='mr-1 px-2 py-2' variant={'outline'} onClick={() => handleCreateContract()}>
               Create contract
             </Button>
-            {/* <Link href={{
-              pathname: '/contract/create',
-              // query: {
-              //   supplierId: dataOrder?.order?.suppliersId ?? '',
-              //   userId: dataOrder?.order?.userId ?? '',
-              //   orderId: dataOrder?.order?.id ?? '',
-              // },
-            }}>
-            </Link> */}
             <Button
               className='mr-1 px-2 py-2'
               variant={'default'}

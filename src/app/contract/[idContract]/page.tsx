@@ -10,21 +10,22 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Icons } from '@/components/ui/icons'
 import ChatBox from '@/components/ChatBox'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
-import { fetchAPI } from '@/utils/fetchAPI'
 import {
   ContractData,
+  EContractType,
   EFunctionCall,
   ERolesOfParticipant,
   IContractAttribute,
   IContractCreateParams,
+  IContractDisputeParams,
   IContractParticipant,
   IDisableButton,
   IIndividual,
   IVisibleButton,
-  InvitationItem,
-  RSAKey
+  IVoteRatio,
+  InvitationItem
 } from '@/interface/contract.i'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -38,7 +39,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import Web3 from 'web3'
 import { useAppContext } from '@/components/ThemeProvider'
 import { useToast } from '@/components/ui/use-toast'
 import {
@@ -51,15 +51,14 @@ import {
 } from '@/components/ui/dialog'
 import InvitationArea from '@/components/InvitationArea'
 import {
+  calculateVoteRatio,
   fetchDataWhenEntryPage,
   getIndividualFromParticipant,
   handleCallFunctionOfBlockchain,
-  handleConfirmStagesFunc,
   handleOnDeployContractFunc,
   inviteNewParticipant,
-  transferMoneyFunc,
   updateStateButton,
-  withdrawMoneyFunc
+  withdrawMoneyDispute
 } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   Select,
@@ -70,10 +69,11 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { initDisableButton, initVisibleButton } from '@/constants/initVariable.constants'
+import { initDisableButton, initRatioParticipant, initVisibleButton } from '@/constants/initVariable.constants'
 import Dispute from './(component)/Dispute'
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
 import { initContractAttribute } from './(component)/(store)/storeContractData'
+import Voting from '@/app/contract/[idContract]/(component)/Voting'
 
 export default function Dashboard() {
   const [contractAttribute, setContractAttribute] = useState<IContractAttribute[]>(initContractAttribute)
@@ -105,6 +105,8 @@ export default function Dashboard() {
     receiver: IContractParticipant | undefined
     sender: IContractParticipant | undefined
   }>()
+  const [voteRatio, setVoteRatio] = useState<IVoteRatio>(initRatioParticipant)
+  const [arbitratorUser, setArbitratorUser] = useState<IContractParticipant[]>()
   const [dialogInvite, setDialogInvite] = useState(false)
   const [stages, setStages] = useState<any[]>([
     {
@@ -116,6 +118,10 @@ export default function Dashboard() {
   const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>()
   const [showChat, setShowChat] = useState(false)
   const { idContract } = useParams()
+  const Router = useRouter()
+  useEffect(() => {
+    console.log('voteRatio', voteRatio)
+  }, [voteRatio])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   // fetchDataWhenEntryPage
   useEffect(() => {
@@ -135,8 +141,15 @@ export default function Dashboard() {
         response?.contractData.participants,
         userInfo,
         response?.contractBallance ? response?.contractBallance : 0,
-        response?.contractData.contract.stages
+        response?.contractData?.contract
       )
+      const { arbitrators, votes } = getIndividualFromParticipant(response?.contractData.participants)
+
+      setVoteRatio({
+        ...calculateVoteRatio(votes),
+        votes
+      })
+      setArbitratorUser(arbitrators)
       setContractStatus(response?.contractData.contract.status)
       setDependentInfo(getIndividualFromParticipant(response?.contractData.participants))
     })
@@ -192,18 +205,6 @@ export default function Dashboard() {
     setDialogInvite(false)
   }
 
-  async function withdrawMoney() {
-    withdrawMoneyFunc(addressContract, userInfo, individual)
-      .then(() => {})
-      .catch((error) => {
-        toast({
-          title: 'Error occurred while withdrawing money',
-          description: error,
-          variant: 'destructive'
-        })
-      })
-  }
-
   async function onCallFunctionInBlockchain() {
     setIsOpenEnterPrivateKey(false)
     const responseMessage = await handleCallFunctionOfBlockchain(
@@ -240,11 +241,26 @@ export default function Dashboard() {
           individual,
           setIsDisableButton,
           setIsVisibleButton,
-          privateKey,
-          contractParticipants
+          contractParticipants,
+          contractData
+        },
+        withdrawMoneyFunctionParams: {
+          addressContract,
+          setCurrentBalance,
+          individual,
+          setUserInfo,
+          userInfo,
+          setIsVisibleButton,
+          setIsDisableButton,
+          contractData
+        },
+        openDisputeFunctionParams: getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet),
+        compareContractFunctionParams: {
+          idContract: idContract as string
         }
       }
     )
+    if (responseMessage.contractId) Router.push(`/contract/${responseMessage.contractId}`)
     toast({
       title: responseMessage.message,
       variant: responseMessage.status,
@@ -285,66 +301,21 @@ export default function Dashboard() {
     setIsDeployContractAlert(false)
   }
 
-  // async function handleConfirmStages() {
-  //   handleConfirmStagesFunc(
-  //     addressContract,
-  //     userInfo,
-  //     individual,
-  //     setIsDisableButton,
-  //     setIsVisibleButton
-  //   )
-  //     .then(() => {
-  //       toast({
-  //         title: "Confirm successfully !",
-  //         description: "You have confirmed the stage",
-  //         variant: "success",
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       toast({
-  //         title: "Error occurred while confirming stage",
-  //         description: error,
-  //         variant: "destructive",
-  //       });
-  //     });
-  // }
-
-  async function handleCancelContract() {
-    try {
-      const privateCode = await fetchAPI('/smart-contracts/abi', 'GET')
-      const abi = privateCode.data.abi.abi
-      const web3 = new Web3(window.ethereum)
-      const contract = new web3.eth.Contract(abi, addressContract as string)
-      await contract.methods.setStatus(1).send({ from: userInfo?.data?.addressWallet })
-      setIsCancelContractAlert(false)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   async function handleCompareContractInformation() {}
 
   const getDataToOpenDisputeContract = (
     participantContract: IContractParticipant[],
     addressWallet: string
-  ): IContractCreateParams => {
-    const invitations = participantContract.map((item) => {
-      if (
-        item.permission?.ROLES === ERolesOfParticipant.SENDER ||
-        item.permission?.ROLES === ERolesOfParticipant.RECEIVER
-      )
-        return {
-          email: item.email,
-          permission: item.permission,
-          messages: 'You have a invitation to join a dispute contract'
-        }
-    })
+  ): IContractDisputeParams => {
+    const { receiver, sender } = getIndividualFromParticipant(participantContract)
     return {
-      addressWallet,
-      name: 'Disputed Contract - Supply Chain Management',
-      type: 'DISPUTE',
-      templateId: 'ac321ca5-1393-4474-9f09-f8d09ab15b1d',
-      invitation: invitations as InvitationItem[]
+      addressWallet: addressWallet,
+      customer: sender?.User?.addressWallet,
+      supplier: receiver?.User?.addressWallet,
+      parentId: idContract as string,
+      totalAmount: Number(individual.totalAmount),
+      userInfo,
+      addressContract
     }
   }
 
@@ -374,31 +345,67 @@ export default function Dashboard() {
                     Name of Contract: <span>{contractData?.contractTitle}</span>
                   </div>
                   <div className='font-semibold'>
-                    Created By: <span>{contractData?.createdBy?.name}</span>
+                    {contractData?.type === EContractType.CONTRACT ? (
+                      <>
+                        Created By: <span>{contractData?.createdBy?.name}</span>
+                      </>
+                    ) : (
+                      <div>
+                        From Contract:{' '}
+                        <div className='mt-2 flex'>
+                          <Input className='me-2' value={contractData?.parentId} />
+                          <Link href={`/contract/${contractData?.parentId}`}>
+                            <Button>Go To Contract</Button>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
                   <div className='font-semibold'>
                     Address Contract:
                     <Input readOnly className='mt-2' value={addressContract} placeholder='Address Contract Empty' />
                   </div>
-                  <div>
-                    <div className='font-semibold'>Contract Progress </div>
-                    {contractStatus === 'PENDING' && <Progress value={0} className='my-2' />}
-                    {contractStatus === 'PARTICIPATED' && <Progress value={25} className='my-2' />}
-                    {contractStatus === 'ENFORCE' && <Progress value={50} className='my-2' />}
-                    {contractStatus === 'SIGNED' && <Progress value={75} className='my-2' />}
-                    {contractStatus === 'COMPLETED' && <Progress value={100} className='my-2' />}
-                    <div className='flex'>
-                      <div className='ms-1 text-center font-semibold'>Participated</div>
-                      <div className='ms-8 text-center font-semibold'>Deployed</div>
-                      <div className='ms-8 text-center font-semibold'>
-                        Signed <br /> Contract
+                  {contractData?.type === EContractType.CONTRACT ? (
+                    <div>
+                      <div className='font-semibold'>Contract Progress </div>
+                      {contractStatus === 'PENDING' && <Progress value={0} className='my-2' />}
+                      {contractStatus === 'PARTICIPATED' && <Progress value={25} className='my-2' />}
+                      {contractStatus === 'ENFORCE' && <Progress value={50} className='my-2' />}
+                      {contractStatus === 'SIGNED' && <Progress value={75} className='my-2' />}
+                      {contractStatus === 'DISPUTED' && (
+                        <Progress value={75} className='my-2 bg-destructive/20' color='bg-destructive' />
+                      )}
+                      {contractStatus === 'COMPLETED' && <Progress value={100} className='my-2' />}
+                      <div className='flex'>
+                        <div className='ms-1 text-center font-semibold'>Participated</div>
+                        <div className='ms-8 text-center font-semibold'>Deployed</div>
+                        <div className='ms-8 text-center font-semibold'>
+                          Signed <br /> Contract
+                        </div>
+                        <div className='ms-10 text-center font-semibold'>Completed</div>
                       </div>
-                      <div className='ms-10 text-center font-semibold'>Completed</div>
                     </div>
-                  </div>
+                  ) : (
+                    <div>
+                      <div className='font-semibold'>Contract Dispute Progress </div>
+                      {contractStatus === 'PARTICIPATED' && isDisableButton.setIsVotedAll === false && (
+                        <Progress value={25} className='my-2' />
+                      )}
+                      {(contractStatus === 'VOTED' || isDisableButton.setIsVotedAll === true) && (
+                        <Progress value={55} className='my-2' />
+                      )}
+                      {contractStatus === 'COMPLETED' && <Progress value={100} className='my-2' />}
+                      <div className='flex'>
+                        <div className='ms-1 text-center font-semibold'>Participated</div>
+                        <div className='ms-20 text-center font-semibold'>Voted</div>
+                        <div className='ms-24 text-center font-semibold'>Completed</div>
+                      </div>
+                    </div>
+                  )}
                   <Separator className='' />
                   <div className='flex items-center justify-center text-center'>
-                    <Button className='' disabled={isDisableButton.editContractButton} variant={'violet'}>
+                    <Button className='' disabled={false} variant={'violet'}>
                       <Link href={`/contract/${idContract}/edit`}>Edit contract</Link>
                     </Button>
                     <Button
@@ -442,11 +449,23 @@ export default function Dashboard() {
                       Invite
                     </Button>
                   </div>
-                  <Dispute
-                    isDisableButton={isDisableButton}
-                    isVisibleButton={isVisibleButton}
-                    payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
-                  />
+                  {isVisibleButton.openDisputedButton && (
+                    <Dispute
+                      isDisableButton={isDisableButton}
+                      isVisibleButton={isVisibleButton}
+                      payload={getDataToOpenDisputeContract(contractParticipants, userInfo?.data.addressWallet)}
+                      setIsOpenEnterPrivateKey={setIsOpenEnterPrivateKey}
+                      setNameFunctionCall={setNameFunctionCall}
+                      setPrivateKey={setPrivateKey}
+                    />
+                  )}
+                  {isVisibleButton.goToDisputeButton && (
+                    <Link href={`/contract/${contractData?.disputedContractId}`}>
+                      <Button variant={'violet'} className='w-full'>
+                        Go To Dispute Contract
+                      </Button>
+                    </Link>
+                  )}
                   <div>
                     <Card className='h-[215px]'>
                       <CardContent className='text-sm'>
@@ -454,39 +473,59 @@ export default function Dashboard() {
                           <CardTitle className='flex items-center text-lg'>Individual Dependent</CardTitle>
                           <Separator className='mt-2' />
                         </div>
-                        <ScrollArea className='mt-2 h-[180px]'>
-                          {dependentInfo?.sender?.User?.name && (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
-                                    dependentInfo.sender?.User.addressWallet.slice(-5)}
-                                </p>
+                        <ScrollArea className='mt-2 h-[140px]'>
+                          <div className='px-2'>
+                            {dependentInfo?.sender?.User?.name && (
+                              <div className='mt-3 flex items-center'>
+                                <div className='grid'>
+                                  <p className='text-sm font-medium leading-none'>{dependentInfo.sender.User?.name}</p>
+                                  <p className='text-sm text-muted-foreground'>
+                                    {'*'.repeat(dependentInfo.sender.User?.addressWallet.length - 30) +
+                                      dependentInfo.sender?.User.addressWallet.slice(-5)}
+                                  </p>
+                                </div>
+                                <div className='ml-auto font-medium'>
+                                  <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
+                                    Customer
+                                  </Badge>
+                                </div>
                               </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'destructive'} className='me-1 translate-y-[-5px]'>
-                                  Sender User
-                                </Badge>
+                            )}
+                            {dependentInfo?.receiver?.User?.name && (
+                              <div className='mt-3 flex items-center'>
+                                <div className='grid'>
+                                  <p className='text-sm font-medium leading-none'>
+                                    {dependentInfo.receiver.User?.name}
+                                  </p>
+                                  <p className='text-sm text-muted-foreground'>
+                                    {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
+                                      dependentInfo.receiver.User?.addressWallet.slice(-5)}
+                                  </p>
+                                </div>
+                                <div className='ml-auto font-medium'>
+                                  <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
+                                    Supplier
+                                  </Badge>
+                                </div>
                               </div>
-                            </div>
-                          )}
-                          {dependentInfo?.receiver?.User?.name && (
-                            <div className='mt-3 flex items-center'>
-                              <div className='grid'>
-                                <p className='text-sm font-medium leading-none'>{dependentInfo.receiver.User?.name}</p>
-                                <p className='text-sm text-muted-foreground'>
-                                  {'*'.repeat(dependentInfo.receiver.User?.addressWallet.length - 30) +
-                                    dependentInfo.receiver.User?.addressWallet.slice(-5)}
-                                </p>
+                            )}
+                            {arbitratorUser?.map((item, index) => (
+                              <div className='mt-3 flex items-center' key={index}>
+                                <div className='grid'>
+                                  <p className='text-sm font-medium leading-none'>{item?.User?.name || 'No Name'}</p>
+                                  <p className='text-sm text-muted-foreground'>
+                                    {'*'.repeat(item?.User?.addressWallet.length - 30) +
+                                      item?.User?.addressWallet.slice(-5)}
+                                  </p>
+                                </div>
+                                <div className='ml-auto font-medium'>
+                                  <Badge variant={'default'} className='me-1 translate-y-[-5px]'>
+                                    Arbitrator
+                                  </Badge>
+                                </div>
                               </div>
-                              <div className='ml-auto font-medium'>
-                                <Badge variant={'blue'} className='me-1 translate-y-[-5px]'>
-                                  Receiver User
-                                </Badge>
-                              </div>
-                            </div>
-                          )}
+                            ))}
+                          </div>
                         </ScrollArea>
                       </CardContent>
                     </Card>
@@ -509,109 +548,205 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent className='text-sm'>
-                <div className='mt-2 grid gap-3'>
-                  <div className='flex align-middle'>
-                    <div className='font-semibold'>Sender Representative:</div>
-                    <div className='ms-2 translate-y-[-7px]'>
-                      <Input
-                        readOnly
-                        className='ms-3 w-[180px]'
-                        placeholder='Empty'
-                        defaultValue={individual?.senderInd}
-                      />
+                {contractData?.type === EContractType.CONTRACT && (
+                  <div>
+                    <div className='mt-2 grid gap-3'>
+                      <div className='flex align-middle'>
+                        <div className='font-semibold'>Sender Representative:</div>
+                        <div className='ms-2 translate-y-[-7px]'>
+                          <Input
+                            readOnly
+                            className='ms-3 w-[180px]'
+                            placeholder='Empty'
+                            defaultValue={individual?.senderInd}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-2 grid gap-3'>
+                      <div className='flex align-middle'>
+                        <div className='font-semibold'>Receiver Representative:</div>
+                        <div className='ms-2 translate-y-[-7px]'>
+                          <Input
+                            readOnly
+                            className='w-[180px]'
+                            placeholder='Empty'
+                            defaultValue={individual?.receiverInd}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-2 grid gap-3'>
+                      <div className='flex align-middle'>
+                        <div className='font-semibold'>Total Value Of Contract: </div>
+                        <div className='translate-x-[15px] translate-y-[-7px]'>
+                          <Input
+                            readOnly
+                            className='w-[180px]'
+                            placeholder='Total Amount of Money'
+                            defaultValue={`${individual?.totalAmount ? individual?.totalAmount + ' ETH' : ''}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-2 grid gap-3'>
+                      <div className='flex align-middle'>
+                        <div className='font-semibold'>Funds locked in Contract:</div>
+                        <div className='translate-x-[5px] translate-y-[-7px]'>
+                          <Input readOnly className='w-[180px]' value={currentBalance + ' ETH'} />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className='mt-2 grid gap-3'>
-                  <div className='flex align-middle'>
-                    <div className='font-semibold'>Receiver Representative:</div>
-                    <div className='ms-2 translate-y-[-7px]'>
-                      <Input
-                        readOnly
-                        className='w-[180px]'
-                        placeholder='Empty'
-                        defaultValue={individual?.receiverInd}
-                      />
+                )}
+                {contractData?.type === EContractType.DISPUTE && (
+                  <div>
+                    <div className='mb-4'>
+                      <div className='mb-2'>
+                        <div className='flex justify-between'>
+                          <div className='mb-1 font-semibold'>Customer </div>
+                          <div className='flex justify-between'>
+                            <div className='mt-1 font-semibold'>{voteRatio?.sender} %</div>
+                          </div>
+                        </div>
+                        <div className='flex'>
+                          <Progress value={voteRatio?.sender}></Progress>{' '}
+                        </div>
+                      </div>
+                      <div className='mt-2'>
+                        <div className='flex justify-between'>
+                          <div className='mb-1 font-semibold'>Supplier </div>
+                          <div className='flex justify-between'>
+                            <div className='mt-1 font-semibold'>{voteRatio?.receiver} %</div>
+                          </div>
+                        </div>
+                        <div className='flex'>
+                          <Progress
+                            color='bg-destructive'
+                            className='bg-destructive/20'
+                            value={voteRatio?.receiver}
+                          ></Progress>{' '}
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-2 grid gap-3'>
+                      <div className='flex align-middle'>
+                        <div className='font-semibold'>Funds locked in Contract:</div>
+                        <div className='ms-4 translate-y-[-7px]'>
+                          <Input readOnly className='w-[180px]' value={currentBalance + ' ETH'} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-2 grid gap-3'>
+                      <div className='flex align-middle'>
+                        <div className='font-semibold'>Winner: </div>
+                        <div className='ms-4 w-full translate-y-[-7px]'>
+                          <Input
+                            readOnly
+                            placeholder='Address Wallet'
+                            defaultValue={
+                              contractData.status !== 'VOTED' && contractData.status !== 'COMPLETED'
+                                ? 'Waiting for the result'
+                                : voteRatio.receiver > voteRatio.sender
+                                  ? individual.receiverInd
+                                  : individual.senderInd
+                            }
+                          />
+                        </div>
+                        <div className='w-[40%]'>
+                          <Badge className='ms-2 h-[20px] text-center'>
+                            {contractData.status !== 'VOTED' && contractData.status !== 'COMPLETED'
+                              ? 'Unknown'
+                              : voteRatio.receiver > voteRatio.sender
+                                ? 'Supplier'
+                                : 'Customer'}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className='mt-2 grid gap-3'>
-                  <div className='flex align-middle'>
-                    <div className='font-semibold'>Total Value Of Contract: </div>
-                    <div className='translate-x-[15px] translate-y-[-7px]'>
-                      <Input
-                        readOnly
-                        className='w-[180px]'
-                        placeholder='Total Amount of Money'
-                        defaultValue={`${individual?.totalAmount ? individual?.totalAmount + ' ETH' : ''}`}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className='mt-2 grid gap-3'>
-                  <div className='flex align-middle'>
-                    <div className='font-semibold'>Funds locked in Contract:</div>
-                    <div className='translate-x-[5px] translate-y-[-7px]'>
-                      <Input readOnly className='w-[180px]' value={currentBalance + ' ETH'} />
-                    </div>
-                  </div>
-                </div>
+                )}
+
                 <Separator className='my-4' />
-                <div className='flex'>
-                  {isVisibleButton.deployButton && (
-                    <Button
-                      disabled={isDisableButton.deployButton}
-                      variant={'orange'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsDeployContractAlert(true)
-                      }}
-                    >
-                      Deploy Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.signButton && (
-                    <Button
-                      disabled={isDisableButton.signButton}
-                      variant={'blue'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Sign Contract
-                    </Button>
-                  )}
-                  {isVisibleButton.transferButton && (
-                    <Button
-                      disabled={isDisableButton.transferButton}
-                      variant={'destructive'}
-                      className='w-full'
-                      onClick={() => {
-                        setIsOpenEnterPrivateKey(true)
-                        setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
-                        setPrivateKey('')
-                      }}
-                    >
-                      Transfer
-                    </Button>
-                  )}
-                  {isVisibleButton.withdrawButton && (
-                    <Button
-                      disabled={isDisableButton.withdrawButton}
-                      className='w-full'
-                      onClick={() => {
+                {isVisibleButton.deployButton && (
+                  <Button
+                    disabled={isDisableButton.deployButton}
+                    variant={'orange'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsDeployContractAlert(true)
+                    }}
+                  >
+                    Deploy Contract
+                  </Button>
+                )}
+                <Voting
+                  isDisableButton={isDisableButton}
+                  isVisibleButton={isVisibleButton}
+                  individual={individual}
+                  votes={voteRatio}
+                  setVotes={setVoteRatio}
+                  setIsDisableButton={setIsDisableButton}
+                  userInfo={userInfo}
+                />
+                {isVisibleButton.signButton && (
+                  <Button
+                    disabled={isDisableButton.signButton}
+                    variant={'blue'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.SIGN_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Sign Contract
+                  </Button>
+                )}
+                {isVisibleButton.transferButton && (
+                  <Button
+                    disabled={isDisableButton.transferButton}
+                    variant={'destructive'}
+                    className='w-full'
+                    onClick={() => {
+                      setIsOpenEnterPrivateKey(true)
+                      setNameFunctionCall(EFunctionCall.TRANSFER_CONTRACT)
+                      setPrivateKey('')
+                    }}
+                  >
+                    Transfer
+                  </Button>
+                )}
+                {isVisibleButton.withdrawButton && (
+                  <Button
+                    disabled={isDisableButton.withdrawButton}
+                    className='w-full'
+                    onClick={() => {
+                      if (contractData?.type === EContractType.DISPUTE) {
+                        withdrawMoneyDispute({
+                          addressWallet: contractData?.winnerAddressWallet as string,
+                          addressContract: contractData?.contractAddress as string,
+                          contractData: contractData,
+                          setCurrentBalance,
+                          setIsDisableButton,
+                          setUserInfo
+                        }).then((response) => {
+                          toast({
+                            title: response.message,
+                            variant: response.status,
+                            description: response.description
+                          })
+                        })
+                      } else {
                         setIsOpenEnterPrivateKey(true)
                         setNameFunctionCall(EFunctionCall.WITHDRAW_CONTRACT)
                         setPrivateKey('')
-                      }}
-                    >
-                      Withdraw
-                    </Button>
-                  )}
-                </div>
+                      }
+                    }}
+                  >
+                    Withdraw
+                  </Button>
+                )}
                 <div className='flex gap-2'>
                   {isVisibleButton.confirmButtonSender && (
                     <Button
@@ -695,14 +830,14 @@ export default function Dashboard() {
                   <Card className='h-[350px]'>
                     <CardHeader>
                       <div className='flex justify-between'>
-                        <CardTitle className='mt-2'>Participants</CardTitle>
+                        <CardTitle className='mt-2 text-lg'>Participants</CardTitle>
                         <Button className='pt-2' variant={'outline'}>
                           <Icons.userRoundPlus />
                         </Button>
                       </div>
                       <Separator />
                     </CardHeader>
-                    <ScrollArea className='h-[300px]'>
+                    <ScrollArea className='px h-[250px] px-1'>
                       <CardContent className='grid gap-8 px-5'>
                         {contractParticipants.map((participant, index) => (
                           <div className='flex items-center' key={index}>
@@ -710,7 +845,7 @@ export default function Dashboard() {
                               <p className='text-sm font-medium leading-none'>
                                 {participant?.User ? participant?.User?.name : 'No Name'}
                               </p>
-                              <p className='text-sm text-muted-foreground'>{participant.email}</p>
+                              <p className='text-[0.7rem] text-muted-foreground'>{participant.email}</p>
                             </div>
                             <div className='ml-auto font-medium'>
                               <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>
@@ -786,7 +921,6 @@ export default function Dashboard() {
                   If you forget the private key, you will not be able to recover
                 </b>
               </AlertDialogDescription>
-
               <div className='flex'>
                 <Select
                   onValueChange={(e) => {
@@ -810,6 +944,7 @@ export default function Dashboard() {
                   <Input
                     placeholder='Fill your private key'
                     className='ms-2 w-full'
+                    type='password'
                     onChange={(e) => {
                       setPrivateKey(e.target.value)
                     }}

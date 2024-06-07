@@ -36,25 +36,24 @@ import { useState } from 'react'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { useToast } from '@/components/ui/use-toast'
 import { getColumns } from './columns' // Import hàm getColumns
-import { TData } from './[id]/page'
-import { DataWithName } from './[id]/page'
 import { DataTableProps } from './[id]/page'
 import { Product } from './[id]/page'
-import { OrderDetail } from './[id]/page'
+import { DataWithName, IOrderDetail } from '@/interface/order.i'
+import { useAppContext } from '@/components/ThemeProvider'
 
 export function DataTable<TData extends DataWithName>({ data, getDataOrders, setData }: DataTableProps<TData>) {
   const columns = getColumns(
     data,
     (orderDetails) => setData((prev) => ({ ...prev, orderDetails })),
     getDataOrders
-  ) as ColumnDef<OrderDetail, any>[] // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
+  ) as ColumnDef<IOrderDetail, any>[] // Lấy danh sách cột bằng cách truyền data vào hàm getColumns
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [userInfo, setUserInfo] = React.useState<any>(JSON.parse(localStorage.getItem('user-info') as string))
+  const { userInfo, setUserInfo }: any = useAppContext()
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [ListSelectProduct, setListSelectProduct] = React.useState<Product[]>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const table = useReactTable({
-    data: data.orderDetails as OrderDetail[], // Add type assertion to data.orderDetails
+    data: data.products, // Add type assertion to data.orderDetails
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -69,16 +68,16 @@ export function DataTable<TData extends DataWithName>({ data, getDataOrders, set
     }
   })
 
-  const [selectedIndex, setSelectedIndex] = useState(-1)
+  const [selected, setSelected] = useState('')
   const { toast } = useToast()
 
-  const handleSelect = (index: number) => {
+  const handleAddProduct = async (productId: string) => {
     if (ListSelectProduct.length > 0) {
       const payload = {
-        supplierId: ListSelectProduct?.[index]?.idSupplier ?? '',
-        productId: ListSelectProduct?.[index]?.id ?? ''
+        orderId: data.id,
+        productId: productId
       }
-      fetchAPI('/orders', 'POST', payload)
+      await fetchAPI('orders/add-product', 'POST', payload)
         .then((res) => {
           if (res.status === 201) {
             toast({
@@ -97,24 +96,21 @@ export function DataTable<TData extends DataWithName>({ data, getDataOrders, set
     }
   }
 
-  const getProduct = () => {
-    if (data.orderDetails.length > 0) {
-      const idSupplier = data?.orderDetails[0]?.idSupplier ?? ''
-      fetchAPI(`/products/find-all-by-supplier/${idSupplier}`, 'GET')
-        .then((res) => {
-          const mappedProducts = res.data.map((value: any) => {
-            return {
-              ...value,
-              image: value?.images?.[0]?.path ?? '',
-              priceWithoutTax: value.price - value.discount,
-              idOrder: value.idOrder,
-              quantity: 1
-            }
-          })
-          setListSelectProduct(mappedProducts)
+  async function getProduct() {
+    await fetchAPI(`/products/find-all-by-supplier/${data.suppliersId}`, 'GET')
+      .then((res) => {
+        const mappedProducts = res.data.map((value: any) => {
+          return {
+            ...value,
+            image: value?.images?.[0]?.path ?? '',
+            priceWithoutTax: value.price - value.discount,
+            idOrder: value.idOrder,
+            quantity: 1
+          }
         })
-        .catch((errors) => console.log('Error : ' + errors))
-    }
+        setListSelectProduct(mappedProducts)
+      })
+      .catch((errors) => console.log('Error : ' + errors))
   }
   React.useEffect(() => {
     getProduct()
@@ -183,26 +179,21 @@ export function DataTable<TData extends DataWithName>({ data, getDataOrders, set
               <TableRow className='justify-start hover:bg-transparent'>
                 <TableCell colSpan={7}>
                   <div className='flex'>
-                    <Select
-                      onValueChange={(value) => {
-                        const index = ListSelectProduct.findIndex((item) => item.name === value)
-                        setSelectedIndex(index)
-                      }}
-                    >
+                    <Select onValueChange={(value) => console.log(value)}>
                       <SelectTrigger className='w-[180px]'>
                         <SelectValue placeholder='Select a fruit' />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
                           {ListSelectProduct.map((value, index) => (
-                            <SelectItem value={value.name} key={index}>
+                            <SelectItem value={value.id} key={index}>
                               {value.name}
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
-                    <Button className='ml-2' variant='blue' onClick={() => handleSelect(selectedIndex)}>
+                    <Button className='ml-2' variant='blue' onClick={() => handleAddProduct(selected)}>
                       Add Product
                     </Button>
                   </div>

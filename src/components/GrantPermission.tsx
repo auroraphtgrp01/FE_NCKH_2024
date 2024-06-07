@@ -6,15 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Accordion, AccordionItem, AccordionContent } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { ERolesOfParticipant, IPermission } from '@/interface/contract.i'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { initPermission, rolesTypeParticipant } from '@/constants/initVariable.constants'
 import { Separator } from '@/components/ui/separator'
 

@@ -3,8 +3,11 @@ import {
   IDisableButton,
   IPermission,
   IResponseFunction,
-  IVisibleButton
+  IVisibleButton,
+  IVoteRatio
 } from '@/interface/contract.i'
+import { updateUserInfoFromLocalStorage } from '@/utils/updateUserInfo'
+import { handleInstanceWeb3 } from '@/utils/web3Instance'
 
 export const initDisableButton: IDisableButton = {
   fetchCompareButton: true,
@@ -17,7 +20,11 @@ export const initDisableButton: IDisableButton = {
   confirmButtonSender: true,
   confirmButtonReceiver: true,
   openDisputedButton: false,
-  inviteButton: false
+  inviteButton: false,
+  voteButton: true,
+  voteCustomerButton: false,
+  voteSupplierButton: false,
+  setIsVotedAll: false
 }
 
 export const initVisibleButton: IVisibleButton = {
@@ -30,7 +37,9 @@ export const initVisibleButton: IVisibleButton = {
   confirmButtonSender: false,
   confirmButtonReceiver: false,
   openDisputedButton: true,
-  inviteButton: false
+  inviteButton: false,
+  voteButton: false,
+  goToDisputeButton: false
 }
 
 export const initResponseMessages: IResponseFunction = {
@@ -52,3 +61,14 @@ export const rolesTypeParticipant: { key: string; value: string }[] = Object.key
   key,
   value: ERolesOfParticipant[key as keyof typeof ERolesOfParticipant]
 }))
+
+export const getUserInfo = async () => {
+  const { balance } = await handleInstanceWeb3()
+  return updateUserInfoFromLocalStorage({ key: 'balance', value: balance })
+}
+
+export const initRatioParticipant: IVoteRatio = {
+  sender: parseFloat(Number(0).toFixed(2)),
+  receiver: parseFloat(Number(0).toFixed(2)),
+  votes: []
+}

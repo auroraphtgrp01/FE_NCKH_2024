@@ -38,3 +38,22 @@ export interface DatePicker {
   selectedDate: Date | undefined
   onDateChange: (newDate: any) => void
 }
+
+export interface ISupplier {
+  id: string
+  name: string
+  email: string
+  User: User
+  images: string[]
+  phoneNumber: string
+  address: string
+  taxCode: string
+  userId: string
+  description: string | null
+  createdAt: string
+  updatedAt: string | null
+  createdBy: any
+  updatedBy: any
+  deletedAt: string | null
+  deletedBy: string | null
+}

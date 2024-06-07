@@ -1,4 +1,9 @@
-import { onCreateANewContract } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
+'use client'
+
+import {
+  onCreateANewContract,
+  onOpenDisputeContract
+} from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,9 +17,15 @@ import {
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useToast } from '@/components/ui/use-toast'
-import { EStageStatus, IOpenDisputedComponentProps, IStagesContract } from '@/interface/contract.i'
+import {
+  EFunctionCall,
+  EStageContractStatus,
+  IOpenDisputedComponentProps,
+  IStagesContract
+} from '@/interface/contract.i'
 import { getDateNow } from '@/utils/dayjs'
 import { AlertDialogCancel } from '@radix-ui/react-alert-dialog'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 const stages: IStagesContract[] = [
@@ -23,7 +34,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.PENDING,
+    status: EStageContractStatus.PENDING,
     dueDate: getDateNow()
   },
   {
@@ -31,7 +42,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.PENDING,
+    status: EStageContractStatus.PENDING,
     dueDate: getDateNow()
   },
   {
@@ -39,7 +50,7 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.PENDING,
+    status: EStageContractStatus.PENDING,
     dueDate: getDateNow()
   },
   {
@@ -47,33 +58,32 @@ const stages: IStagesContract[] = [
     percent: 0,
     requestBy: '0x',
     requestTo: '1x',
-    status: EStageStatus.APPROVED,
+    status: EStageContractStatus.APPROVED,
     dueDate: getDateNow()
   }
 ]
 
-export default function Dispute({ isDisableButton, isVisibleButton, payload }: IOpenDisputedComponentProps) {
+export default function Dispute({
+  isDisableButton,
+  isVisibleButton,
+  payload,
+  setIsOpenEnterPrivateKey,
+  setNameFunctionCall,
+  setPrivateKey
+}: IOpenDisputedComponentProps) {
   const { toast } = useToast()
+  const Router = useRouter()
   const handleOpenDisputeContract = () => {
-    onCreateANewContract(payload).then((res) => {
-      toast({
-        title: res.message,
-        description: res.description,
-        variant: res.status
-      })
-    })
+    setIsOpenEnterPrivateKey(true)
+    setNameFunctionCall(EFunctionCall.ON_OPEN_DISPUTE_CONTRACT)
+    setPrivateKey('')
   }
   return (
     <div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
           {isVisibleButton.openDisputedButton && (
-            <Button
-              disabled={isDisableButton.fetchCompareButton}
-              className='w-full'
-              onClick={() => {}}
-              variant={'destructive'}
-            >
+            <Button className='w-full' onClick={() => {}} variant={'destructive'}>
               Open Dispute Contract
             </Button>
           )}

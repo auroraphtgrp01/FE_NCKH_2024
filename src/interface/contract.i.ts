@@ -64,6 +64,7 @@ export interface IContractParticipant {
   User: User
   permission: IPermission
   completedStages: IStageContract[]
+  vote?: 'A' | 'B'
 }
 
 export interface IStageContract {
@@ -72,7 +73,7 @@ export interface IStageContract {
   requestBy: string
   requestTo: string
   description?: string
-  status: EStageStatus
+  status: EStageContractStatus
   createdAt: Date
 }
 
@@ -82,7 +83,9 @@ export enum EContractStatus {
   ENFORCE = 'ENFORCE',
   SIGNED = 'SIGNED',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',
+  VOTED = 'VOTED',
+  DISPUTED = 'DISPUTED'
 }
 export interface DynamicType {
   [key: string]: any
@@ -107,6 +110,12 @@ export interface ContractData {
   deletedAt: string | null
   deletedBy: string | null
   User: User
+  stages: IStage[]
+  type: EContractType
+  parentId?: string
+  disputedContractId?: string
+  winnerAddressWallet?: string
+  contractAddress?: string
 }
 export interface IIndividual {
   receiverInd: string
@@ -124,6 +133,8 @@ export interface IVisibleButton extends DynamicType {
   confirmButtonReceiver: boolean
   openDisputedButton: boolean
   inviteButton: boolean
+  voteButton: boolean
+  goToDisputeButton: boolean
 }
 export interface IDisableButton extends DynamicType {
   fetchCompareButton: boolean
@@ -137,8 +148,13 @@ export interface IDisableButton extends DynamicType {
   confirmButtonReceiver: boolean
   openDisputedButton: boolean
   inviteButton: boolean
+  voteButton: boolean
+  voteSupplierButton: boolean
+  voteCustomerButton: boolean
+  setIsVotedAll: boolean
 }
 export interface IStage {
+  id?: string
   percent: number
   deliveryAt: number
   description?: string
@@ -202,7 +218,8 @@ export enum EFunctionCall {
   TRANSFER_CONTRACT = 'TRANSFER_CONTRACT',
   SIGN_CONTRACT = 'SIGN_CONTRACT',
   CONFIRM_CONTRACT_SENDER = 'CONFIRM_CONTRACT_SENDER',
-  CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER'
+  CONFIRM_CONTRACT_RECEIVER = 'CONFIRM_CONTRACT_RECEIVER',
+  ON_OPEN_DISPUTE_CONTRACT = 'ON_OPEN_DISPUTE_CONTRACT'
 }
 
 export interface ISignContractFunctionCallParams {
@@ -228,6 +245,18 @@ export interface ITransferMoneyFunctionCallParams {
   privateKey?: string
 }
 
+export interface IWithdrawMoneyFunctionCallParams {
+  addressContract: string
+  setCurrentBalance: Dispatch<SetStateAction<number>>
+  individual: IIndividual
+  userInfo: UserInfoData
+  setUserInfo: Dispatch<SetStateAction<UserInfoData>>
+  setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
+  setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+  contractData: ContractData | undefined
+  privateKey?: string
+}
+
 export interface IConfirmStageFunctionCallParams {
   addressContract: string
   userInfo: UserInfoData
@@ -235,8 +264,9 @@ export interface IConfirmStageFunctionCallParams {
   individual: IIndividual
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
   setIsVisibleButton: Dispatch<SetStateAction<IVisibleButton>>
-  privateKey?: string
   contractParticipants: IContractParticipant[]
+  contractData: ContractData | undefined
+  privateKey?: string
 }
 export interface IResponseFunction {
   status: 'success' | 'destructive'
@@ -248,7 +278,32 @@ export interface IResponseFunction {
 export interface IOpenDisputedComponentProps {
   isDisableButton: IDisableButton
   isVisibleButton: IVisibleButton
-  payload: IContractCreateParams
+  payload: IContractDisputeParams
+  setIsOpenEnterPrivateKey: Dispatch<SetStateAction<boolean>>
+  setNameFunctionCall: Dispatch<SetStateAction<EFunctionCall | undefined>>
+  setPrivateKey: Dispatch<SetStateAction<string>>
+}
+
+export interface IContractVotingProps {
+  isDisableButton: IDisableButton
+  setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+  isVisibleButton: IVisibleButton
+  votes: IVoteRatio
+  setVotes: Dispatch<SetStateAction<IVoteRatio>>
+  userInfo: UserInfoData
+  individual: IIndividual
+}
+
+export interface IVoteRatio {
+  sender: number
+  receiver: number
+  votes: IVotes[]
+}
+
+export interface IVotes {
+  participantId: string
+  vote: 'A' | 'B' | undefined
+  userId: string
 }
 
 export interface IStagesContract {
@@ -257,15 +312,8 @@ export interface IStagesContract {
   requestBy: string
   requestTo: string
   description?: string
-  status: EStageStatus
+  status: EStageContractStatus
   dueDate: string | Date
-}
-
-export enum EStageStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  OUT_OF_DATE = 'OUT_OF_DATE'
 }
 
 export interface ITemplateContract {
@@ -290,6 +338,20 @@ export interface IContractCreateParams {
   type?: 'CONTRACT' | 'DISPUTE'
   rolesOfCreator?: ERolesOfParticipant
 }
+export interface IContractDisputeParams {
+  addressWallet: string
+  parentId: string
+  customer: string | undefined
+  supplier: string | undefined
+  totalAmount: number
+  userInfo: UserInfoData | undefined
+  addressContract: string
+  privateKey?: string
+}
+
+export interface ICompareContractParams {
+  idContract: string
+}
 
 export interface IResponseFunctionFetchData {
   contractData: any
@@ -301,5 +363,20 @@ export enum EStageContractStatus {
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
   ENFORCE = 'ENFORCE',
-  WITHDRAWN = 'WITHDRAWN'
+  WITHDRAWN = 'WITHDRAWN',
+  OUT_OF_DATE = 'OUT_OF_DATE'
+}
+
+export enum EContractType {
+  CONTRACT = 'Contract',
+  DISPUTE = 'Dispute'
+}
+
+export interface IWithdrawMoneyDisputeContractParams {
+  addressWallet: string
+  addressContract: string
+  setCurrentBalance: Dispatch<SetStateAction<number>>
+  setUserInfo: Dispatch<SetStateAction<UserInfoData>>
+  setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
+  contractData: ContractData
 }

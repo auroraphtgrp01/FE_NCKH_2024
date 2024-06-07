@@ -28,7 +28,7 @@ export default function PreviewContract({
                   )}
                   {item.type === EContractAttributeType.CONTRACT_TITLE && (
                     <div>
-                      <h1 className='mt-5 text-center text-2xl font-bold uppercase'>{item.value}</h1>
+                      <h1 className='mb-7 mt-5 text-center text-2xl font-bold uppercase'>{item.value}</h1>
                     </div>
                   )}
                   {item.type === EContractAttributeType.CONTRACT_NUMBER && (
@@ -38,7 +38,7 @@ export default function PreviewContract({
                   )}
                   {item.type === EContractAttributeType.CONTRACT_TEXT && (
                     <div>
-                      <h2 className='mt-6 whitespace-pre-line'>{item.value}</h2>
+                      <h2 className='mt-2 whitespace-pre-line'>{item.value}</h2>
                     </div>
                   )}
                   {item.type === EContractAttributeType.CONTRACT_HEADING_1 && (

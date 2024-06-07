@@ -8,6 +8,9 @@ import { Footer } from '@/components/Footer'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import NavbarVertical from '@/components/NavbarVertical'
 import { cn } from '@/lib/utils'
+import { handleInstanceWeb3 } from '@/utils/web3Instance'
+import { updateUserInfoFromLocalStorage } from '@/utils/updateUserInfo'
+import { useEffect } from 'react'
 const inter = Inter({ subsets: ['vietnamese'] })
 
 export const metadata: Metadata = {

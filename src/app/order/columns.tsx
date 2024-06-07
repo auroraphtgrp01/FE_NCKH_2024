@@ -6,26 +6,26 @@ import { Input } from '@/components/ui/input'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { useToast } from '@/components/ui/use-toast'
 import { useEffect } from 'react'
-import { DataWithName, OrderDetail } from './[id]/page'
+import { DataWithName, IOrderDetail } from '@/interface/order.i'
 
 export function getColumns(
   data: DataWithName,
   setData: React.Dispatch<React.SetStateAction<DataWithName>>,
   getDataOrders: () => void
-): ColumnDef<OrderDetail>[] {
+): ColumnDef<IOrderDetail>[] {
   const { toast } = useToast()
   const userInfoString = localStorage.getItem('user-info')
   const user_info = userInfoString ? JSON.parse(userInfoString) : null
   const isCustomer = user_info && user_info.data.role === 'Customer'
   const updateOrder = async (e: any, index: number, type: string) => {
-    const products = data.orderDetails.map((value: any) => {
+    const products = data.products.map((value: any) => {
       return { ...value }
     })
     type == 'quantity'
       ? (products[index].quantity = Number(e.target.value))
       : (products[index].discount = Number(e.target.value))
     const payload = {
-      id: data.orderDetails[0].idOrder,
+      id: data.id,
       products: products
     }
     await fetchAPI('/orders', 'PATCH', payload)
@@ -121,6 +121,11 @@ export function getColumns(
       accessorKey: 'unit',
       header: () => <div className='font-semibold'>Unit</div>,
       cell: ({ row }) => <div className='text-start'>{row.getValue('unit')}</div>
+    },
+    {
+      accessorKey: 'total',
+      header: () => <div className='font-semibold'>Total</div>,
+      cell: ({ row }) => <div className='text-start'>{row.getValue('total')}</div>
     }
   ]
 }

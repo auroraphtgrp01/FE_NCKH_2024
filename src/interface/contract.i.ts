@@ -48,7 +48,7 @@ export interface IContractAttribute {
   statusAttribute?: EStatusAttribute
   createdBy?: Executor
   updatedBy?: Executor | null
-  description?: string | null // for contract payment stage
+  descriptionOfStage?: string // for contract payment stage
 }
 export enum EStatusAttribute {
   CREATE = 'Create',
@@ -382,4 +382,9 @@ export interface IWithdrawMoneyDisputeContractParams {
   setUserInfo: Dispatch<SetStateAction<UserInfoData>>
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
   contractData: ContractData
+}
+
+export interface IInputValue {
+  property: string
+  value?: string
 }

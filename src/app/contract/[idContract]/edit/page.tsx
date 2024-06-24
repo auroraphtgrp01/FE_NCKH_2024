@@ -94,12 +94,14 @@ export default function DialogEditContract() {
     if (attributeToUpdate.type === EContractAttributeType.CONTRACT_PAYMENT_STAGE) {
       updatedAttributes[index] = {
         ...attributeToUpdate,
-        descriptionOfStage: e.target.value
+        descriptionOfStage: e.target.value,
+        statusAttribute: EStatusAttribute.UPDATE
       }
     } else
       updatedAttributes[index] = {
         ...attributeToUpdate,
-        value: e.target.value
+        value: e.target.value,
+        statusAttribute: EStatusAttribute.UPDATE
       }
     setContractAttribute(updatedAttributes)
   }

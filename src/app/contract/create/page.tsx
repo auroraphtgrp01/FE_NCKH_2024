@@ -46,7 +46,7 @@ export default function page() {
   const Router = useRouter()
   const { toast } = useToast()
   useEffect(() => {
-    fetchAPI('/template-contracts', 'GET')
+    fetchAPI('/template-contracts/find-all-for-client', 'GET')
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
           setTemplate((prev) => [...prev, ...res.data])
@@ -95,10 +95,6 @@ export default function page() {
       setContractAttribute([])
     }
   }, [current])
-
-  useEffect(() => {
-    console.log(templateSelect)
-  }, [templateSelect])
   async function onClickCreateContractButton() {
     const templateId = templateSelect ? templateSelect.id : undefined
     onCreateANewContract({
@@ -117,9 +113,6 @@ export default function page() {
       })
     })
   }
-  useEffect(() => {
-    console.log(template)
-  }, [template])
 
   return (
     <div>

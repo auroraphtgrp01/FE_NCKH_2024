@@ -29,20 +29,9 @@ import BreadCrumbHeader from '@/components/BreadCrumbHeader'
 import { DialogDescription, DialogTrigger } from '@radix-ui/react-dialog'
 import { fetchAPI } from '@/utils/fetchAPI'
 import { Label } from '@radix-ui/react-dropdown-menu'
-
-export type User = {
-  name: string
-  email: string
-  phoneNumber: string
-  identifyNumber: string
-  addressWallet: string
-  gender: string
-  dateOfBirth: string
-  PIN: string
-  userStatus: string
-  role: string
-  id: string
-}
+import { User } from './(utils)/type'
+import { loadData } from './(functionHandler)/functionHandler'
+import { EUserStatus } from './(utils)/enum'
 
 export default function DataTableDemo() {
   const defaultColumnVisibility = {
@@ -63,14 +52,13 @@ export default function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = React.useState({})
+  const [currentPage, setCurrentPage] = React.useState<number>(1)
+  const [limit, setLimit] = React.useState<number>(10)
 
   React.useEffect(() => {
-    // fetchAPI(`/contracts/get-all-contract-details`, 'GET').then((res) => {
-    //   if (res.status === 200 || res.status === 201) {
-    //     console.log(res.data.contracts)
-    //     setDataTable(res.data.contracts)
-    //   }
-    // })
+    loadData({ currentPage, limit }).then((res) => {
+      setDataTable([...res.users])
+    })
   }, [])
 
   const columnsContracts: ColumnDef<User>[] = [
@@ -118,44 +106,39 @@ export default function DataTableDemo() {
     {
       accessorKey: 'indentifyNumber',
       header: () => <div className='text-center font-semibold'>Indentify Number</div>,
-      cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('indentifyNumber')}</div>
-      )
+      cell: ({ row }) => <div className='text-center font-semibold capitalize'>{row.getValue('indentifyNumber')}</div>
     },
     {
       accessorKey: 'addressWallet',
       header: () => <div className='text-center font-semibold'>Address Wallet</div>,
-      cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('addressWallet')}</div>
-      )
+      cell: ({ row }) => <div className='text-center capitalize'>{row.getValue('addressWallet')}</div>
     },
     {
       accessorKey: 'gender',
       header: () => <div className='text-center font-semibold'>Gender</div>,
-      cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('gender')}</div>
-      )
+      cell: ({ row }) => <div className='text-center capitalize'>{row.getValue('gender')}</div>
     },
     {
       accessorKey: 'dateOfBirth',
       header: () => <div className='text-center font-semibold'>Date Of Birth</div>,
-      cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('dateOfBirth')}</div>
-      )
+      cell: ({ row }) => <div className='text-center capitalize'>{row.getValue('dateOfBirth')}</div>
     },
     {
       accessorKey: 'userStatus',
       header: () => <div className='text-center font-semibold'>User Status</div>,
-      cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('userStatus')}</div>
-      )
+      cell: ({ row }) =>
+        row.getValue('userStatus') === EUserStatus.ACTIVE ? (
+          <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('userStatus')}</div>
+        ) : row.getValue('userStatus') === EUserStatus.BLOCKED ? (
+          <div className='text-center font-semibold capitalize text-red-500'>{row.getValue('userStatus')}</div>
+        ) : (
+          <div className='text-center font-semibold capitalize text-yellow-500'>{row.getValue('userStatus')}</div>
+        )
     },
     {
       accessorKey: 'role',
       header: () => <div className='text-center font-semibold'>Role</div>,
-      cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('role')}</div>
-      )
+      cell: ({ row }) => <div className='text-center font-semibold capitalize'>{row.getValue('role')}</div>
     },
     {
       accessorKey: 'action',
@@ -298,7 +281,7 @@ export default function DataTableDemo() {
             </DialogTrigger>
             <DialogContent className='sm:max-w-[900px]'>
               <DialogHeader>
-                <DialogTitle>Create a new supplier</DialogTitle>
+                <DialogTitle>Create a new user</DialogTitle>
                 <DialogDescription>
                   Please enter complete and valid information. Click save when you done.
                 </DialogDescription>

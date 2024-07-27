@@ -23,53 +23,11 @@ import {
 import { useParams } from 'next/navigation'
 import { fetchAPI } from '@/utils/fetchAPI'
 import Link from 'next/link'
-const image = [
-  'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720TPB/cong-ty-cp-xi-mang-ha-tien-1-651515.jpg',
-  'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720Ymu/cong-ty-co-phan-go-an-cuong-651470.jpg',
-  'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720GWy/magis-stone-1176889.jpg',
-  'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg'
-]
-
-const dataProduct = [
-  {
-    id: 4,
-    name: 'Xi măng Hà Tiên 1',
-    image:
-      'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description: 'Xi măng Hà Tiên 1, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
-  },
-  {
-    id: 5,
-    name: 'Gạch ốp lát Viglacera',
-    image:
-      'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description: 'Gạch ốp lát Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
-  },
-  {
-    id: 6,
-    name: 'Sứ vệ sinh Viglacera',
-    image:
-      'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description: 'Sứ vệ sinh Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
-  },
-  {
-    id: 7,
-    name: 'Kính xây dựng Viglacera',
-    image:
-      'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description: 'Kính xây dựng Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
-  },
-  {
-    id: 8,
-    name: 'Gạch ngói đất sét nung Viglacera',
-    image:
-      'https://gcs.tripi.vn/public-tripi/tripi-feed/img/473720ztl/cong-ty-tnhh-siam-city-cement-viet-nam-651497.jpg',
-    description: 'Gạch ngói đất sét nung Viglacera, chất lượng cao, giá cả hợp lý, đa dạng mẫu mã, màu sắc'
-  }
-]
 
 export default function page() {
   const [isSelectImg, setIsSelectImg] = useState(0)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [limit, setLimit] = useState<number>(5)
   const [isDetail, setIsDetail] = useState(false)
   const [cart, setCart] = useState<any>([])
   const [productDetail, setProductDetail] = useState<any>()
@@ -85,9 +43,11 @@ export default function page() {
         const supplierResponse = await fetchAPI(`/suppliers/${id}`, 'GET')
         setDataSupplier(supplierResponse.data)
 
-        const productResponse = await fetchAPI(`/products/find-all-by-supplier/${id}`, 'GET')
-        setDataProduct(productResponse.data)
-        console.log(productResponse.data)
+        const productResponse = await fetchAPI(
+          `/products/find-all-by-supplier/${id}?page=${currentPage}&limit=${limit}`,
+          'GET'
+        )
+        setDataProduct(productResponse.data.products)
       } catch (error) {
         console.error('Error fetching data:', error)
       }
@@ -115,7 +75,6 @@ export default function page() {
   function openDetailProduct(index: number) {
     setProductDetail(dataProduct[index])
     setIsDetail(true)
-    console.log(dataProduct[index])
   }
   function isAddToCart() {
     setCart([...cart, productDetail])
@@ -133,7 +92,6 @@ export default function page() {
       supplierId: id,
       productId: productDetail.id
     }
-    console.log(payload)
 
     await fetchAPI('/orders', 'POST', payload)
       .then((res) => {
@@ -143,7 +101,6 @@ export default function page() {
             variant: 'success'
           })
           setIsDetail(false)
-          console.log(res)
         }
       })
       .catch((err) => {
@@ -239,44 +196,37 @@ export default function page() {
           </div>
         </div>
       </div>
+
       <div className='container mx-auto px-4 py-12 md:px-6'>
         <Carousel className='w-full'>
           <CarouselContent>
             {dataProduct.map((item: any, index: number) => (
-              <CarouselItem
-                key={index}
-                className='md:basis-1/2 lg:basis-1/4'
-                onClick={(e) => {
-                  openDetailProduct(index)
-                }}
-              >
-                <div className='p-1'>
-                  <Card className='cursor-pointer'>
-                    <CardContent className='flex aspect-square items-center justify-center p-6'>
-                      <div className='h-[300px] overflow-hidden rounded-lg shadow-md dark:bg-zinc-800'>
-                        <img
-                          alt='Product 1'
-                          className='h-40 w-full select-none object-cover'
-                          height='300'
-                          src={
-                            item.images[0]
-                              ? item.images[0].path
-                              : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
-                          }
-                          style={{
-                            aspectRatio: '400/300',
-                            objectFit: 'cover'
-                          }}
-                          width='400'
-                        />
-                        <div className='p-4'>
-                          <h3 className='mb-2 select-none text-lg font-semibold'>{item.name}</h3>
-                          <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
+              <CarouselItem key={index} className='md:basis-1/2 lg:basis-1/4' onClick={() => openDetailProduct(index)}>
+                <div className='h-full p-1'>
+                  <Card
+                    className='flex h-full flex-col overflow-hidden rounded-lg shadow-md transition-transform hover:scale-105 dark:bg-zinc-800'
+                    onClick={() => openDetailProduct(index)}
+                  >
+                    <div className='flex-shrink-0'>
+                      <img
+                        alt={item.name}
+                        className='h-40 w-full object-cover'
+                        height='300'
+                        src={
+                          item.images[0]
+                            ? item.images[0].path
+                            : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
+                        }
+                        style={{
+                          aspectRatio: '400/300'
+                        }}
+                        width='400'
+                      />
+                    </div>
+                    <div className='flex flex-grow flex-col p-4'>
+                      <h3 className='mb-2 select-none text-lg font-semibold'>{item.name}</h3>
+                      <p className='line-clamp-2 select-none text-gray-500 dark:text-gray-400'>{item.description}</p>
+                    </div>
                   </Card>
                 </div>
               </CarouselItem>
@@ -286,6 +236,7 @@ export default function page() {
           <CarouselNext />
         </Carousel>
       </div>
+
       <Dialog open={isDetail} onOpenChange={setIsDetail}>
         <DialogContent className='sm:max-w-[850px]'>
           <div className='mx-auto grid max-w-6xl items-start px-2 py-4 md:grid-cols-2'>

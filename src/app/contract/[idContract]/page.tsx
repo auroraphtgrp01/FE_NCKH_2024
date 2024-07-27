@@ -17,12 +17,14 @@ import {
   EContractType,
   EFunctionCall,
   ERolesOfParticipant,
+  EStageContractStatus,
   IContractAttribute,
   IContractCreateParams,
   IContractDisputeParams,
   IContractParticipant,
   IDisableButton,
   IIndividual,
+  IStage,
   IVisibleButton,
   IVoteRatio,
   InvitationItem
@@ -108,20 +110,11 @@ export default function Dashboard() {
   const [voteRatio, setVoteRatio] = useState<IVoteRatio>(initRatioParticipant)
   const [arbitratorUser, setArbitratorUser] = useState<IContractParticipant[]>()
   const [dialogInvite, setDialogInvite] = useState(false)
-  const [stages, setStages] = useState<any[]>([
-    {
-      percent: 100,
-      deliveryAt: '2024-07-16T00:00:00Z',
-      description: 'This is the stage of the contract'
-    }
-  ])
+  const [stages, setStages] = useState<IStage[]>()
   const [nameFunctionCall, setNameFunctionCall] = useState<EFunctionCall>()
   const [showChat, setShowChat] = useState(false)
   const { idContract } = useParams()
   const Router = useRouter()
-  useEffect(() => {
-    console.log('voteRatio', voteRatio)
-  }, [voteRatio])
   // --------------------------------------------------------------------------------------------------------------------------------------------- //
   // fetchDataWhenEntryPage
   useEffect(() => {
@@ -132,7 +125,8 @@ export default function Dashboard() {
       setAddressContract,
       setContractParticipants,
       setIndividual,
-      setCurrentBalance
+      setCurrentBalance,
+      setStages
     ).then((response) => {
       updateStateButton(
         response?.contractData.contract.status,
@@ -832,7 +826,7 @@ export default function Dashboard() {
                       <div className='flex justify-between'>
                         <CardTitle className='mt-2 text-lg'>Participants</CardTitle>
                         <Button className='pt-2' variant={'outline'}>
-                          <Icons.userRoundPlus />
+                          <Icons.userRoundPlus className='h-4 w-4' />
                         </Button>
                       </div>
                       <Separator />
@@ -845,14 +839,23 @@ export default function Dashboard() {
                               <p className='text-sm font-medium leading-none'>
                                 {participant?.User ? participant?.User?.name : 'No Name'}
                               </p>
-                              <p className='text-[0.7rem] text-muted-foreground'>{participant.email}</p>
+                              <div className='marquee'>
+                                <p className='text-[0.7rem] text-muted-foreground'>
+                                  {participant.email.length > 25
+                                    ? participant.email.substring(0, 23) + '...'
+                                    : participant.email}
+                                </p>
+                              </div>
                             </div>
                             <div className='ml-auto font-medium'>
-                              <Badge variant={handleBadgeColor(participant.status)} className='me-1 translate-y-[-5px]'>
+                              <Badge
+                                variant={handleBadgeColor(participant.status)}
+                                className='me-1 h-8 translate-y-[-5px]'
+                              >
                                 {participant.status}
                               </Badge>
-                              <Button className='px-2' variant={'destructive'}>
-                                <Icons.shieldPlus />
+                              <Button className='h-8 px-2' variant={'destructive'}>
+                                <Icons.shieldPlus className='h-5 w-5' />
                               </Button>
                             </div>
                           </div>

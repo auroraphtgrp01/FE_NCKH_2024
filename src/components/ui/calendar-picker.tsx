@@ -36,7 +36,7 @@ export function CalendarPicker({ selectedDate, onDateChange }: DatePicker) {
           </SelectContent>
         </Select>
         <div className='rounded-md border'>
-          <Calendar mode='single' selected={selectedDate} onSelect={onDateChange} />
+          <Calendar mode='range' selected={selectedDate as any} onSelect={onDateChange} />
         </div>
       </PopoverContent>
     </Popover>

@@ -27,62 +27,39 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Link from 'next/link'
 import BreadCrumbHeader from '@/components/BreadCrumbHeader'
-import { DialogDescription, DialogOverlay, DialogPortal, DialogTrigger } from '@radix-ui/react-dialog'
-import { fetchAPI } from '@/utils/fetchAPI'
+import { DialogDescription, DialogTrigger } from '@radix-ui/react-dialog'
 import { Label } from '@radix-ui/react-dropdown-menu'
 
-export interface Participant {
-  userName: string
+export type Supplier = {
   id: string
-  email: string
-  status: string
-}
-
-export type Contract = {
-  id: string
-  contractAddress: string
   name: string
-  status: string
-  type: string
+  taxCode: string
   email: string
+  phoneNumber: string
+  address: string
+  description: string
 }
 
 export default function DataTableDemo() {
-  const [dataTable, setDataTable] = React.useState<Contract[]>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [participants, setParticipants] = React.useState<Participant[]>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-
-  React.useEffect(() => {
-    fetchAPI(`/contracts/get-all-contract-details`, 'GET').then((res) => {
-      if (res.status === 200 || res.status === 201) {
-        console.log(res.data.contracts)
-        setDataTable(res.data.contracts)
-      }
-    })
-  }, [])
-  async function handleOpenParticipant(contractId: string) {
-    const response = await fetchAPI(`/participants/find-all/${contractId}`, 'GET')
-    console.log(response.data)
-    const data: Participant[] = await Promise.all(
-      response.data.map((item: any) => {
-        const result: Participant = {
-          id: item.id,
-          email: item.email,
-          userName: item.User.name,
-          status: item.status
-        }
-        return result
-      })
-    )
-    setParticipants(data)
-    setIsOpen(true)
+  const defaultColumnVisibility = {
+    id: true,
+    name: true,
+    taxCode: true,
+    email: true,
+    phoneNumber: true,
+    address: true,
+    description: true
   }
 
-  const columnsContracts: ColumnDef<Contract>[] = [
+  const [dataTable, setDataTable] = React.useState<Supplier[]>([])
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<any>(defaultColumnVisibility)
+  const [rowSelection, setRowSelection] = React.useState({})
+
+  React.useEffect(() => {}, [])
+
+  const columnsSuppier: ColumnDef<Supplier>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -103,46 +80,59 @@ export default function DataTableDemo() {
       enableHiding: false
     },
     {
-      accessorKey: 'contractAddress',
-      header: ({ column }) => <div className='font-semibold'>Address Contract</div>,
+      accessorKey: 'name',
+      header: ({ column }) => <div className='font-semibold'>Name</div>,
       cell: ({ row }) => (
         <div className='text-start'>
-          {row.getValue('contractAddress') !== undefined || row.getValue('contractAddress') !== ''
-            ? row.getValue('contractAddress')
+          {row.getValue('name') !== undefined || row.getValue('name') !== ''
+            ? row.getValue('name')
             : 'Not yet deployed'}
         </div>
       )
     },
     {
-      accessorKey: 'contractTitle',
-      header: ({ column }) => <div className='font-semibold'>Contract Title</div>,
-      cell: ({ row }) => <div className='text-start'>{row.getValue('contractTitle')}</div>
+      accessorKey: 'taxCode',
+      header: ({ column }) => <div className='font-semibold'>Tax Code</div>,
+      cell: ({ row }) => <div className='text-start'>{row.getValue('taxCode')}</div>
     },
     {
-      accessorKey: 'type',
+      accessorKey: 'email',
       enableHiding: true,
-      header: ({ column }) => <div className='font-semibold'>Type</div>,
-      cell: ({ row }) => <div className='text-start'>{row.getValue('type')}</div>
+      header: ({ column }) => <div className='font-semibold'>Email</div>,
+      cell: ({ row }) => <div className='text-start'>{row.getValue('email')}</div>
     },
     {
-      accessorKey: 'status',
-      header: () => <div className='text-center font-semibold'>Status</div>,
+      accessorKey: 'phoneNumber',
+      header: () => <div className='text-center font-semibold'>Phone Number</div>,
       cell: ({ row }) => (
-        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('status')}</div>
+        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('phoneNumber')}</div>
       )
     },
     {
-      accessorKey: 'id',
+      accessorKey: 'address',
+      header: () => <div className='text-center font-semibold'>Address</div>,
+      cell: ({ row }) => (
+        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('address')}</div>
+      )
+    },
+    {
+      accessorKey: 'description',
+      header: () => <div className='text-center font-semibold'>Description</div>,
+      cell: ({ row }) => (
+        <div className='text-center font-semibold capitalize text-green-500'>{row.getValue('description')}</div>
+      )
+    },
+    {
+      accessorKey: 'action',
       header: () => <div className='text-center font-semibold'>Action</div>,
       cell: ({ row }) => (
         <div className='text-center'>
-          {/* <Button onClick={() => handleOpenParticipant(row.getValue('id'))}>Participants</Button> */}
           <Link href={``}>
             <Dialog>
               <DialogTrigger asChild>
                 <Button>Update</Button>
               </DialogTrigger>
-              <DialogContent className='sm:max-w-[425px]'>
+              <DialogContent className='sm:max-w-[500px]'>
                 <DialogHeader>
                   <DialogTitle>Update</DialogTitle>
                   <DialogDescription>
@@ -206,47 +196,9 @@ export default function DataTableDemo() {
     }
   ]
 
-  const columnsParticipants: ColumnDef<Participant>[] = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label='Select all'
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label='Select row'
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
-    {
-      accessorKey: 'userName',
-      header: ({ column }) => <div className='font-semibold'>User Name</div>,
-      cell: ({ row }) => <div className='font-semibold capitalize'>{row.getValue('userName')}</div>
-    },
-
-    {
-      accessorKey: 'email',
-      header: () => <div className='font-semibold'>Email</div>,
-      cell: ({ row }) => <div className='font-semibold capitalize'>{row.getValue('email')}</div>
-    },
-    {
-      accessorKey: 'status',
-      header: () => <div className='font-semibold'>Status</div>,
-      cell: ({ row }) => <div className='font-semibold capitalize'>{row.getValue('status')}</div>
-    }
-  ]
-
-  const tableContracts = useReactTable({
+  const tableSupplier = useReactTable({
     data: dataTable,
-    columns: columnsContracts,
+    columns: columnsSuppier,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -262,26 +214,6 @@ export default function DataTableDemo() {
       rowSelection
     }
   })
-
-  const tableParticipants = useReactTable({
-    data: participants,
-    columns: columnsParticipants,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection
-    }
-  })
-
   return (
     <div className='w-full'>
       <header className='sticky top-0 z-30 flex h-10 items-center gap-4 border-b bg-background'>
@@ -294,16 +226,11 @@ export default function DataTableDemo() {
       <div className='flex items-center py-4'>
         <Input
           placeholder='Filter emails...'
-          value={(tableContracts.getColumn('id')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => tableContracts.getColumn('id')?.setFilterValue(event.target.value)}
+          value={(tableSupplier.getColumn('id')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => tableSupplier.getColumn('id')?.setFilterValue(event.target.value)}
           className='max-w-sm'
         />
         <div className='ml-auto'>
-          {/* <Link href={'#'}>
-            <Button className='me-3' variant={'destructive'}>
-              Create a new Contract
-            </Button>
-          </Link> */}
           <Dialog>
             <DialogTrigger asChild>
               <Button className='mr-3' variant={'destructive'}>
@@ -367,7 +294,7 @@ export default function DataTableDemo() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
-              {tableContracts
+              {tableSupplier
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => (
@@ -387,7 +314,7 @@ export default function DataTableDemo() {
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
-            {tableContracts.getHeaderGroups().map((headerGroup) => (
+            {tableSupplier.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
@@ -398,8 +325,8 @@ export default function DataTableDemo() {
             ))}
           </TableHeader>
           <TableBody>
-            {tableContracts.getRowModel().rows?.length ? (
-              tableContracts.getRowModel().rows.map((row) => (
+            {tableSupplier.getRowModel().rows?.length ? (
+              tableSupplier.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
@@ -408,7 +335,7 @@ export default function DataTableDemo() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columnsContracts.length} className='h-24 text-center'>
+                <TableCell colSpan={columnsSuppier.length} className='h-24 text-center'>
                   No results.
                 </TableCell>
               </TableRow>
@@ -418,78 +345,20 @@ export default function DataTableDemo() {
       </div>
       <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='flex-1 text-sm text-muted-foreground'>
-          Page {tableContracts.getState().pagination.pageIndex + 1} of {tableContracts.getPageCount()}
+          Page {tableSupplier.getState().pagination.pageIndex + 1} of {tableSupplier.getPageCount()}
         </div>
         <Button
           variant='outline'
-          onClick={() => tableContracts.previousPage()}
-          disabled={!tableContracts.getCanPreviousPage()}
+          onClick={() => tableSupplier.previousPage()}
+          disabled={!tableSupplier.getCanPreviousPage()}
         >
           Previous
         </Button>
-        <Button variant='outline' onClick={() => tableContracts.nextPage()} disabled={!tableContracts.getCanNextPage()}>
+        <Button variant='outline' onClick={() => tableSupplier.nextPage()} disabled={!tableSupplier.getCanNextPage()}>
           Next
         </Button>
       </div>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogPortal>
-          <DialogOverlay>
-            <DialogContent
-              className='min-w-[800px] p-8'
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  e.preventDefault()
-                }
-              }}
-            >
-              <DialogHeader>
-                <DialogTitle>Individuals involved in the contract</DialogTitle>
-                <div className='text-sm text-muted-foreground'>
-                  The information here is extracted from the database. You can re-fetch it from the chain-network
-                  <div className='mt-3 rounded-md border'>
-                    <Table>
-                      <TableHeader>
-                        {tableParticipants.getHeaderGroups().map((headerGroup) => (
-                          <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                              return (
-                                <TableHead key={header.id}>
-                                  {header.isPlaceholder
-                                    ? null
-                                    : flexRender(header.column.columnDef.header, header.getContext())}
-                                </TableHead>
-                              )
-                            })}
-                          </TableRow>
-                        ))}
-                      </TableHeader>
-                      <TableBody>
-                        {tableParticipants.getRowModel().rows?.length ? (
-                          tableParticipants.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                              {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id}>
-                                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </TableCell>
-                              ))}
-                            </TableRow>
-                          ))
-                        ) : (
-                          <TableRow>
-                            <TableCell colSpan={columnsParticipants.length} className='h-24 text-center'>
-                              No results.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-              </DialogHeader>
-            </DialogContent>
-          </DialogOverlay>
-        </DialogPortal>
-      </Dialog>
+      /
     </div>
   )
 }

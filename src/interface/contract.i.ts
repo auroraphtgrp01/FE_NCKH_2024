@@ -16,7 +16,8 @@ export enum EContractAttributeType {
   CONTRACT_HEADING_1 = 'Contract Heading 1',
   CONTRACT_HEADING_2 = 'Contract Heading 2',
   CONTRACT_ATTRIBUTE = 'Contract Attribute',
-  CONTRACT_SIGNATURE = 'Contract Signature'
+  CONTRACT_SIGNATURE = 'Contract Signature',
+  CONTRACT_PAYMENT_STAGE = 'Contract payment stage'
 }
 export enum EContractAttributeTypeAdditional {
   CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED = 'Contract Attribute Party Address Wallet Joined',
@@ -29,7 +30,8 @@ export enum EContractAttributeTypeAdditional {
   CONTRACT_HEADING_1 = 'Contract Heading 1',
   CONTRACT_HEADING_2 = 'Contract Heading 2',
   CONTRACT_ATTRIBUTE = 'Contract Attribute',
-  CONTRACT_SIGNATURE = 'Contract Signature'
+  CONTRACT_SIGNATURE = 'Contract Signature',
+  CONTRACT_PAYMENT_STAGE = 'Contract payment stage'
 }
 export enum EContractAttributeTypeAdditionalHeader {
   CONTRACT_HEADER = 'Contract Header',
@@ -46,6 +48,7 @@ export interface IContractAttribute {
   statusAttribute?: EStatusAttribute
   createdBy?: Executor
   updatedBy?: Executor | null
+  descriptionOfStage?: string // for contract payment stage
 }
 export enum EStatusAttribute {
   CREATE = 'Create',
@@ -379,4 +382,9 @@ export interface IWithdrawMoneyDisputeContractParams {
   setUserInfo: Dispatch<SetStateAction<UserInfoData>>
   setIsDisableButton: Dispatch<SetStateAction<IDisableButton>>
   contractData: ContractData
+}
+
+export interface IInputValue {
+  property: string
+  value?: string
 }

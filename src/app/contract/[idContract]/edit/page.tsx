@@ -49,11 +49,12 @@ export default function DialogEditContract() {
       getData(idContract as string)
     }
   }, [idContract, getData])
-  useEffect(() => {
-    console.log(contractAttribute)
-  }, [contractAttribute])
 
-  const handleChangeAttributeInput = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleChangeAttributeInput = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    isPercentOfStage?: boolean
+  ) => {
     const updatedAttributes = [...contractAttribute]
     const attributeToUpdate = updatedAttributes[index]
 
@@ -68,6 +69,17 @@ export default function DialogEditContract() {
         ...attributeToUpdate,
         property: e.target.value
       }
+    } else if (attributeToUpdate.type === EContractAttributeType.CONTRACT_PAYMENT_STAGE) {
+      if (isPercentOfStage === undefined || isPercentOfStage === false)
+        updatedAttributes[index] = {
+          ...attributeToUpdate,
+          property: e.target.value
+        }
+      else
+        updatedAttributes[index] = {
+          ...attributeToUpdate,
+          value: e.target.value
+        }
     } else {
       updatedAttributes[index] = {
         ...attributeToUpdate,
@@ -79,10 +91,18 @@ export default function DialogEditContract() {
   const handleValueOfTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
     const updatedAttributes = [...contractAttribute]
     const attributeToUpdate = updatedAttributes[index]
-    updatedAttributes[index] = {
-      ...attributeToUpdate,
-      value: e.target.value
-    }
+    if (attributeToUpdate.type === EContractAttributeType.CONTRACT_PAYMENT_STAGE) {
+      updatedAttributes[index] = {
+        ...attributeToUpdate,
+        descriptionOfStage: e.target.value,
+        statusAttribute: EStatusAttribute.UPDATE
+      }
+    } else
+      updatedAttributes[index] = {
+        ...attributeToUpdate,
+        value: e.target.value,
+        statusAttribute: EStatusAttribute.UPDATE
+      }
     setContractAttribute(updatedAttributes)
   }
   function compareChangesOfContractAttribute() {
@@ -119,14 +139,14 @@ export default function DialogEditContract() {
         Router.push(`/contract/${idContract}`)
         toast({
           title: 'Update Successfully',
-          description: 'Your changes have been saved successfully',
+          description: response.data.message,
           variant: 'default'
         })
       })
       .catch((error) => {
         toast({
           title: 'Update Failed',
-          description: 'Your changes have not been saved successfully',
+          description: error.response.data.message,
           variant: 'destructive'
         })
       })
@@ -299,6 +319,47 @@ export default function DialogEditContract() {
                                     }}
                                     className='mr-auto'
                                     defaultValue={item.value}
+                                  />
+                                </span>
+                              </h2>
+                            </div>
+                          )}
+                          {item.type === EContractAttributeType.CONTRACT_PAYMENT_STAGE && (
+                            <div>
+                              <h2 className='mt-2 flex w-full text-[14px]'>
+                                <b className=''>
+                                  <InputWithTooltip
+                                    deleteArray={deleteArray}
+                                    setDeleteArray={setDeleteArray}
+                                    setInfoOfContractAttribute={setInfoOfContractAttribute}
+                                    setIsDetailOpen={setIsDetailAttributeDialog}
+                                    setContractAttribute={setContractAttribute}
+                                    contractAttribute={contractAttribute}
+                                    index={index}
+                                    defaultValue={item.property}
+                                    description={''}
+                                    onBlur={(e) => {
+                                      handleChangeAttributeInput(e, index)
+                                    }}
+                                  />
+                                </b>
+                                <span className='ms-2 w-[15%] text-wrap'>
+                                  <Input
+                                    onBlur={(e) => {
+                                      handleChangeAttributeInput(e, index, true)
+                                    }}
+                                    className='mr-auto'
+                                    defaultValue={item.value}
+                                    type='number'
+                                  ></Input>
+                                </span>
+                                <span className='ms-2 w-[65%] text-wrap'>
+                                  <Textarea
+                                    onBlur={(e) => {
+                                      handleValueOfTextarea(e, index)
+                                    }}
+                                    className='mr-auto'
+                                    defaultValue={item.descriptionOfStage}
                                   />
                                 </span>
                               </h2>

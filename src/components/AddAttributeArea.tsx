@@ -16,12 +16,14 @@ import {
   EContractAttributeTypeAdditional,
   EContractAttributeTypeAdditionalHeader,
   EStatusAttribute,
-  IContractAttribute
+  IContractAttribute,
+  IInputValue
 } from '@/interface/contract.i'
 import { useToast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
 import { IContractParticipant } from '../interface/contract.i'
 import { getIndividualFromParticipant } from '@/app/contract/[idContract]/(functionHandler)/functionHandler'
+import { set } from 'react-hook-form'
 
 export default function AddAttributeArea({
   contractAttribute,
@@ -66,9 +68,10 @@ export default function AddAttributeArea({
       setContractAttributeType(contractAttributeTypeArray)
     }
   }, [contractAttribute])
+
   const { toast } = useToast()
   const [SelectType, setSelectType] = useState<EContractAttributeType>()
-  const [inputValue, setInputValue] = useState<any>('')
+  const [inputValue, setInputValue] = useState<IInputValue>({ property: '' })
   const [textArea, setTextArea] = useState<string>('')
   function handleAddAttribute() {
     if (
@@ -93,19 +96,22 @@ export default function AddAttributeArea({
             ? individual?.sender?.User.addressWallet
             : SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
               ? individual?.receiver?.User.addressWallet
-              : inputValue,
+              : SelectType === EContractAttributeType.CONTRACT_PAYMENT_STAGE
+                ? inputValue.value
+                : inputValue.property,
       property:
         SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE ||
         SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_JOINED ||
         SelectType === EContractAttributeType.TOTAL_AMOUNT ||
         SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND ||
-        SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE
-          ? inputValue
+        SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_RECEIVE ||
+        SelectType === EContractAttributeType.CONTRACT_PAYMENT_STAGE
+          ? inputValue.property
           : undefined,
+      descriptionOfStage: SelectType === EContractAttributeType.CONTRACT_PAYMENT_STAGE ? textArea : undefined,
       type: SelectType as EContractAttributeType,
       statusAttribute: EStatusAttribute.CREATE
     }
-    console.log(newContractAttribute)
 
     const partyAttributeArr = [
       {
@@ -142,11 +148,11 @@ export default function AddAttributeArea({
     if (!index) {
       if (SelectType === EContractAttributeType.CONTRACT_PARTY_INFO) {
         setContractAttribute([...contractAttribute, ...partyAttributeArr])
-        setInputValue('')
+        setInputValue({ property: '' })
         setTextArea('')
       } else {
         setContractAttribute([...contractAttribute, newContractAttribute])
-        setInputValue('')
+        setInputValue({ property: '' })
         setTextArea('')
       }
     } else {
@@ -155,18 +161,19 @@ export default function AddAttributeArea({
         newContractAttributeArray.splice(index, 0, ...partyAttributeArr)
         newContractAttributeArray.splice(index + 6, 1)
         setContractAttribute(newContractAttributeArray)
-        setInputValue('')
+        setInputValue({ property: '' })
         setTextArea('')
       } else {
         const newContractAttributeArray = [...contractAttribute]
         newContractAttributeArray.splice(index, 0, newContractAttribute)
         newContractAttributeArray.splice(index + 1, 1)
         setContractAttribute(newContractAttributeArray)
-        setInputValue('')
+        setInputValue({ property: '' })
         setTextArea('')
       }
     }
-    setInputValue('')
+    setSelectType(undefined)
+    setInputValue({ property: '', value: '' })
     setTextArea('')
   }
   return (
@@ -176,9 +183,10 @@ export default function AddAttributeArea({
           <Input
             className='w-[32%]'
             onChange={(e) => {
-              setInputValue(e.target.value)
+              setInputValue({ property: e.target.value })
             }}
-            value={inputValue}
+            placeholder='Property'
+            value={inputValue.property}
           />
         )}
         <Select
@@ -215,6 +223,29 @@ export default function AddAttributeArea({
             className='mt-2 w-[100%]'
             value={textArea}
           />
+        </div>
+      )}
+      {SelectType === EContractAttributeType.CONTRACT_PAYMENT_STAGE && (
+        <div className='flex flex-col'>
+          <div className='mt-2 flex w-full'>
+            <Input
+              onChange={(e) => {
+                setInputValue({ ...inputValue, value: e.target.value })
+              }}
+              className='mr-2 w-[15%]'
+              type='number'
+              placeholder='(%)'
+              value={inputValue.value}
+            />
+            <Textarea
+              onChange={(e) => {
+                setTextArea(e.target.value)
+              }}
+              placeholder='Description of Stage'
+              className='w-[85%]'
+              value={textArea}
+            />
+          </div>
         </div>
       )}
       {SelectType === EContractAttributeType.CONTRACT_ATTRIBUTE_PARTY_ADDRESS_WALLET_SEND && (

@@ -31,8 +31,8 @@ export type RegisterResType = z.TypeOf<typeof RegisterRes>
 
 export const LoginBody = z
   .object({
-    email: z.string().email(),
-    password: z.string().min(6).max(100)
+    addressWallet: z.string().length(42),
+    PIN: z.string().length(6)
   })
   .strict()
 

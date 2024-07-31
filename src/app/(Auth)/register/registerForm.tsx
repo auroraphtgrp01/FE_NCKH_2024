@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { PIN, PINType, RegisterBody, RegisterBodyType } from '@/validateSchema/Authentication.validate'
+import { LoginBody, PIN, PINType, RegisterBody, RegisterBodyType } from '@/validateSchema/Authentication.validate'
 import {
   Select,
   SelectContent,
@@ -37,6 +37,7 @@ import { DialogOverlay, DialogPortal } from '@radix-ui/react-dialog'
 import { set } from 'date-fns'
 import usePreventLeave from 'react-hook-use-prevent-leave'
 import { useRouter } from 'next/navigation'
+import Web3 from 'web3'
 
 export default function RegisterForm() {
   const [blockPage, setBlockPage] = React.useState<boolean>(true)
@@ -70,15 +71,18 @@ export default function RegisterForm() {
       setIsOpen(true)
     }, 100)
   }
-  function updatePIN(values: z.infer<typeof PIN>) {
-    fetchAPI(`/users/pin/${registerId}`, 'PATCH', values)
-      .then((res) => {
-        toast({
-          title: 'Register Success',
-          description: 'Register Success. Please login to continue.',
-          variant: 'default'
-        })
-        Router.push('/')
+  async function updatePIN(values: z.infer<typeof PIN>) {
+    await fetchAPI(`/users/pin/${registerId}`, 'PATCH', values)
+      .then(async (res) => {
+        if (res.status === 200 || res.status === 201) {
+          toast({
+            title: 'Register Success',
+            description: 'Register account Success',
+            variant: 'default'
+          })
+          await login({ addressWallet: userInfo?.accounts, PIN: values.PIN })
+          Router.push('/')
+        }
       })
       .catch((err) => {
         toast({
@@ -89,21 +93,58 @@ export default function RegisterForm() {
       })
     setIsOpen(false)
   }
-  function onSubmit(values: z.infer<typeof RegisterBody>) {
+  async function login(values: z.infer<typeof LoginBody>) {
+    const login = await fetchAPI('/auth/login', 'POST', {
+      addressWallet: values.addressWallet,
+      PIN: values.PIN
+    })
+    if (login.status == 201) {
+      const web3 = new Web3(window.ethereum)
+      const balance = await web3.eth.getBalance(login.data.addressWallet)
+      const balanceEth = web3.utils.fromWei(balance, 'ether')
+      setUserInfo({
+        data: login.data,
+        balance: Number(balanceEth).toFixed(3)
+      })
+      localStorage.setItem(
+        'user-info',
+        JSON.stringify({
+          data: login.data,
+          balance: Number(balanceEth).toFixed(3)
+        })
+      )
+
+      setIsOpen(false)
+      toast({
+        title: 'Login success',
+        description: 'You have successfully logged in',
+        variant: 'success',
+        duration: 2000
+      })
+    } else {
+      toast({
+        title: 'Login failed',
+        description: 'Please check your PIN code',
+        variant: 'destructive',
+        duration: 2000
+      })
+    }
+  }
+
+  async function onSubmit(values: z.infer<typeof RegisterBody>) {
     if (!date || !userInfo?.accounts)
       return toast({
         title: 'Empty Field',
         description: 'Please fill all field to register account',
         variant: 'destructive'
       })
-    console.log(values)
 
     const payload = {
       ...values,
       dateOfBirth: date?.toISOString(),
       addressWallet: userInfo?.accounts
     }
-    fetchAPI('/auth/register', 'POST', payload)
+    await fetchAPI('/auth/register', 'POST', payload)
       .then((res) => {
         if (res.status === 201) {
           setRegisterId(res.data.id)
@@ -118,7 +159,7 @@ export default function RegisterForm() {
         })
       })
   }
-  function handleSubmit(values: z.infer<typeof RegisterBody>) {}
+  // function handleSubmit(values: z.infer<typeof RegisterBody>) {}
   return (
     <div>
       <Card>

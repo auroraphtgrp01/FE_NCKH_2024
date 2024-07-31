@@ -61,6 +61,15 @@ export default function PreviewContract({
                       </h2>
                     </div>
                   )}
+                  {item.type === EContractAttributeType.CONTRACT_PAYMENT_STAGE && (
+                    <div>
+                      <h2 className='mt-2 text-justify text-[14px]'>
+                        - <b className='ms-1'>{item.property}</b>: <span className='text-wrap'>{item.value}%</span>
+                        <br />
+                        <span>{item.descriptionOfStage}</span>
+                      </h2>
+                    </div>
+                  )}
                   {item.type === EContractAttributeType.TOTAL_AMOUNT && (
                     <div>
                       <h2 className='mt-2 text-justify text-[14px]'>

@@ -48,7 +48,10 @@ const InputWithTooltip = React.forwardRef<HTMLInputElement, IInputWithTooltipPro
       setContractAttribute(newContractAttributeArray)
     }
     const handleDeleteItem = () => {
-      setDeleteArray([...(deleteArray as any), contractAttribute[index].id])
+      setDeleteArray([
+        ...(deleteArray as any),
+        { id: contractAttribute[index].id, type: contractAttribute[index].type }
+      ])
       const newContractAttributeArray = [...contractAttribute]
       newContractAttributeArray.splice(index, 1)
       setContractAttribute(newContractAttributeArray)

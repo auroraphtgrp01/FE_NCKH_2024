@@ -82,7 +82,7 @@ Compared to other products on the market, such as VNPT's eContract, our project 
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-repo.git
+   git clone https://github.com/your-repo.git](https://github.com/auroraphtgrp01/FE_NCKH_2024
 Install dependencies:
 
 bash

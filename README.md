@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Supply Chain Management System with Blockchain Integration
 
-## Getting Started
+This project aims to address the existing issues in supply chain management by applying blockchain technology and smart contracts. The primary focus is on securing data, reducing the need for intermediaries, and overcoming geographical barriers in business operations.
 
-First, run the development server:
+## 🎯 **Project Objectives**
 
-```bash
+With the current challenges and existing problems in the real-world supply chain, our project aims to achieve the following goals:
+
+- **Data Security and Integrity:** Prevent data tampering, fraud, or unauthorized changes for personal gain.
+- **Geographical Optimization:** Allow people from different locations worldwide to communicate and participate in a contract.
+- **Dispute Resolution:** Minimize the role of intermediaries and efficiently resolve contract disputes.
+
+To accomplish these objectives, we propose the following solution:
+
+### 🚀 **Solution: Blockchain and Smart Contracts**
+
+We implement blockchain and smart contracts to resolve issues related to contract data protection, minimize the role of intermediaries, reduce costs, and eliminate geographical barriers in supply chain management system operations.
+
+## 📦 **Supply Chain Overview**
+
+### **What is a Supply Chain?**
+
+The supply chain, also known as the chain of supply, encompasses a series of activities and processes related to producing, transporting, and distributing products from suppliers to the final customers. This process covers everything from sourcing raw materials to delivering the finished product to the customer.
+
+### **Key Operations**
+
+In the supply chain, multiple operations are interconnected, including sales, production, promotion, payment, and distribution. In this project, we focus on two critical operations: **Sales** and **Payment**.
+
+## 💻 **Technology Stack**
+
+- **Frontend:** Next.js, ShadcnUI, TailwindCSS
+- **Blockchain Integration:** Web3.js
+- **Real-time Communication:** WebSocket
+- **Programming Language:** TypeScript
+
+## ⚙️ **System Workflow**
+
+1. **Contract Creation:**
+   - Users create a contract, inviting relevant individuals such as corporate lawyers, secretaries, and accountants with specific roles and permissions.
+   - Once a blank contract is created, an invitation is sent to involved users via email.
+
+2. **Contract Development:**
+   - Participants collaboratively edit and finalize the contract.
+   - The contract is then deployed on a blockchain network, and both parties sign the contract using digital signatures.
+
+3. **Payment and Contract Execution:**
+   - The buyer transfers tokens to the contract based on the agreed value.
+   - If the buyer does not transfer the payment within the specified time, the contract is terminated unconditionally.
+   - Once the payment is made, the involved parties fulfill their obligations according to the contract.
+   - The seller confirms the completion of their contractual obligations.
+
+4. **Dispute Resolution:**
+   - The system requests confirmation from the buyer.
+   - If the buyer agrees, the contract automatically enables the withdrawal feature based on the agreement.
+   - If the buyer disagrees, a dispute contract is initiated, involving a third party.
+   - An economic arbitrator will assess the situation and decide based on a 49-51 voting mechanism.
+   - The third-party decision is final, and tokens are unlocked according to the regulations.
+
+## 🔄 **Key Differences from Existing Products**
+
+Compared to other products on the market, such as VNPT's eContract, our project addresses several shortcomings:
+
+- **Data Integrity:** Contracts are stored as images and hashed, which makes it impossible to automatically compare data if there are changes in the database.
+- **Automation:** Our system supports automatic payment processing and reduces the role of third parties.
+
+## 🎉 **Achieved Results**
+
+- **Blockchain and Smart Contracts:** Successful implementation in the system to resolve existing issues.
+- **Automation:** Automating contract execution and payment processes.
+- **Risk Reduction:** Minimizing fraud, risks, and reliance on third parties.
+- **Cost Efficiency:** Addressing issues related to costs and geographical barriers.
+- **Environmental Protection:** Reducing paper usage and enhancing idea communication efficiency.
+
+## 🛠 **Pending Challenges**
+
+- **Time Constraints:** Lack of time to complete a comprehensive system.
+- **Supply Chain Operations:** Not all supply chain operations have been applied.
+- **KYC Integration:** KYC has yet to be implemented in the system.
+- **Intermediary Role in Disputes:** In cases of disputes, the role of intermediaries still exists, and further research is needed to minimize dependence on them.
+
+## 📄 **How to Get Started**
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-repo.git
+Install dependencies:
+
+bash
+Copy code
+cd your-project
+npm install
+Start the development server:
+
+bash
+Copy code
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Deploy the smart contracts:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ensure you have a blockchain network running (e.g., Ganache or any testnet).
+Deploy your smart contracts using the Web3.js library.
+Connect the frontend with the blockchain network:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Integrate the Web3.js configuration in your Next.js application.
+📝 Contributing
+We welcome contributions from the community. Please read our contributing guidelines for more information on how to get involved.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+📜 License
+This project is licensed under the MIT License.
